@@ -76,21 +76,21 @@ public class DataStorage {
         if (isContainerLoaded(id)) {
             getCachedStorageData(id).ifPresent(data -> data.setPlaced(isPlaced));
         }
-        dataSource.updateContainer(id, "IsPlaced", String.valueOf(isPlaced ? 1 : 0));
+        dataSource.updateContainerIsPlaced(id, isPlaced ? 1 : 0);
     }
 
     public static void setContainerSizeType(int id, @NotNull StorageUnitType type) {
         if (isContainerLoaded(id)) {
             getCachedStorageData(id).ifPresent(data -> data.setSizeType(type));
         }
-        dataSource.updateContainer(id, "SizeType", String.valueOf(type.ordinal()));
+        dataSource.updateContainerSizeType(id, type.ordinal());
     }
 
     public static void setContainerLocation(int id, @NotNull Location l) {
         if (isContainerLoaded(id)) {
             getCachedStorageData(id).ifPresent(data -> data.setLastLocation(l));
         }
-        dataSource.updateContainer(id, "LastLocation", formatLocation(l));
+        dataSource.updateContainerLastLocation(id, formatLocation(l));
     }
 
     // This will not update the current data cache!
