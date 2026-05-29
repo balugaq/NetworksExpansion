@@ -1091,7 +1091,6 @@ public class NetworksMain implements TabExecutor {
                             return true;
                         }
                         player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "amount"));
-                        player.sendMessage(e.getMessage());
                     }
 
                     return true;
@@ -1138,7 +1137,6 @@ public class NetworksMain implements TabExecutor {
                             return true;
                         }
                         player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "amount"));
-                        player.sendMessage(e.getMessage());
                     }
 
                     return true;
@@ -1160,7 +1158,6 @@ public class NetworksMain implements TabExecutor {
                         addStorageItem(player, amount);
                     } catch (NumberFormatException e) {
                         player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "amount"));
-                        player.sendMessage(e.getMessage());
                     }
 
                     return true;
@@ -1183,7 +1180,6 @@ public class NetworksMain implements TabExecutor {
                         reduceStorageItem(player, amount);
                     } catch (NumberFormatException e) {
                         player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "amount"));
-                        player.sendMessage(e.getMessage());
                     }
 
                     return true;
@@ -1206,7 +1202,6 @@ public class NetworksMain implements TabExecutor {
                         setContainerId(player, containerId);
                     } catch (NumberFormatException e) {
                         player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "containerId"));
-                        player.sendMessage(e.getMessage());
                     }
 
                     return true;
@@ -1301,7 +1296,6 @@ public class NetworksMain implements TabExecutor {
                                     worldeditBlockMenuSetSlot(player, slot);
                                 } catch (NumberFormatException e) {
                                     player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "slot"));
-                                    player.sendMessage(e.getMessage());
                                 }
                             } else {
                                 player.sendMessage(getErrorMessage(ErrorType.MISSING_REQUIRED_ARGUMENT, "subCommand"));
