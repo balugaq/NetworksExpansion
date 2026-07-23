@@ -326,7 +326,7 @@
         <dependency>
             <groupId>dev.sefiraat</groupId>
             <artifactId>SefiLib</artifactId>
-            <version>0.2.6</version>
+            <version>0.3.0</version>
             <scope>compile</scope>
         </dependency>
         <!-- Support FluffyMachines -->
