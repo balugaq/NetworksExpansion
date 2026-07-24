@@ -281,7 +281,7 @@
         <dependency>
             <groupId>com.bgsoftware</groupId>
             <artifactId>WildChestsAPI</artifactId>
-            <version>2024.1</version>
+            <version>2026.2</version>
             <scope>provided</scope>
         </dependency>
         <!-- Support WildStacker -->
