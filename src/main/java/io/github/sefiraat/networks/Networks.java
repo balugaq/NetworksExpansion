@@ -140,7 +140,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
 
         this.supportedPluginManager = new SupportedPluginManager();
 
-        // Try connect database
+        // Try to connect database
         getLogger().info(getLocalizationService().getString("messages.startup.connecting-database"));
         try {
             dataSource = new DataSource();
@@ -186,7 +186,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
                 1,
                 Slimefun.getTickerTask().getTickRate());
 
-        // Fix dupe bug which break the network controller data without player interaction
+        // Fix dupe bug where player breaks the network controller data without player interaction
         Bukkit.getScheduler()
             .runTaskTimer(
                 this,
