@@ -55,7 +55,7 @@ dependencies {
     compileOnly("com.bgsoftware:WildChestsAPI:2024.1")
     compileOnly("com.bgsoftware:WildStackerAPI:2023.2")
     compileOnly("dev.rosewood:rosestacker:1.5.23")
-    compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.2.017") {
+    compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.3.000") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldguard", "worldguard-legacy")
