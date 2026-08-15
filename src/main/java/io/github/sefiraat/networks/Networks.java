@@ -115,6 +115,8 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     public void onEnable() {
         instance = this;
 
+        loadLibraries();
+
         getLogger().info("Loading language");
         this.configManager = new ConfigManager();
         this.localizationService = new LocalizationService(this);
