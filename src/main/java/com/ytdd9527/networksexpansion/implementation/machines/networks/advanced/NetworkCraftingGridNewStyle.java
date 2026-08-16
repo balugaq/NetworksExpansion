@@ -229,52 +229,53 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
         NetworkRoot root = definition.getNode().getRoot();
         root.refreshRootItems();
 
-        // Get the recipe input
-        final ItemStack[] inputs = new ItemStack[INGREDIENT_SLOTS.length];
-        int i = 0;
-        for (int recipeSlot : INGREDIENT_SLOTS) {
-            ItemStack stack = menu.getItemInSlot(recipeSlot);
-            inputs[i] = stack;
-            i++;
-        }
-
-        ItemStack crafted = null;
-
-        // Go through each slimefun recipe, trigger and set the ItemStack if found
-        for (Map.Entry<ItemStack[], ItemStack> entry :
-            SupportedCraftingTableRecipes.getRecipes().entrySet()) {
-            if (SupportedCraftingTableRecipes.testRecipe(inputs, entry.getKey())) {
-                crafted = entry.getValue();
-                break;
+        for (int k = 0; k < times; k++) {
+            // Get the recipe input
+            final ItemStack[] inputs = new ItemStack[INGREDIENT_SLOTS.length];
+            int i = 0;
+            for (int recipeSlot : INGREDIENT_SLOTS) {
+                ItemStack stack = menu.getItemInSlot(recipeSlot);
+                inputs[i] = stack;
+                i++;
             }
-        }
 
-        if (crafted != null) {
-            final SlimefunItem sfi2 = SlimefunItem.getByItem(crafted);
-            if (sfi2 != null && sfi2.isDisabled()) {
-                player.sendMessage(Lang.getString("messages.unsupported-operation.encoder.disabled_output"));
+            ItemStack crafted = null;
+
+            // Go through each slimefun recipe, trigger and set the ItemStack if found
+            for (Map.Entry<ItemStack[], ItemStack> entry :
+                SupportedCraftingTableRecipes.getRecipes().entrySet()) {
+                if (SupportedCraftingTableRecipes.testRecipe(inputs, entry.getKey())) {
+                    crafted = entry.getValue();
+                    break;
+                }
+            }
+
+            if (crafted != null) {
+                final SlimefunItem sfi2 = SlimefunItem.getByItem(crafted);
+                if (sfi2 != null && sfi2.isDisabled()) {
+                    player.sendMessage(Lang.getString("messages.unsupported-operation.encoder.disabled_output"));
+                    return;
+                }
+            }
+
+            // If no slimefun recipe found, try a vanilla one
+            if (crafted == null) {
+                crafted = Bukkit.craftItem(inputs, player.getWorld(), player);
+            }
+
+            // If no item crafted OR result doesn't fit, escape
+            if (crafted.getType() == Material.AIR || !BlockMenuUtil.fits(menu, crafted, OUTPUT_SLOT)) {
                 return;
             }
-        }
 
-        // If no slimefun recipe found, try a vanilla one
-        if (crafted == null) {
-            crafted = Bukkit.craftItem(inputs, player.getWorld(), player);
-        }
+            // fire craft event
+            NetworkCraftEvent event = new NetworkCraftEvent(player, this, inputs, crafted);
+            Bukkit.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                return;
+            }
+            crafted = event.getOutput();
 
-        // If no item crafted OR result doesn't fit, escape
-        if (crafted.getType() == Material.AIR || !BlockMenuUtil.fits(menu, crafted, OUTPUT_SLOT)) {
-            return;
-        }
-
-        // fire craft event
-        NetworkCraftEvent event = new NetworkCraftEvent(player, this, inputs, crafted);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
-            return;
-        }
-        crafted = event.getOutput();
-        for (int k = 0; k < times; k++) {
             // Push item
             if (crafted != null) {
                 BlockMenuUtil.pushItem(menu, crafted.clone(), OUTPUT_SLOT);
