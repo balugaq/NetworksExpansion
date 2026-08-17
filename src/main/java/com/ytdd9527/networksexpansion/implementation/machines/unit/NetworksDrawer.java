@@ -451,10 +451,10 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                                     Math.min(requestedItemStack.getAmount(), requestedItemStack.getMaxStackSize());
                                 final ItemStack clone = StackUtils.getAsQuantity(requestedItemStack, max);
                                 requestedItemStack.setAmount(requestedItemStack.getAmount() - max);
-                                final HashMap<Integer, ItemStack> remnant = InventoryUtil.addItem(player, clone);
-                                remnant.values().stream()
-                                    .findFirst()
-                                    .ifPresent(leftOver -> data.depositItemStack0(l, leftOver, false));
+                                InventoryUtil.addItem(player, clone);
+                                if (clone.getAmount() > 0) {
+                                    data.depositItemStack0(l, clone, false);
+                                }
                             } while (requestedItemStack.getAmount() > 0);
                         }
                     } else {

@@ -216,7 +216,10 @@ public class SwitchingMonitor extends NetworkObject implements HangingBlock, Pla
                 ItemStack result = root.getItemStack0(
                     attachon, new ItemRequest(template, Math.min(amount, template.getMaxStackSize())));
                 if (result != null) {
-                    InventoryUtil.addItem(player, result).values().forEach(item -> root.addItemStack0(attachon, item));
+                    InventoryUtil.addItem(player, result);
+                    if (result.getAmount() > 0) {
+                        root.addItemStack0(attachon, result);
+                    }
                 }
             }
         } else {

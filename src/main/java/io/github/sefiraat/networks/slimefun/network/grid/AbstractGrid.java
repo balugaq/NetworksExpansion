@@ -434,9 +434,8 @@ public abstract class AbstractGrid extends NetworkObject {
             return;
         }
 
-        HashMap<Integer, ItemStack> remnant = InventoryUtil.addItem(player, requestingStack);
-        requestingStack = remnant.values().stream().findFirst().orElse(null);
-        if (requestingStack != null) {
+        InventoryUtil.addItem(player, requestingStack);
+        if (requestingStack.getAmount() > 0) {
             definition.getNode().getRoot().addItemStack(requestingStack);
         }
     }
