@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.ytdd9527.networksexpansion"
-version = "2.1.115"
+version = "2.1.116"
 
 java {
     toolchain {
@@ -44,18 +44,18 @@ dependencies {
         exclude("net.jcip", "jcip-annotations")
         exclude("com.google.code.findbugs", "jsr305")
     }
-    compileOnly("org.projectlombok:lombok:1.18.38")
-    annotationProcessor("org.projectlombok:lombok:1.18.38")
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
     compileOnly("com.github.houbb:pinyin:0.4.0")
 
     // Supported Plugins
     compileOnly("com.github.SlimefunGuguProject:InfinityExpansion:3c5db3650a")
     compileOnly("com.github.Sefiraat:Netheopoiesis:8d1af6c570")
     compileOnly("com.github.schntgaispock:SlimeHUD:1.2.7")
-    compileOnly("com.bgsoftware:WildChestsAPI:2024.1")
-    compileOnly("com.bgsoftware:WildStackerAPI:2023.2")
+    compileOnly("com.bgsoftware:WildChestsAPI:2026.2")
+    compileOnly("com.bgsoftware:WildStackerAPI:2026.2")
     compileOnly("dev.rosewood:rosestacker:1.5.23")
-    compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.2.017") {
+    compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.3.000") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldguard", "worldguard-legacy")
