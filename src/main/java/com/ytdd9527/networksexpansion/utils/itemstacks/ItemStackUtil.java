@@ -1026,9 +1026,9 @@ public final class ItemStackUtil {
             ItemStack incoming = toGive.clone();
             incoming.setAmount(Math.min(toGive.getMaxStackSize(), toGive.getAmount()));
             toGive.setAmount(toGive.getAmount() - incoming.getAmount());
-            Collection<ItemStack> leftover = InventoryUtil.addItem(p, incoming).values();
-            for (ItemStack itemStack : leftover) {
-                p.getWorld().dropItemNaturally(p.getLocation(), itemStack);
+            InventoryUtil.addItem(p, incoming);
+            if (incoming.getAmount() > 0) {
+                p.getWorld().dropItemNaturally(p.getLocation(), incoming);
             }
         }
     }
