@@ -52,7 +52,7 @@ dependencies {
     compileOnly("com.github.SlimefunGuguProject:InfinityExpansion:3c5db3650a")
     compileOnly("com.github.Sefiraat:Netheopoiesis:8d1af6c570")
     compileOnly("com.github.schntgaispock:SlimeHUD:1.2.7")
-    compileOnly("com.bgsoftware:WildChestsAPI:2024.1")
+    compileOnly("com.bgsoftware:WildChestsAPI:2026.2")
     compileOnly("com.bgsoftware:WildStackerAPI:2023.2")
     compileOnly("dev.rosewood:rosestacker:1.5.23")
     compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.2.017") {
