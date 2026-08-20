@@ -5,6 +5,8 @@ import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.stackcaches.ItemStackCache;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.PersistentDataAPI;
+import io.papermc.paper.datacomponent.DataComponentType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -40,8 +42,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("deprecation")
 @UtilityClass
@@ -50,6 +54,7 @@ public class StackUtils {
     private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMCVersion();
     public static final boolean IS_1_20_5 = MC_VERSION.isAtLeast(MinecraftVersion.V1_20_5);
     public static final boolean IS_1_21 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21);
+    public static final boolean IS_1_21_4 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_4);
 
     @NotNull
     public static ItemStack getAsQuantity(@Nullable ItemStack itemStack, int amount) {
@@ -154,6 +159,10 @@ public class StackUtils {
 
         if (Networks.getConfigManager().useBukkitItemComparison()) {
             return itemStack.isSimilar(cache.getItemStack());
+        }
+
+        if (IS_1_21_4) {
+            return itemsMatchModern(cache.getItemStack(), itemStack, checkLore, checkCustomModelId);
         }
 
         // If either item does not have a meta then either a mismatch or both without meta = vanilla
@@ -314,6 +323,33 @@ public class StackUtils {
         return !itemMeta.hasDisplayName() || Objects.equals(itemMeta.getDisplayName(), cachedMeta.getDisplayName());
 
         // Everything should match if we've managed to get here
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static boolean itemsMatchModern(
+        @NotNull ItemStack cacheItem,
+        @NotNull ItemStack itemStack,
+        boolean checkLore,
+        boolean checkCustomModelId) {
+        final Set<DataComponentType> excluded = new HashSet<>();
+        if (!shouldCompareLore(itemStack, checkLore)) {
+            excluded.add(DataComponentTypes.LORE);
+        }
+        if (!checkCustomModelId) {
+            excluded.add(DataComponentTypes.CUSTOM_MODEL_DATA);
+        }
+        return cacheItem.matchesWithoutData(itemStack, excluded, true);
+    }
+
+    private static boolean shouldCompareLore(@NotNull ItemStack itemStack, boolean checkLore) {
+        return checkLore
+            || FORCE_CHECK_LORE
+            || itemStack.getMaxStackSize() == 1
+            || itemStack.getType() == Material.PLAYER_HEAD
+            || itemStack.getType() == Material.SPAWNER
+            || itemStack.getType() == Material.SUGAR
+            || itemStack.getType() == Material.MINECART
+            || itemStack.getType() == Material.CHEST_MINECART;
     }
 
     @SuppressWarnings("removal")
