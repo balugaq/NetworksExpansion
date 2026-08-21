@@ -1,6 +1,7 @@
 plugins {
     java
     id("com.gradleup.shadow") version "9.0.0"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 group = "com.ytdd9527.networksexpansion"
@@ -31,7 +32,7 @@ repositories {
 
 dependencies {
     // Core
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("com.github.SlimefunGuguProject:Slimefun4:2025.1")
 
     // Tools etc.
@@ -69,6 +70,12 @@ dependencies {
     compileOnly(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
 }
 
+tasks.withType<JavaExec>().configureEach {
+    systemProperty("file.encoding", "UTF-8")
+    systemProperty("sun.stdout.encoding", "UTF-8")
+    systemProperty("sun.stderr.encoding", "UTF-8")
+}
+
 tasks {
     compileJava {
         options.compilerArgs.add("-Xlint:-removal")
@@ -101,6 +108,34 @@ tasks {
 
     build {
         dependsOn(shadowJar)
+    }
+
+    runServer {
+        dependsOn(shadowJar)
+        val run = file(providers.gradleProperty("server.run.dir").orElse("run"))
+        runDirectory.set(run)
+
+        doFirst {
+            run.resolve("eula.txt").writeText("eula=true")
+
+            val pl = run.resolve("plugins")
+            pl.mkdirs()
+            copy {
+                from(projectDir.resolve("build/libs")) {
+                    include("${name}-${version}.jar")
+                }
+                into(pl)
+            }
+        }
+
+        jvmArgs(
+            "-Dfile.encoding=UTF-8",
+            "-Dsun.jnu.encoding=UTF-8",
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5001",
+            "-Dnet.kyori.adventure.text.warn_when_legacy_formatting_detected=false"
+        )
+        maxHeapSize = "4G"
+        minecraftVersion("1.21.11")
     }
 }
 

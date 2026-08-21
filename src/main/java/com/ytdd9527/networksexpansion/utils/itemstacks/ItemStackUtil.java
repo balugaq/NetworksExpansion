@@ -26,6 +26,8 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,13 +82,45 @@ public final class ItemStackUtil {
         return itemStack;
     }
 
+    private static final @Nullable VarHandle API_ITEM_STACK_CRAFT_DELEGATE_FIELD;
+    static {
+        if (StackUtils.IS_1_21) {
+            try {
+                API_ITEM_STACK_CRAFT_DELEGATE_FIELD = MethodHandles.privateLookupIn(
+                    ItemStack.class,
+                    MethodHandles.lookup()
+                ).findVarHandle(ItemStack.class, "craftDelegate", ItemStack.class);
+            } catch (final IllegalAccessException | NoSuchFieldException exception) {
+                throw new RuntimeException(exception);
+            }
+        } else {
+            API_ITEM_STACK_CRAFT_DELEGATE_FIELD = null;
+        }
+    }
+
+    private static ItemStack getDelegate(ItemStack bukkit) {
+        if (StackUtils.IS_1_21) {
+            return (ItemStack) API_ITEM_STACK_CRAFT_DELEGATE_FIELD.get(bukkit);
+        } else {
+            return bukkit;
+        }
+    }
+
     public static @NotNull ItemStack asCraftItemStack(@NotNull ItemStack stack) {
         if (StackUtils.IS_1_21) {
-            if (stack instanceof SlimefunItemStack sfis) {
-                return ItemStackUtil.getCleanItem(sfis);
+            if (stack instanceof SlimefunItemStack) {
+                return ItemStackUtil.getCleanItem(stack);
             }
-            if (stack instanceof ItemStackWrapper wrapper) {
-                return ItemStackUtil.getCleanItem(wrapper);
+            if (stack instanceof ItemStackWrapper) {
+                return ItemStackUtil.getCleanItem(stack);
+            }
+
+            var delegate = getDelegate(stack);
+            if (delegate instanceof SlimefunItemStack) {
+                return ItemStackUtil.getCleanItem(stack);
+            }
+            if (delegate instanceof ItemStackWrapper) {
+                return ItemStackUtil.getCleanItem(stack);
             }
         }
 
