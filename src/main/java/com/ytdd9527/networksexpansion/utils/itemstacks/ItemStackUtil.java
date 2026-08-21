@@ -7,6 +7,7 @@ import com.balugaq.netex.utils.InventoryUtil;
 import com.balugaq.netex.utils.NetworksVersionedEnchantment;
 import com.ytdd9527.networksexpansion.utils.TextUtil;
 import io.github.sefiraat.networks.utils.StackUtils;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.nms.ItemNameAdapter;
 import io.github.thebusybiscuit.slimefun4.utils.itemstack.ItemStackWrapper;
@@ -77,6 +78,19 @@ public final class ItemStackUtil {
         ItemStack itemStack = item instanceof ItemStackWrapper ? ItemStackUtil.getCleanItem(item) : item.clone();
         itemStack.setAmount(amount);
         return itemStack;
+    }
+
+    public static @NotNull ItemStack asCraftItemStack(@NotNull ItemStack stack) {
+        if (StackUtils.IS_1_21) {
+            if (stack instanceof SlimefunItemStack sfis) {
+                return ItemStackUtil.getCleanItem(sfis);
+            }
+            if (stack instanceof ItemStackWrapper wrapper) {
+                return ItemStackUtil.getCleanItem(wrapper);
+            }
+        }
+
+        return stack;
     }
 
     /**
