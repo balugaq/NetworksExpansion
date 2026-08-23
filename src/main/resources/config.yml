@@ -22,6 +22,11 @@ disable-profile-check: false
 
 fast-interact-quantum: true
 
+# AE storage cell settings
+ae:
+  # 元件可升级到的物品种类上限。新元件初始1种,每个量子储存+1,直至此上限。
+  max-item-types: 64
+
 rpg-fix:
   force-check-lore: false
 

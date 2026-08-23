@@ -11,6 +11,7 @@ import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.NetworksVersionedParticle;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.mooy1.infinityexpansion.items.storage.StorageCache;
@@ -194,6 +195,7 @@ public class NetworkRoot extends NetworkNode {
     private @Nullable Map<Location, BarrelIdentity> mapOutputAbleBarrels = null;
     private @Nullable Map<Location, StorageUnitData> mapInputAbleCargoStorageUnits = null;
     private @Nullable Map<Location, StorageUnitData> mapOutputAbleCargoStorageUnits = null;
+    private @Nullable Set<BlockMenu> aeDriveMenus = null;
     private Map<ItemStack, Long> allItemsView = null;
 
     @Setter
@@ -420,9 +422,9 @@ public class NetworkRoot extends NetworkNode {
 
         if (item instanceof NetworkQuantumStorage) {
             return getNetworkStorage(menu, includeEmpty);
-        } else if (Networks.getSupportedPluginManager().isFluffyMachines() && item instanceof Barrel barrel) {
+        } else if (item instanceof Barrel barrel) {
             return getFluffyBarrel(menu, barrel, includeEmpty);
-        } else if (Networks.getSupportedPluginManager().isInfinityExpansion() && item instanceof StorageUnit storageUnit) {
+        } else if (item instanceof StorageUnit storageUnit) {
             return getInfinityBarrel(menu, storageUnit, includeEmpty);
         } else {
             return null;
@@ -561,45 +563,108 @@ public class NetworkRoot extends NetworkNode {
 
         // Barrels
         for (BarrelIdentity barrelIdentity : getOutputAbleBarrels()) {
-            addAmount(itemStacks, barrelIdentity.getItemStack(), barrelIdentity.getAmount());
+            final Long currentAmount = itemStacks.get(barrelIdentity.getItemStack());
+            final long newAmount;
+            if (currentAmount == null) {
+                newAmount = barrelIdentity.getAmount();
+            } else {
+                long newLong = currentAmount + barrelIdentity.getAmount();
+                if (newLong < 0) {
+                    newAmount = 0;
+                } else {
+                    newAmount = currentAmount + barrelIdentity.getAmount();
+                }
+            }
+            itemStacks.put(barrelIdentity.getItemStack(), newAmount);
         }
 
         // Cargo storage units
         Map<StorageUnitData, Location> cacheMap = getOutputAbleCargoStorageUnitDatas();
         for (StorageUnitData cache : cacheMap.keySet()) {
             for (ItemContainer itemContainer : cache.getStoredItems()) {
-                addAmount(itemStacks, itemContainer.getSample(), itemContainer.getAmount());
+                final Long currentAmount = itemStacks.get(itemContainer.getSample());
+                long newAmount;
+                if (currentAmount == null) {
+                    newAmount = itemContainer.getAmount();
+                } else {
+                    long newLong = currentAmount + (long) itemContainer.getAmount();
+                    if (newLong < 0) {
+                        newAmount = 0;
+                    } else {
+                        newAmount = currentAmount + itemContainer.getAmount();
+                    }
+                }
+                itemStacks.put(itemContainer.getSample(), newAmount);
             }
         }
 
         for (BlockMenu blockMenu : getAdvancedGreedyBlockMenus()) {
-            ItemStack template = blockMenu.getItemInSlot(AdvancedGreedyBlock.TEMPLATE_SLOT);
-            if (template == null || template.getType() == Material.AIR) continue;
             int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
             for (int slot : slots) {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
-                final ItemStack clone = StackUtils.getAsQuantity(itemStack == null || itemStack.getType() == Material.AIR ? template : itemStack, 1);
-                addAmount(itemStacks, clone, itemStack);
+                if (itemStack == null || itemStack.getType() == Material.AIR) {
+                    continue;
+                }
+                final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
+                final Long currentAmount = itemStacks.get(clone);
+                final long newAmount;
+                if (currentAmount == null) {
+                    newAmount = itemStack.getAmount();
+                } else {
+                    long newLong = currentAmount + (long) itemStack.getAmount();
+                    if (newLong < 0) {
+                        newAmount = 0;
+                    } else {
+                        newAmount = currentAmount + itemStack.getAmount();
+                    }
+                }
+                itemStacks.put(clone, newAmount);
             }
         }
 
         for (BlockMenu blockMenu : getGreedyBlockMenus()) {
-            ItemStack template = blockMenu.getItemInSlot(NetworkGreedyBlock.TEMPLATE_SLOT);
-            if (template == null || template.getType() == Material.AIR) continue;
             int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
             final ItemStack itemStack = blockMenu.getItemInSlot(slots[0]);
-            final ItemStack clone = StackUtils.getAsQuantity(itemStack == null || itemStack.getType() == Material.AIR ? template : itemStack, 1);
-            addAmount(itemStacks, clone, itemStack);
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                continue;
+            }
+            final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
+            final Long currentAmount = itemStacks.get(clone);
+            final long newAmount;
+            if (currentAmount == null) {
+                newAmount = itemStack.getAmount();
+            } else {
+                long newLong = currentAmount + (long) itemStack.getAmount();
+                if (newLong < 0) {
+                    newAmount = 0;
+                } else {
+                    newAmount = currentAmount + itemStack.getAmount();
+                }
+            }
+            itemStacks.put(clone, newAmount);
         }
 
         for (BlockMenu blockMenu : getCrafterOutputs()) {
             int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
             for (int slot : slots) {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
-                if (itemStack != null && itemStack.getType() != Material.AIR) {
-                    final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
-                    addAmount(itemStacks, clone, itemStack);
+                if (itemStack == null || itemStack.getType() == Material.AIR) {
+                    continue;
                 }
+                final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
+                final Long currentAmount = itemStacks.get(clone);
+                final long newAmount;
+                if (currentAmount == null) {
+                    newAmount = itemStack.getAmount();
+                } else {
+                    long newLong = currentAmount + (long) itemStack.getAmount();
+                    if (newLong < 0) {
+                        newAmount = 0;
+                    } else {
+                        newAmount = currentAmount + itemStack.getAmount();
+                    }
+                }
+                itemStacks.put(clone, newAmount);
             }
         }
 
@@ -608,11 +673,49 @@ public class NetworkRoot extends NetworkNode {
             for (int slot : CELL_AVAILABLE_SLOTS) {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack != null && itemStack.getType() != Material.AIR) {
-                    final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
-                    addAmount(itemStacks, clone, itemStack);
+                    final ItemStack clone = itemStack.clone();
+
+                    clone.setAmount(1);
+
+                    final Long currentAmount = itemStacks.get(clone);
+                    long newAmount;
+
+                    if (currentAmount == null) {
+                        newAmount = itemStack.getAmount();
+                    } else {
+                        long newLong = currentAmount + (long) itemStack.getAmount();
+                        if (newLong < 0) {
+                            newAmount = 0;
+                        } else {
+                            newAmount = currentAmount + itemStack.getAmount();
+                        }
+                    }
+
+                    itemStacks.put(clone, newAmount);
                 }
             }
         }
+
+        // AE Drives
+        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(controller, getAEDriveMenus());
+        for (Map.Entry<ItemStack, Long> entry : aeItems.entrySet()) {
+            ItemStack clone = entry.getKey().clone();
+            clone.setAmount(1);
+            final Long currentAmount = itemStacks.get(clone);
+            long newAmount;
+            if (currentAmount == null) {
+                newAmount = entry.getValue();
+            } else {
+                long newLong = currentAmount + entry.getValue();
+                if (newLong < 0) {
+                    newAmount = 0;
+                } else {
+                    newAmount = currentAmount + entry.getValue();
+                }
+            }
+            itemStacks.put(clone, newAmount);
+        }
+
         allItemsView = itemStacks;
         return itemStacks;
     }
@@ -747,6 +850,35 @@ public class NetworkRoot extends NetworkNode {
                 menus.add(menu);
             }
         }
+        return menus;
+    }
+
+    @NotNull
+    public Set<BlockMenu> getAEDriveMenus() {
+        if (this.aeDriveMenus != null) {
+            return this.aeDriveMenus;
+        }
+        final Set<BlockMenu> menus = new HashSet<>();
+        final Set<Location> addedLocations = ConcurrentHashMap.newKeySet();
+        for (Location monitorLocation : this.monitors) {
+            final BlockFace face = NetworkDirectional.getSelectedFace(monitorLocation);
+            if (face == null) {
+                continue;
+            }
+            final Location testLocation = monitorLocation.clone().add(face.getDirection());
+            if (addedLocations.contains(testLocation)) {
+                continue;
+            }
+            addedLocations.add(testLocation);
+            final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(testLocation);
+            if (slimefunItem instanceof AEDrive) {
+                BlockMenu menu = StorageCacheUtils.getMenu(testLocation);
+                if (menu != null) {
+                    menus.add(menu);
+                }
+            }
+        }
+        this.aeDriveMenus = menus;
         return menus;
     }
 
@@ -979,16 +1111,6 @@ public class NetworkRoot extends NetworkNode {
         return stackToReturn;
     }
 
-    public static void addAmount(Map<ItemStack, Long> all, ItemStack key, @Nullable ItemStack item) {
-        if (item == null || item.getType() == Material.AIR) return;
-        long current = all.getOrDefault(key, 0L);
-        all.put(key, current + item.getAmount());
-    }
-
-    public static void addAmount(Map<ItemStack, Long> all, ItemStack key, long amount) {
-        all.put(key, all.getOrDefault(key, 0L) + amount);
-    }
-
     public boolean contains(@NotNull ItemStack itemStack) {
         return contains(new ItemRequest(itemStack, 1));
     }
@@ -1164,6 +1286,10 @@ public class NetworkRoot extends NetworkNode {
                 }
             }
         }
+
+        // AE Drives
+        totalAmount += AEDrive.getStorage().getAmount(controller, getAEDriveMenus(), itemStack);
+
         if (totalAmount > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
         } else {
@@ -1742,6 +1868,7 @@ public class NetworkRoot extends NetworkNode {
         this.outputAbleBarrels = null;
         this.inputAbleCargoStorageUnitDatas = null;
         this.outputAbleCargoStorageUnitDatas = null;
+        this.aeDriveMenus = null;
 
         getBarrels();
         getCargoStorageUnitDatas();
@@ -2028,6 +2155,23 @@ public class NetworkRoot extends NetworkNode {
                     request.receiveAmount(itemStack.getAmount());
                     itemStack.setAmount(0);
                 }
+            }
+        }
+
+        // AE Drives
+        ItemStack take = AEDrive.getStorage().takeItem(controller, getAEDriveMenus(), request);
+        if (take != null) {
+            if (stackToReturn == null) {
+                stackToReturn = take.clone();
+            } else {
+                stackToReturn.setAmount(stackToReturn.getAmount() + take.getAmount());
+            }
+            request.receiveAmount(take.getAmount());
+
+            if (request.getAmount() <= 0) {
+                uncontrolAccessOutput(accessor);
+                tryRecord(accessor, request);
+                return stackToReturn;
             }
         }
 
@@ -2356,6 +2500,17 @@ public class NetworkRoot extends NetworkNode {
                 // Netex - Record end
                 return;
             }
+        }
+
+        // AE Drives
+        Map<ItemStack, Long> itemsToPush = new HashMap<>();
+        itemsToPush.put(incoming.clone(), (long) incoming.getAmount());
+        AEDrive.getStorage().pushItems(controller, getAEDriveMenus(), itemsToPush);
+        incoming.setAmount(itemsToPush.values().iterator().next().intValue());
+        if (incoming.getAmount() == 0) {
+            uncontrolAccessInput(accessor);
+            tryRecord(accessor, beforeItemStack, 0);
+            return;
         }
 
         // Netex - Reduce start
