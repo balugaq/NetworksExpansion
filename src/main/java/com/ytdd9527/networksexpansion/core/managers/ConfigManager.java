@@ -146,8 +146,4 @@ public class ConfigManager {
     public boolean isFastInteractQuantum() {
         return Networks.getInstance().getConfig().getBoolean("fast-interact-quantum", false);
     }
-
-    public int getAeMaxItemTypes() {
-        return getInt("ae.max-item-types", 64);
-    }
 }

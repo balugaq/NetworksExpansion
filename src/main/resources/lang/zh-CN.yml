@@ -50,6 +50,7 @@ messages:
     no_valid_recipe_found: "未找到有效配方"
     not_allowed_block: "不被允许的方块"
     not_blueprint: "不是蓝图"
+    not_enough_items: "没有足够的物品"
     not_enough_items_in_network: "网络中没有足够的物品"
     not_enough_power: "没有足够的网络能源"
     not_enough_resources: "网络中没有足够的原材料"
@@ -218,8 +219,6 @@ messages:
     quantum_storage:
       waiting_for_input_custom_max_amount: "<passive>[<gold>网络拓展<passive>] <warning>请输入网络高级量子存储的容量.最大限制为: 140737488355328"
       waiting_for_input_custom_max_amount_new: "<passive>[<gold>网络拓展<passive>] <warning>请输入网络高级量子存储的容量.最大限制为: 140737488355328"
-    ae_cell:
-      upgrade_success: "<success>升级成功: 容量 %s -> %s <passive>(消耗 %sx 量子储存)"
     grid:
       waiting_for_filter: "<warning>请输入你想要过滤的物品名称(显示名)或类型"
       item_amount: "{0}数量: {1}{2}"
@@ -447,10 +446,6 @@ messages:
       invalid_custom_max_amount_new: "<passive>[<gold>网络拓展<passive>] <error>网络高级量子存储必须为: 1 至 140737488355328"
       may_duping: "Player \"%s\" attempted to use quantum storage to dupe at %s. (see https://b23.tv/BV1ZMXuBpEAz)"
       dangerous_operation: "<error>高危操作，禁止同时连接量子存储和网络单元!"
-    ae_cell:
-      reached_limit: "<warning>已达容量上限: %s"
-      insufficient_material: "<error>量子储存不足: %s / %s"
-      cell_not_in_inventory: "<error>未在背包中找到该存储元件"
     configurator:
       not_a_copyable_block: "<error>该方块没有指定朝向"
       not_a_pasteable_block: "<error>你必须指向一个带方向选择的网络方块"
@@ -514,8 +509,6 @@ messages:
     failed-to-connect-database: "数据库文件连接失败!"
     creating-query-queue: "正在创建队列..."
     creating-auto-save-thread: "正在创建自动保存线程..."
-    initializing-ae-database: "正在初始化 AE 存储数据库..."
-    failed-to-init-ae-database: "AE 存储数据库初始化失败!"
     registering-items: "正在注册物品..."
     registering-listeners: "正在注册监听器..."
     registering-commands: "正在注册命令..."
@@ -563,130 +556,6 @@ messages:
           - "这种植物成熟后,"
           - "收获时将获得人造绿宝石碎片."
   save-all: "正在保存网络拓展数据."
-  ae:
-    cell:
-      button:
-        whitelist: "<warning>白名单"
-        per_unit_capacity: "<passive>  单格容量 · <white>{0}"
-        whitelist_count: "<passive>  白名单 · <white>{0}<passive> / <white>{1}"
-        whitelist_enabled: "<passive>  状态 · <success>● 已启用"
-        whitelist_disabled: "<passive>  状态 · <passive>○ 已禁用"
-        open_whitelist: "<passive>  点击管理白名单"
-        toggle_on: "<success>● 白名单已启用"
-        toggle_off: "<passive>○ 白名单已禁用"
-        toggle_hint: "<passive>  点击切换"
-        setting_slot: "<passive>白名单物品"
-        setting_slot_hint: "<passive>  手持物品点击此处添加"
-        remove_item: "<error>  点击移除此物品"
-        close: "<error>关闭"
-        back: "<warning>返回"
-        upgrade: "<warning>升级"
-        current_units: "<passive>  单元 · <white>{0}<passive> / <white>{1}"
-        upgrade_material_id: "<passive>  材料 ID · <white>{0}"
-        upgrade_material: "<passive>  升级材料 · <white>{0}"
-        upgrade_consume: "<passive>  消耗 1 个材料 · 单元 +1"
-        no_upgrade_material: "<error>  无可用的升级材料"
-        raw_capacity: "<error>  每单元容量: {0}"
-        item_count: "<passive>  数量 · <white>{0}"
-        rename: "<gold>命名"
-        rename_current: "<passive>  当前名称 · <white>{0}"
-        rename_default: "未命名"
-        rename_hint: "<passive>  点击在聊天栏输入新名称"
-      menu:
-        title_view: "预览"
-        title_whitelist: "存储元件 · 白名单"
-        prev_page: "<white>上一页"
-        first_page: "<passive>已是第一页"
-        next_page: "<white>下一页"
-        last_page: "<passive>已是最后一页"
-      lore:
-        capacity_line: "<passive>  单格容量 · <white>{0}"
-        units_line: "<passive>  单元 · {0}<passive> / <white>{1}  {2}"
-        upgrade_line: "<warning>  升级 · <white>{0}<warning> → +1 单元"
-        not_configured: "未配置"
-        hint_open: "<passive>  右键打开 · 管理元件"
-        hint_drive: "<passive>  放入驱动器 · 接入网络"
-        name_line: "<passive>  名称 · <white>{0}"
-        item_entry: "<white>  {0}<passive> · <white>{1}"
-        and_more: "<passive>   ··· 还有 <white>{0}<passive> 项"
-      cannot_drop: "<error>元件界面打开时不能扔掉元件"
-      whitelist_limit: "<error>白名单种类达到单元上限 ({0})，请先升级元件解锁更多单元"
-      upgrade_maxed: "<error>该元件已达到最大单元数 ({0})"
-      upgrade_no_material: "<error>该元件没有可用的升级材料"
-      upgrade_missing: "<error>背包中缺少升级材料: {0}"
-      upgrade_success: "<success>升级成功！当前单元数: {0} / {1}"
-      rename_prompt: "<success>请在聊天栏输入元件的新名称："
-      rename_cancelled: "<error>重命名已取消"
-      rename_failed: "<error>重命名失败，请确保元件在你的背包中"
-      rename_success: "<success>元件已重命名为: {0}"
-    drive:
-      slot_marker: "存储元件槽位"
-      slot_marker_lore: "<passive>  手持元件 · 点击放入"
-      display_name: "<gold>AE 驱动器"
-      item_count: "<passive>  数量 · <white>{0}"
-      cell_count: "<passive>  元件 · <white>{0}<passive> / <white>{1}"
-      total_items: "<passive>  物品 · <white>{0}"
-      item_types: "<passive>  种类 · <white>{0}"
-      more_items: "<passive>  ··· 还有更多"
-      item_entry: "<white>  {0}<passive> · <white>{1}"
-      access_hint: "<passive>  点击浏览全部库存"
-      browse: "<white>浏览库存"
-      prev_page: "<white>◀ 上一页"
-      first_page: "<passive>◀ 已是第一页"
-      next_page: "<white>下一页 ▶"
-      last_page: "<passive>已是最后一页 ▶"
-      back: "<passive>返回"
-      preview_title: "库存预览"
-      saving: "正在保存驱动器元件数据..."
-      saved: "保存成功"
-      cell_uuid_duplicate: "<error>无法放入：该元件UUID已存在于当前驱动器"
-    workbench:
-      title: "元件工作台"
-      cell_slot: "<success>元件放置槽"
-      cell_slot_lore: "<passive>  手持元件点击放入"
-      cell_name: "<passive>  元件 · <white>{0}"
-      item_types: "<passive>  物品种类 · <white>{0}"
-      item_count: "<passive>  数量 · <white>{0}"
-      delete_hint: "<error>  点击删除此物品"
-      item_deleted: "<success>已删除此物品"
-      no_cell: "<passive>  未放入元件"
-      info_title: "<gold>元件工作台"
-      prev_page: "<white>上一页"
-      first_page: "<passive>已是第一页"
-      next_page: "<white>下一页"
-      last_page: "<passive>已是最后一页"
-      close: "<error>关闭"
-      display_placeholder: "<passive>  空槽位"
-    persistence:
-      db_initialized: "AE 存储数据库初始化完成"
-      db_closed: "AE 存储数据库已关闭"
-      backup_failed: "备份失败: {0}"
-      backup_file_missing: "数据库文件不存在: {0}"
-      backup_copy_failed: "复制数据库文件失败: {0}"
-      backup_cleanup_failed: "删除旧备份失败: {0}: {1}"
-      cell_resolve_tpl_failed: "无法解析 tpl_id={0}（元件 {1}）"
-      cell_load_whitelist_failed: "读取元件白名单失败: {0}"
-      cell_save_whitelist_failed: "保存元件白名单失败: {0}"
-      cell_load_items_failed: "读取元件物品失败: {0}"
-      cell_serialize_whitelist_failed: "序列化白名单失败: {0}"
-      cell_deserialize_whitelist_failed: "反序列化白名单失败: {0}"
-      schema_init_failed: "AE schema 初始化失败: {0}"
-      schema_mark_version_failed: "标记 schema 版本失败: {0}"
-      template_insert_failed: "INSERT 物品模板失败: {0}"
-      template_query_failed: "查询物品模板失败: {0}"
-      template_query_all_failed: "全量查询物品模板失败: {0}"
-      template_load_failed: "从数据库加载物品模板失败: {0}"
-      template_preload_failed: "预加载物品模板失败: {0}"
-      journal_flush_failed: "Journal flush 批次失败: {0}"
-      journal_flush_partial: "Journal 部分 flush 失败，回滚 {0} 行"
-      checkpoint_failed: "Checkpoint 失败: {0}"
-      checkpoint_lock_timeout: "Checkpoint 获取锁超时，跳过"
-      checkpoint_batch_failed: "Checkpoint 批次错误: {0}"
-      checkpoint_snapshot_hash_failed: "计算 snapshot_hash 失败: {0}"
-      checkpoint_mark_corrupted_failed: "标记损坏 journal 失败: {0}"
-      checkpoint_query_max_id_failed: "查询 max journal_id 失败: {0}"
-      checkpoint_archive_failed: "归档/清理失败: {0}"
-      replay_lock_timeout: "Replay 获取锁超时"
 icons:
   keybind-settings:
     name: "&6按键控制设置"
@@ -3506,93 +3375,93 @@ items:
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_10:
-    name: "网络量子存储 (1K)"
+    name: "网络量子存储 (1024)"
     lore:
-      - "可存储 1,024 个物品"
+      - "可存储 1024 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_1:
-    name: "网络量子存储 (4K)"
+    name: "网络量子存储 (4k)"
     lore:
-      - "可存储 4,096 个物品"
+      - "可存储 4096 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_2:
     name: "网络量子存储 (32K)"
     lore:
-      - "可存储 32,768 个物品"
+      - "可存储 32768 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_3:
     name: "网络量子存储 (262K)"
     lore:
-      - "可存储 262,144 个物品"
+      - "可存储 262144 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_4:
     name: "网络量子存储 (2M)"
     lore:
-      - "可存储 2,097,152 个物品"
+      - "可存储 2097152 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_5:
     name: "网络量子存储 (16M)"
     lore:
-      - "可存储 16,777,216 个物品"
+      - "可存储 16777216 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_6:
     name: "网络量子存储 (134M)"
     lore:
-      - "可存储 134,217,728 个物品"
+      - "可存储 134217728 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_7:
     name: "网络量子存储 (1B)"
     lore:
-      - "可存储 1,073,741,824 个物品"
+      - "可存储 1073741824 个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_8:
-    name: "网络量子存储 (2.1B)"
+    name: "网络量子存储 (∞)"
     lore:
-      - "可存储 2,147,483,647 个物品"
+      - "可存储几乎无限多个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_11:
-    name: "网络量子存储 (34.4B)"
+    name: "网络量子存储 (34B)"
     lore:
-      - "可存储 34,359,738,352 个物品"
+      - "可存储几乎无限多个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_12:
-    name: "网络量子存储 (549.8B)"
+    name: "网络量子存储 (549B)"
     lore:
-      - "可存储 549,755,813,888 个物品"
+      - "可存储几乎无限多个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_13:
-    name: "网络量子存储 (8.8T)"
+    name: "网络量子存储 (8T)"
     lore:
-      - "可存储 8,796,093,022,208 个物品"
+      - "可存储几乎无限多个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
   NTW_QUANTUM_STORAGE_14:
-    name: "网络量子存储 (140.7T)"
+    name: "网络量子存储 (140T)"
     lore:
-      - "可存储 140,737,488,355,328 个物品"
+      - "可存储几乎无限多个物品"
       - ""
       - "在量子奇点中存储大量物品"
 
@@ -3949,98 +3818,6 @@ items:
     lore:
       - ""
 
-  NTW_EXPANSION_AE_DRIVE:
-    name: "AE驱动器"
-    lore:
-      - "<PASSIVE>存储网络中枢"
-      - ""
-      - "<PASSIVE>放入至多 9 个 AE 存储元件"
-      - "<PASSIVE>接入网络，机器可直接读写库存"
-
-  NTW_EXPANSION_AE_CELL_WORKBENCH:
-    name: "AE元件工作台"
-    lore:
-      - "<PASSIVE>存储元件清理工作台"
-      - ""
-      - "<PASSIVE>放入 1 个 AE 存储元件"
-      - "<PASSIVE>点击物品可删除该种类"
-      - "<PASSIVE>删除后自动排序"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_64:
-    name: "AE存储元件 <MACHINE>(64)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_256:
-    name: "AE存储元件 <MACHINE>(256)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_1K:
-    name: "AE存储元件 <MACHINE>(1K)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_4K:
-    name: "AE存储元件 <MACHINE>(4K)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_32K:
-    name: "AE存储元件 <MACHINE>(32K)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_262K:
-    name: "AE存储元件 <MACHINE>(262K)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_2M:
-    name: "AE存储元件 <MACHINE>(2M)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_16M:
-    name: "AE存储元件 <MACHINE>(16M)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_134M:
-    name: "AE存储元件 <MACHINE>(134M)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_1B:
-    name: "AE存储元件 <MACHINE>(1B)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_2_1B:
-    name: "AE存储元件 <MACHINE>(2.1B)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_34_4B:
-    name: "AE存储元件 <MACHINE>(34.4B)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_549_8B:
-    name: "AE存储元件 <MACHINE>(549.8B)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_8_8T:
-    name: "AE存储元件 <MACHINE>(8.8T)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_140_7T:
-    name: "AE存储元件 <MACHINE>(140.7T)"
-    lore:
-      - "<PASSIVE>存储网络的中转单元"
-
 displays:
   quantum_storage:
     void_excess: "<click_info>满载清空输入: <passive>%s"
@@ -4071,7 +3848,6 @@ groups:
       sub_menu_advanced_storage: "<color_random_string>货运与存储 - 高级存储"
       sub_menu_networks_drawers: "<color_random_string>货运与存储 - 网络抽屉"
       sub_menu_cargo: "<color_random_string>货运与存储 - 货运"
-      sub_menu_ae: "<color_random_string>货运与存储 - AE 储存"
       main_menu_functional_machine: "<color_random_string>功能机器"
       sub_menu_core_machine: "<color_random_string>功能机器 - 核心机器"
       sub_menu_advanced_networks: "<color_random_string>功能机器 - 更高级的网络机器"

@@ -81,8 +81,6 @@ public final class ExpansionItemsMenus {
         Lang.getString("groups.expansion.custom.sub_menu_networks_drawers"));
     public static final SubFlexItemGroup SUB_MENU_CARGO = GroupConfigUtil.getSubFlexItemGroup(
         "NTW_EXPANSION_SUB_MENU_CARGO", Material.END_ROD, Lang.getString("groups.expansion.custom.sub_menu_cargo"));
-    public static final SubFlexItemGroup SUB_MENU_AE = GroupConfigUtil.getSubFlexItemGroup(
-        "NTW_EXPANSION_SUB_MENU_AE", Material.CHISELED_BOOKSHELF, Lang.getString("groups.expansion.custom.sub_menu_ae"));
 
     // functional machine
     public static final SubFlexItemGroup MAIN_MENU_FUNCTIONAL_MACHINE = GroupConfigUtil.getSubFlexItemGroup(
