@@ -6,6 +6,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AECel
 import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.slot.AEDriveMenuSlots;
 import io.github.sefiraat.networks.Networks;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -213,7 +214,7 @@ public final class AECellUniquenessManager {
                 World world = entity.getWorld();
                 if (world != null) {
                     Location loc = entity.getLocation();
-                    world.spawnParticle(NetworksVersionedParticle.DUST, loc, 8, 0.3, 0.3, 0.3, new Particle.DustOptions(0xFF5A5A, 1.2f));
+                    world.spawnParticle(NetworksVersionedParticle.DUST, loc, 8, 0.3, 0.3, 0.3, new Particle.DustOptions(Color.fromRGB(0xFF5A5A), 1.2f));
                 }
                 if (++ticks >= 4) {
                     entity.setGlowing(false);
