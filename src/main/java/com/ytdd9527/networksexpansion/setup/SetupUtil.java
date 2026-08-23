@@ -147,6 +147,25 @@ public class SetupUtil {
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE.registerThis(),
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE_WITHHOLDING.registerThis());
 
+        ExpansionItemsMenus.SUB_MENU_AE.addTo(
+            ExpansionItems.AE_DRIVE.registerThis(),
+            ExpansionItems.AE_CELL_WORKBENCH.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_64.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_256.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_1K.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_4K.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_32K.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_262K.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_2M.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_16M.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_134M.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_1B.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_2_1B.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_34_4B.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_549_8B.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_8_8T.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_140_7T.registerThis());
+
         ExpansionItemsMenus.SUB_MENU_BRIDGE.addTo(
             ExpansionItems.NETWORK_BRIDGE_ORDINAL.registerThis(),
             ExpansionItems.NETWORK_BRIDGE_WHITE.registerThis(),
@@ -277,11 +296,13 @@ public class SetupUtil {
             ExpansionItemsMenus.MAIN_MENU_CARGO_SYSTEM,
             ExpansionItemsMenus.SUB_MENU_ADVANCED_STORAGE,
             ExpansionItemsMenus.SUB_MENU_NETWORKS_DRAWERS,
-            ExpansionItemsMenus.SUB_MENU_CARGO);
+            ExpansionItemsMenus.SUB_MENU_CARGO,
+            ExpansionItemsMenus.SUB_MENU_AE);
         ExpansionItemsMenus.MAIN_MENU_CARGO_SYSTEM.addFrom(
             ExpansionItemsMenus.SUB_MENU_ADVANCED_STORAGE,
             ExpansionItemsMenus.SUB_MENU_NETWORKS_DRAWERS,
-            ExpansionItemsMenus.SUB_MENU_CARGO);
+            ExpansionItemsMenus.SUB_MENU_CARGO,
+            ExpansionItemsMenus.SUB_MENU_AE);
 
         ExpansionItemsMenus.MAIN_ITEM_GROUP.addTo(
             ExpansionItemsMenus.MAIN_MENU_FUNCTIONAL_MACHINE,
