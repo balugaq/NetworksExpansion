@@ -21,6 +21,6 @@
 
 感谢 **mct.tantrum.org** 的服主提供的测试环境。
 
-另外，感谢 **mc.talosmp.net** 的 **GentlemanCheesy** 成为[本人](https://github.com/Sefiraat)的首位赞助者！每个月能多喝一杯咖啡让我能有动力更好地编写插件。
+另外，感谢 **mc.talosmp.net** 的 **[GentlemanCheesy](https://github.com/GentlemanCheesy)** 成为[本人](https://github.com/Sefiraat)的首位赞助者！每个月能多喝一杯咖啡让我能有动力更好地编写插件。
 
 感谢 [m1919810 / matl114](https://github.com/m1919810) — 帮助[我](https://github.com/balugaq)找到了一些[网络拓展](https://github.com/balugaq/NetworksExpansion)的 bug
