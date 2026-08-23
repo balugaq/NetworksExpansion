@@ -1,6 +1,7 @@
 package io.github.sefiraat.networks.utils;
 
 import com.balugaq.netex.api.enums.MinecraftVersion;
+import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.stackcaches.ItemStackCache;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
@@ -161,8 +162,9 @@ public class StackUtils {
             return itemStack.isSimilar(cache.getItemStack());
         }
 
+        // Use DataComponent API
         if (IS_1_21_4) {
-            return itemsMatchModern(cache.getItemStack(), itemStack, checkLore, checkCustomModelId);
+            return itemsMatchModern(ItemStackUtil.asCraftItemStack(cache.getItemStack()), ItemStackUtil.asCraftItemStack(itemStack), checkLore, checkCustomModelId);
         }
 
         // If either item does not have a meta then either a mismatch or both without meta = vanilla
