@@ -1,0 +1,6 @@
+triggers:
+  - type: "label"
+    label_substring: "review"  # 只要标签包含 "review" 就触发
+    on_issue: false               # 不监听 Issue
+    on_pull_request: true         # 只监听 PR
+    run: "review_pr"           # 要执行的工作流名称
