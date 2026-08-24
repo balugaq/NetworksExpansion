@@ -1,14 +1,16 @@
 package io.github.sefiraat.networks.utils;
 
 import com.balugaq.netex.api.enums.MinecraftVersion;
+import com.balugaq.netex.utils.DataComponentsCache;
 import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.stackcaches.ItemStackCache;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.PersistentDataAPI;
-import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.entity.LivingEntity;
@@ -43,10 +45,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 @SuppressWarnings("deprecation")
 @UtilityClass
@@ -154,6 +155,7 @@ public class StackUtils {
             return false;
         }
 
+        // Don't handle them, ensure no one could be transferred by networks
         if (isBlacklisted(itemStack) || isBlacklisted(cache.getItemStack())) {
             return false;
         }
@@ -166,6 +168,8 @@ public class StackUtils {
         if (IS_1_21_4) {
             return itemsMatchModern(ItemStackUtil.asCraftItemStack(cache.getItemStack()), ItemStackUtil.asCraftItemStack(itemStack), checkLore, checkCustomModelId);
         }
+
+        // below 1.21.4
 
         // If either item does not have a meta then either a mismatch or both without meta = vanilla
         if (!itemStack.hasItemMeta() || !cache.getItemStack().hasItemMeta()) {
@@ -280,18 +284,9 @@ public class StackUtils {
         }
 
         // Check the lore
-        if (checkLore
-            || FORCE_CHECK_LORE
-            || itemStack.getMaxStackSize() == 1 // Fix RPG weapons
-            || itemStack.getType()
-            == Material.PLAYER_HEAD // Fix Soul jars in SoulJars & Number Components in MomoTech
-            // & Backpacks-like items in Slimefun & DynaTech & MerakTech & TsingshanTechnology
-            || itemStack.getType() == Material.SPAWNER // Fix Reinforced Spawner in Slimefun4
-            || itemStack.getType() == Material.SUGAR // Fix Symbols in MomoTech
-            || itemStack.getType() == Material.MINECART // Fix Dolly(possible) in FluffyMachines
-            || itemStack.getType() == Material.CHEST_MINECART // Fix Packed Dolly(possible) in FluffyMachines
-        ) {
+        if (shouldCompareLore(itemStack, checkLore)) {
             if (itemMeta.hasLore() && cachedMeta.hasLore()) {
+                // Bukkit automatically handled unset style in lore, so it always downs to correct results.
                 if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
                     return false;
                 }
@@ -333,25 +328,46 @@ public class StackUtils {
         @NotNull ItemStack itemStack,
         boolean checkLore,
         boolean checkCustomModelId) {
-        final Set<DataComponentType> excluded = new HashSet<>();
-        if (!shouldCompareLore(itemStack, checkLore)) {
-            excluded.add(DataComponentTypes.LORE);
+        // most case pdc and others are enough
+        if (!cacheItem.matchesWithoutData(itemStack, checkCustomModelId ? DataComponentsCache.EXCLUDE_LORE : DataComponentsCache.EXCLUDE_LORE_AND_CMD, true)) {
+            return false;
         }
-        if (!checkCustomModelId) {
-            excluded.add(DataComponentTypes.CUSTOM_MODEL_DATA);
+
+        if (shouldCompareLore(itemStack, checkLore)) {
+            // we have to check lore manually, otherwise `matchesWithoutData` cannot identify non-style-preset text.
+            // of course, we can use CraftBukkit utils like `ItemMeta.getLore()`, but it needs reflection.
+            return loreMatchesLoose(
+                cacheItem.getData(DataComponentTypes.LORE).styledLines(),
+                itemStack.getData(DataComponentTypes.LORE).styledLines());
         }
-        return cacheItem.matchesWithoutData(itemStack, excluded, true);
+
+        return true;
+    }
+
+    /**
+     * Compare plain text (no style) only,
+     * Fix #436
+     */
+    private static boolean loreMatchesLoose(List<Component> a1, List<Component> a2) {
+        if (a1.size() != a2.size()) return false;
+        var serializer = PlainTextComponentSerializer.plainText();
+        for (int i = 0; i < a1.size(); i++) {
+            if (!serializer.serialize(a1.get(i)).equals(serializer.serialize(a2.get(i)))) return false;
+        }
+        return true;
     }
 
     private static boolean shouldCompareLore(@NotNull ItemStack itemStack, boolean checkLore) {
         return checkLore
             || FORCE_CHECK_LORE
-            || itemStack.getMaxStackSize() == 1
-            || itemStack.getType() == Material.PLAYER_HEAD
-            || itemStack.getType() == Material.SPAWNER
-            || itemStack.getType() == Material.SUGAR
-            || itemStack.getType() == Material.MINECART
-            || itemStack.getType() == Material.CHEST_MINECART;
+            || itemStack.getMaxStackSize() == 1 // Fix RPG weapons
+            || itemStack.getType()
+            == Material.PLAYER_HEAD // Fix Soul jars in SoulJars & Number Components in MomoTech
+            // & Backpacks-like items in Slimefun & DynaTech & MerakTech & TsingshanTechnology
+            || itemStack.getType() == Material.SPAWNER // Fix Reinforced Spawner in Slimefun4
+            || itemStack.getType() == Material.SUGAR // Fix Symbols in MomoTech
+            || itemStack.getType() == Material.MINECART // Fix Dolly(possible) in FluffyMachines
+            || itemStack.getType() == Material.CHEST_MINECART; // Fix Packed Dolly(possible) in FluffyMachines
     }
 
     @SuppressWarnings("removal")
