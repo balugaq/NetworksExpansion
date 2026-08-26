@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class CheckpointTask implements Runnable {
@@ -57,6 +56,7 @@ public class CheckpointTask implements Runnable {
         }
     }
 
+    // 把 ae_journal 里没应用的行合并进主表；按 (cell, item) 取最新，损坏行跳过并标 applied
     public void doCheckpoint() {
         long maxJournalId = queryMaxPendingJournalId();
         if (maxJournalId < 0) {
@@ -66,21 +66,12 @@ public class CheckpointTask implements Runnable {
         boolean more = true;
         while (more) {
             try {
-                if (!writeStrategy.acquire(5, TimeUnit.SECONDS)) {
-                    LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.checkpoint_lock_timeout"));
-                    return;
-                }
-                try {
-                    int processed = doCheckpointBatch(maxJournalId);
-                    more = processed >= checkpointBatchSize;
-                } finally {
-                    writeStrategy.release();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                more = writeStrategy.runExclusive(() -> doCheckpointBatch(maxJournalId)) >= checkpointBatchSize;
+            } catch (Exception e) {
+                LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.checkpoint_lock_timeout"));
+                Debug.trace(e);
                 return;
             }
-            Thread.yield();
         }
 
         if (archiveEnabled) {
@@ -92,13 +83,13 @@ public class CheckpointTask implements Runnable {
         try (Connection conn = connMgr.getConnection()) {
             conn.setAutoCommit(false);
             try {
-                List<JournalEntry> entries = loadPendingJournal(conn, maxJournalId);
-                if (entries.isEmpty()) {
+                LoadedJournal loaded = loadPendingJournal(conn, maxJournalId);
+                if (loaded.entries.isEmpty()) {
                     conn.commit();
-                    return 0;
+                    return loaded.readCount;
                 }
 
-                Map<String, Map<Long, JournalEntry>> grouped = groupByCell(entries);
+                Map<String, Map<Long, JournalEntry>> grouped = groupByCell(loaded.entries);
                 for (var cellEntry : grouped.entrySet()) {
                     String cellUuid = cellEntry.getKey();
                     for (var itemEntry : cellEntry.getValue().entrySet()) {
@@ -107,9 +98,9 @@ public class CheckpointTask implements Runnable {
                     updateCellMetaStored(conn, cellUuid);
                 }
 
-                markApplied(conn, entries);
+                markApplied(conn, loaded.entries);
                 conn.commit();
-                return entries.size();
+                return loaded.readCount;
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
@@ -122,8 +113,12 @@ public class CheckpointTask implements Runnable {
     }
 
     private void applyJournalEntry(Connection conn, String cellUuid, JournalEntry je) throws SQLException {
-        switch (je.op) {
-            case 'P': {
+        JournalOp op = JournalOp.fromCode(je.op);
+        if (op == null) {
+            return;
+        }
+        switch (op) {
+            case PUT -> {
                 if (je.tplId == null || je.newAmount == null) {
                     break;
                 }
@@ -145,9 +140,8 @@ public class CheckpointTask implements Runnable {
                         ps.executeUpdate();
                     }
                 }
-                break;
             }
-            case 'R': {
+            case REMOVE -> {
                 if (je.tplId == null) {
                     break;
                 }
@@ -157,18 +151,6 @@ public class CheckpointTask implements Runnable {
                     ps.setLong(2, je.tplId);
                     ps.executeUpdate();
                 }
-                break;
-            }
-            case 'D': {
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ae_cell_items WHERE cell_uuid = ?")) {
-                    ps.setString(1, cellUuid);
-                    ps.executeUpdate();
-                }
-                try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ae_cell_meta WHERE cell_uuid = ?")) {
-                    ps.setString(1, cellUuid);
-                    ps.executeUpdate();
-                }
-                break;
             }
         }
     }
@@ -235,16 +217,18 @@ public class CheckpointTask implements Runnable {
         return sb.toString();
     }
 
-    private List<JournalEntry> loadPendingJournal(Connection conn, long maxJournalId) throws SQLException {
+    private LoadedJournal loadPendingJournal(Connection conn, long maxJournalId) throws SQLException {
         String sql = "SELECT journal_id, cell_uuid, op, tpl_id, new_amount, crc32, timestamp "
             + "FROM ae_journal WHERE applied = 0 AND journal_id <= ? ORDER BY journal_id LIMIT ?";
         List<JournalEntry> entries = new ArrayList<>();
         List<Long> corruptedIds = new ArrayList<>();
+        int readCount = 0;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, maxJournalId);
             ps.setInt(2, checkpointBatchSize);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    readCount++;
                     JournalEntry je = new JournalEntry();
                     je.journalId = rs.getLong("journal_id");
                     je.cellUuid = rs.getString("cell_uuid");
@@ -268,7 +252,7 @@ public class CheckpointTask implements Runnable {
         if (!corruptedIds.isEmpty()) {
             markCorruptedApplied(conn, corruptedIds);
         }
-        return entries;
+        return new LoadedJournal(entries, readCount);
     }
 
     private void markCorruptedApplied(Connection conn, List<Long> journalIds) {
@@ -288,7 +272,7 @@ public class CheckpointTask implements Runnable {
         Map<String, Map<Long, JournalEntry>> grouped = new LinkedHashMap<>();
         for (JournalEntry je : entries) {
             grouped.computeIfAbsent(je.cellUuid, k -> new LinkedHashMap<>());
-            long key = je.op == 'D' ? -1L : (je.tplId != null ? je.tplId : -1L);
+            long key = je.tplId != null ? je.tplId : -1L;
             JournalEntry existing = grouped.get(je.cellUuid).get(key);
             if (existing == null || je.journalId > existing.journalId) {
                 grouped.get(je.cellUuid).put(key, je);
@@ -327,18 +311,27 @@ public class CheckpointTask implements Runnable {
         long retentionCutoff = now - journalRetentionMs;
         long archiveCutoff = now - archiveRetentionMs;
         try (Connection conn = connMgr.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO ae_journal_archive (journal_id, cell_uuid, op, tpl_id, new_amount, crc32, timestamp) "
-                    + "SELECT journal_id, cell_uuid, op, tpl_id, new_amount, crc32, timestamp "
-                    + "FROM ae_journal WHERE applied = 1 AND timestamp < ?")) {
-                ps.setLong(1, retentionCutoff);
-                ps.executeUpdate();
+            // 归档 + 删除源 journal 放在同一事务里，保证一致性
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO ae_journal_archive (journal_id, cell_uuid, op, tpl_id, new_amount, crc32, timestamp) "
+                        + "SELECT journal_id, cell_uuid, op, tpl_id, new_amount, crc32, timestamp "
+                        + "FROM ae_journal WHERE applied = 1 AND timestamp < ?")) {
+                    ps.setLong(1, retentionCutoff);
+                    ps.executeUpdate();
+                }
+                try (PreparedStatement ps =
+                         conn.prepareStatement("DELETE FROM ae_journal WHERE applied = 1 AND timestamp < ?")) {
+                    ps.setLong(1, retentionCutoff);
+                    ps.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-            try (PreparedStatement ps =
-                     conn.prepareStatement("DELETE FROM ae_journal WHERE applied = 1 AND timestamp < ?")) {
-                ps.setLong(1, retentionCutoff);
-                ps.executeUpdate();
-            }
+
             try (PreparedStatement ps =
                      conn.prepareStatement("DELETE FROM ae_journal_archive WHERE timestamp < ?")) {
                 ps.setLong(1, archiveCutoff);
@@ -363,8 +356,8 @@ public class CheckpointTask implements Runnable {
         }
         if (count > archiveMaxRows) {
             long toDelete = count - archiveMaxRows;
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ae_journal_archive WHERE journal_id IN ("
-                + "SELECT journal_id FROM ae_journal_archive ORDER BY timestamp ASC LIMIT ?)")) {
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ae_journal_archive WHERE rowid IN ("
+                + "SELECT rowid FROM ae_journal_archive ORDER BY timestamp ASC LIMIT ?)")) {
                 ps.setLong(1, toDelete);
                 ps.executeUpdate();
             }
@@ -379,18 +372,10 @@ public class CheckpointTask implements Runnable {
         boolean more = true;
         while (more) {
             try {
-                if (!writeStrategy.acquire(10, TimeUnit.SECONDS)) {
-                    LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.replay_lock_timeout"));
-                    return;
-                }
-                try {
-                    int processed = doCheckpointBatch(maxId);
-                    more = processed >= checkpointBatchSize;
-                } finally {
-                    writeStrategy.release();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                more = writeStrategy.runExclusive(() -> doCheckpointBatch(maxId)) >= checkpointBatchSize;
+            } catch (Exception e) {
+                LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.replay_lock_timeout"));
+                Debug.trace(e);
                 return;
             }
         }
@@ -404,5 +389,15 @@ public class CheckpointTask implements Runnable {
         Long newAmount;
         int crc32;
         long timestamp;
+    }
+
+    private static class LoadedJournal {
+        final List<JournalEntry> entries;
+        final int readCount;
+
+        LoadedJournal(List<JournalEntry> entries, int readCount) {
+            this.entries = entries;
+            this.readCount = readCount;
+        }
     }
 }

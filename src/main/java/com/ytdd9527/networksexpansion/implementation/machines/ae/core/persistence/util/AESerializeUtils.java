@@ -1,7 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.util;
 
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import org.bukkit.Material;
+import com.balugaq.netex.utils.Debug;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,24 +25,9 @@ public final class AESerializeUtils {
                 return null;
             }
             return item;
-        } catch (IllegalArgumentException e) {
+        } catch (RuntimeException e) {
+            Debug.trace(e, "反序列化物品 base64 失败");
             return null;
         }
-    }
-
-    @Nullable
-    public static String getId(@Nullable ItemStack item) {
-        if (item == null || item.getType().isAir()) {
-            return "VANILLA_AIR";
-        }
-        SlimefunItem sfItem = SlimefunItem.getByItem(item);
-        if (sfItem != null) {
-            return "SLIMEFUN_" + sfItem.getId();
-        }
-        Material material = item.getType();
-        if (new ItemStack(material).equals(item)) {
-            return "VANILLA_" + material.name();
-        }
-        return null;
     }
 }

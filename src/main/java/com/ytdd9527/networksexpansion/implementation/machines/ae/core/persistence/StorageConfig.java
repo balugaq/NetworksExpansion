@@ -1,5 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence;
 
+import com.ytdd9527.networksexpansion.core.managers.ConfigManager;
 import io.github.sefiraat.networks.Networks;
 
 import java.io.File;
@@ -7,21 +8,31 @@ import java.io.File;
 public class StorageConfig {
 
     private final File sqliteFile;
-    private final boolean walMode = true;
-    private final int busyTimeout = 5000;
-    private final long journalRetentionMinutes = 30;
-    private final boolean archiveEnabled = true;
-    private final int archiveRetentionDays = 7;
-    private final int archiveMaxRows = 2000000;
-    private final int checkpointInterval = 60;
-    private final int checkpointThreshold = 5000;
-    private final boolean backupEnabled = true;
-    private final int backupIntervalHours = 24;
-    private final int maxBackups = 7;
+    private final boolean walMode;
+    private final int busyTimeout;
+    private final long journalRetentionMinutes;
+    private final boolean archiveEnabled;
+    private final int archiveRetentionDays;
+    private final int archiveMaxRows;
+    private final int checkpointInterval;
+    private final int checkpointThreshold;
+    private final boolean backupEnabled;
+    private final int backupIntervalHours;
 
     public StorageConfig() {
+        ConfigManager cm = Networks.getConfigManager();
         File dataFolder = Networks.getInstance().getDataFolder();
         this.sqliteFile = new File(new File(dataFolder, "data"), "ae_storage.db");
+        this.walMode = cm.getAeStorageWalMode();
+        this.busyTimeout = cm.getAeStorageBusyTimeout();
+        this.journalRetentionMinutes = cm.getAeStorageJournalRetentionMinutes();
+        this.archiveEnabled = cm.getAeStorageArchiveEnabled();
+        this.archiveRetentionDays = cm.getAeStorageArchiveRetentionDays();
+        this.archiveMaxRows = cm.getAeStorageArchiveMaxRows();
+        this.checkpointInterval = cm.getAeStorageCheckpointInterval();
+        this.checkpointThreshold = cm.getAeStorageCheckpointThreshold();
+        this.backupEnabled = cm.getAeStorageBackupEnabled();
+        this.backupIntervalHours = cm.getAeStorageBackupIntervalHours();
     }
 
     public File getSqliteFile() {
@@ -66,9 +77,5 @@ public class StorageConfig {
 
     public int getBackupIntervalHours() {
         return backupIntervalHours;
-    }
-
-    public int getMaxBackups() {
-        return maxBackups;
     }
 }
