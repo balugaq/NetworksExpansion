@@ -113,7 +113,7 @@ public final class AECellPersistence {
         }
         long per = getPerTypeLimit(itemStack);
         // 无限元件单元数恒为无限，不接受增减(避免 MAX+1 溢出归零)
-        if (per >= Long.MAX_VALUE / 2) {
+        if (isUnlimited(per)) {
             return;
         }
         long maxUnits = getMaxUnitsFor(per);
@@ -130,8 +130,12 @@ public final class AECellPersistence {
         }
     }
 
+    public static boolean isUnlimited(long perTypeLimit) {
+        return AEStorageCellCache.isUnlimitedPerType(perTypeLimit);
+    }
+
     public static long getMaxUnitsFor(long perTypeLimit) {
-        if (perTypeLimit >= Long.MAX_VALUE / 2) {
+        if (isUnlimited(perTypeLimit)) {
             return Long.MAX_VALUE;
         }
         return Math.min(perTypeLimit, AEStorageCellCache.getMaxUnitCount());
@@ -178,7 +182,7 @@ public final class AECellPersistence {
         PersistentDataAPI.setLong(meta, Keys.AE_CELL_CAPACITY, perTypeLimit);
         Long cur = PersistentDataAPI.getLong(meta, Keys.AE_CELL_CURRENT_CAPACITY);
         if (cur == null || cur <= 0) {
-            long initial = perTypeLimit >= Long.MAX_VALUE / 2 ? Long.MAX_VALUE : 1L;
+            long initial = isUnlimited(perTypeLimit) ? Long.MAX_VALUE : 1L;
             PersistentDataAPI.setLong(meta, Keys.AE_CELL_CURRENT_CAPACITY, initial);
         }
         itemStack.setItemMeta(meta);
@@ -192,7 +196,7 @@ public final class AECellPersistence {
             return cache;
         }
 
-        boolean unlimited = perTypeLimit >= Long.MAX_VALUE / 2;
+        boolean unlimited = isUnlimited(perTypeLimit);
         long currentPerTypeLimit = unlimited
             ? Long.MAX_VALUE
             : Math.min(getCurrentPerTypeLimit(itemStack),

@@ -151,6 +151,10 @@ public class ConfigManager {
         return getInt("ae.max-item-types", 64);
     }
 
+    public long getAeStorageWriteTimeout() {
+        return getLong("ae-storage.write-timeout-seconds", 10L);
+    }
+
     public boolean getBoolean(@NotNull String path, boolean defaultValue) {
         return Networks.getInstance().getConfig().getBoolean(path, defaultValue);
     }

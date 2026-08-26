@@ -56,6 +56,9 @@ public final class AECellMenu {
     private static final Map<UUID, ChestMenu> OPENING_MENUS = new ConcurrentHashMap<>();
     private static final Map<UUID, UUID> RENAMING = new ConcurrentHashMap<>();
 
+    private static final ItemStack ICON_BACK = Lang.getIcon("ae-back-button", Material.BARRIER);
+    private static final ItemStack ICON_SETTING_SLOT = Lang.getIcon("ae-setting-slot", Material.GREEN_STAINED_GLASS_PANE);
+
     private AECellMenu() {
     }
 
@@ -374,7 +377,7 @@ public final class AECellMenu {
             if (whitelist.size() >= limit) {
                 player.sendMessage(Lang.getString("messages.ae.cell.whitelist_limit", AENumberFormat.formatNumber(limit)));
             } else if (!inWhitelist(whitelist, cursor)) {
-                if (AEStorageCell.isStorageCell(cursor) || isShulkerBox(cursor)) {
+                if (AEStorageCell.isStorageCell(cursor) || StackUtils.isBlacklisted(cursor)) {
                     player.sendMessage(Lang.getString("messages.ae.cell.whitelist_not_allowed"));
                 } else {
                     ItemStack template = cursor.clone();
@@ -407,10 +410,6 @@ public final class AECellMenu {
             }
         }
         return false;
-    }
-
-    private static boolean isShulkerBox(@NotNull ItemStack item) {
-        return item.getType().name().endsWith("_SHULKER_BOX");
     }
 
     @Nullable
@@ -513,12 +512,12 @@ public final class AECellMenu {
 
     @NotNull
     private static ItemStack backButton() {
-        return Lang.getIcon("ae-back-button", Material.BARRIER);
+        return ICON_BACK;
     }
 
     @NotNull
     private static ItemStack settingSlotItem() {
-        return Lang.getIcon("ae-setting-slot", Material.GREEN_STAINED_GLASS_PANE);
+        return ICON_SETTING_SLOT;
     }
 
     @NotNull

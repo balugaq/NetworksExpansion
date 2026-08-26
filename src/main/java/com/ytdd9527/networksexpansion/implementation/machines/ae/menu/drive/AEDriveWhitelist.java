@@ -259,12 +259,7 @@ public final class AEDriveWhitelist {
 
     @NotNull
     private static ItemStack buildAddButton() {
-        ItemStack item = new ItemStack(Material.NAME_TAG);
-        item.editMeta(meta -> {
-            meta.setDisplayName(Lang.getString("messages.ae.drive.whitelist_add"));
-            meta.setLore(List.of(Lang.getString("messages.ae.drive.whitelist_add_lore")));
-        });
-        return item;
+        return Lang.getIcon("ae-drive-whitelist-add", Material.NAME_TAG);
     }
 
     @NotNull

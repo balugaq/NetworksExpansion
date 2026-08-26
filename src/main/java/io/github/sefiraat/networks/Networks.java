@@ -69,6 +69,9 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     private static BukkitRunnable autoSaveThread;
 
     @Getter
+    private static BukkitRunnable aeAutoSaveThread;
+
+    @Getter
     private static AEStorageDatabase aeStorageDatabase;
 
     private static MinecraftVersion minecraftVersion = MinecraftVersion.UNKNOWN;
@@ -173,11 +176,21 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         long period = 20L * seconds;
         autoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
 
+        // AE 驱动器元件数据自动保存
+        aeAutoSaveThread = new BukkitRunnable() {
+            @Override
+            public void run() {
+                AEDrive.saveAllDriveCells();
+            }
+        };
+        aeAutoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
+
         getLogger().info(getLocalizationService().getString("messages.startup.initializing-ae-database"));
         try {
             aeStorageDatabase = new AEStorageDatabase();
             aeStorageDatabase.init();
         } catch (Exception e) {
+            aeStorageDatabase = null;
             getLogger().warning(getLocalizationService().getString("messages.startup.failed-to-init-ae-database"));
             Debug.trace(e);
         }
@@ -255,6 +268,9 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
 
         if (autoSaveThread != null) {
             autoSaveThread.cancel();
+        }
+        if (aeAutoSaveThread != null) {
+            aeAutoSaveThread.cancel();
         }
         DataStorage.saveAmountChange();
         AEDrive.saveAllDriveCells();
@@ -357,6 +373,22 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
             .version("1.14.0")
             .build();
         libraryManager.loadLibrary(opencc4j);
+
+        getLogger().info("正在加载 heaven");
+        Library heaven = Library.builder()
+            .groupId("com{}github{}houbb")
+            .artifactId("heaven")
+            .version("0.13.0")
+            .build();
+        libraryManager.loadLibrary(heaven);
+
+        getLogger().info("正在加载 nlp-common");
+        Library nlp = Library.builder()
+            .groupId("com{}github{}houbb")
+            .artifactId("nlp-common")
+            .version("0.0.5")
+            .build();
+        libraryManager.loadLibrary(nlp);
     }
 
     public MinecraftVersion getMCVersion() {

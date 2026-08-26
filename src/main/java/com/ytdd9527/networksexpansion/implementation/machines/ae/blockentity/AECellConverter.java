@@ -76,9 +76,9 @@ public class AECellConverter extends SpecialSlimefunItem {
 
     private static final NamespacedKey CELL_SLOT_MARKER_KEY =
         new NamespacedKey("networks", "ae_converter_cell_slot_marker");
-    private static final ItemStack DISPLAY_PLACEHOLDER = buildDisplayPlaceholder();
-    private static final ItemStack BORDER_ICON = buildBorderIcon();
-    private static final ItemStack SEPARATOR_ICON = buildSeparatorIcon();
+    private static final ItemStack DISPLAY_PLACEHOLDER = Lang.getIcon("ae-display-placeholder", Material.GREEN_STAINED_GLASS_PANE);
+    private static final ItemStack BORDER_ICON = Lang.getIcon("ae-converter-border", Material.BLUE_STAINED_GLASS_PANE);
+    private static final ItemStack SEPARATOR_ICON = Lang.getIcon("ae-converter-separator", Material.GRAY_STAINED_GLASS_PANE);
 
     private final Map<Location, Integer> pageCache = new HashMap<>();
     private final Map<Location, Boolean> exportMode = new HashMap<>();
@@ -348,7 +348,7 @@ public class AECellConverter extends SpecialSlimefunItem {
             player.sendMessage(Lang.getString("messages.ae.converter.no_quantum_storage"));
             return;
         }
-        NetworkQuantumStorage storage = getQuantumStorageOf(qsItem);
+        NetworkQuantumStorage storage = asQuantumStorage(qsItem);
         if (storage == null) {
             player.sendMessage(Lang.getString("messages.ae.converter.tier_mismatch"));
             return;
@@ -496,7 +496,7 @@ public class AECellConverter extends SpecialSlimefunItem {
     }
 
     @Nullable
-    private static NetworkQuantumStorage getQuantumStorageOf(@NotNull ItemStack item) {
+    private static NetworkQuantumStorage asQuantumStorage(@NotNull ItemStack item) {
         SlimefunItem sf = SlimefunItem.getByItem(item);
         return sf instanceof NetworkQuantumStorage storage ? storage : null;
     }
@@ -671,30 +671,5 @@ public class AECellConverter extends SpecialSlimefunItem {
             close.setItemMeta(meta);
         }
         return close;
-    }
-
-    @NotNull
-    private static ItemStack buildDisplayPlaceholder() {
-        ItemStack placeholder = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-        ItemMeta meta = placeholder.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(" ");
-            placeholder.setItemMeta(meta);
-        }
-        return placeholder;
-    }
-
-    @NotNull
-    private static ItemStack buildBorderIcon() {
-        ItemStack border = new ItemStack(Material.BLUE_STAINED_GLASS_PANE);
-        border.editMeta(meta -> meta.setDisplayName(" "));
-        return border;
-    }
-
-    @NotNull
-    private static ItemStack buildSeparatorIcon() {
-        ItemStack separator = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        separator.editMeta(meta -> meta.setDisplayName(" "));
-        return separator;
     }
 }

@@ -147,6 +147,17 @@ public final class AECellUniquenessManager {
             return;
         }
         menu.replaceExistingItem(slot, null);
+        // 被丢弃的元件已不在该驱动器，把对应 UUID 从其驱动器集合移除，避免重复误判
+        String uuid = getUuidString(item);
+        if (uuid != null) {
+            Set<Location> drives = UUID_TO_DRIVES.get(uuid);
+            if (drives != null) {
+                drives.remove(menu.getLocation());
+                if (drives.isEmpty()) {
+                    UUID_TO_DRIVES.remove(uuid);
+                }
+            }
+        }
         returnItem(player, menu.getLocation(), item);
     }
 

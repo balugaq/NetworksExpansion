@@ -255,16 +255,13 @@ public class CheckpointTask implements Runnable {
         return new LoadedJournal(entries, readCount);
     }
 
-    private void markCorruptedApplied(Connection conn, List<Long> journalIds) {
+    private void markCorruptedApplied(Connection conn, List<Long> journalIds) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement("UPDATE ae_journal SET applied = 1 WHERE journal_id = ?")) {
             for (long id : journalIds) {
                 ps.setLong(1, id);
                 ps.addBatch();
             }
             ps.executeBatch();
-        } catch (SQLException e) {
-            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.checkpoint_mark_corrupted_failed", e.getMessage()));
-            Debug.trace(e);
         }
     }
 
@@ -340,6 +337,8 @@ public class CheckpointTask implements Runnable {
             if (archiveMaxRows > 0) {
                 trimArchiveToMaxRows(conn);
             }
+            // 归档删除与 trim 在 manual-commit 下需显式提交，否则随连接关闭被回滚
+            conn.commit();
         } catch (SQLException e) {
             LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.checkpoint_archive_failed", e.getMessage()));
             Debug.trace(e);

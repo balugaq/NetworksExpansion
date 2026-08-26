@@ -2,9 +2,11 @@ package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persisten
 
 import com.ytdd9527.networksexpansion.core.managers.ConfigManager;
 import io.github.sefiraat.networks.Networks;
+import lombok.Getter;
 
 import java.io.File;
 
+@Getter
 public class StorageConfig {
 
     private final File sqliteFile;
@@ -23,6 +25,11 @@ public class StorageConfig {
         ConfigManager cm = Networks.getConfigManager();
         File dataFolder = Networks.getInstance().getDataFolder();
         this.sqliteFile = new File(new File(dataFolder, "data"), "ae_storage.db");
+        // 数据库文件路径固定，父目录在初始化时就确保存在
+        File parent = sqliteFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
         this.walMode = cm.getAeStorageWalMode();
         this.busyTimeout = cm.getAeStorageBusyTimeout();
         this.journalRetentionMinutes = cm.getAeStorageJournalRetentionMinutes();
@@ -33,49 +40,5 @@ public class StorageConfig {
         this.checkpointThreshold = cm.getAeStorageCheckpointThreshold();
         this.backupEnabled = cm.getAeStorageBackupEnabled();
         this.backupIntervalHours = cm.getAeStorageBackupIntervalHours();
-    }
-
-    public File getSqliteFile() {
-        return sqliteFile;
-    }
-
-    public boolean isWalMode() {
-        return walMode;
-    }
-
-    public int getBusyTimeout() {
-        return busyTimeout;
-    }
-
-    public long getJournalRetentionMinutes() {
-        return journalRetentionMinutes;
-    }
-
-    public boolean isArchiveEnabled() {
-        return archiveEnabled;
-    }
-
-    public int getArchiveRetentionDays() {
-        return archiveRetentionDays;
-    }
-
-    public int getArchiveMaxRows() {
-        return archiveMaxRows;
-    }
-
-    public int getCheckpointInterval() {
-        return checkpointInterval;
-    }
-
-    public int getCheckpointThreshold() {
-        return checkpointThreshold;
-    }
-
-    public boolean isBackupEnabled() {
-        return backupEnabled;
-    }
-
-    public int getBackupIntervalHours() {
-        return backupIntervalHours;
     }
 }
