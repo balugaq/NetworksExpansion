@@ -1,15 +1,17 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.item;
 
+import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.core.items.SpecialSlimefunItem;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AECellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AEStorageCellCache;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.cell.AECellMenu;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AECellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.component.AECellLore;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.attributes.NotPlaceable;
 import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
+import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +20,7 @@ import java.util.UUID;
 
 public class AEStorageCell extends SpecialSlimefunItem implements NotPlaceable {
 
+    @Getter
     private final long perTypeLimit;
 
     public AEStorageCell(
@@ -30,10 +33,6 @@ public class AEStorageCell extends SpecialSlimefunItem implements NotPlaceable {
         this.perTypeLimit = perTypeLimit;
     }
 
-    public long getPerTypeLimit() {
-        return perTypeLimit;
-    }
-
     @Override
     public void preRegister() {
         addItemHandler((ItemUseHandler) e -> {
@@ -41,6 +40,11 @@ public class AEStorageCell extends SpecialSlimefunItem implements NotPlaceable {
                 return;
             }
             ItemStack cell = e.getItem();
+            if (AECellPersistence.isWrongServer(e.getPlayer(), cell)) {
+                e.getPlayer().sendMessage(Lang.getString("messages.ae.cell.wrong_server"));
+                e.cancel();
+                return;
+            }
             long per = getPerTypeLimit(cell);
             loadCellCache(cell, per);
             applyLore(cell, per, getCurrentPerTypeLimit(cell));

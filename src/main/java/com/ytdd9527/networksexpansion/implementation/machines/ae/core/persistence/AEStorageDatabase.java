@@ -1,8 +1,5 @@
 /*
- * AE 存储持久化层（WAL + Journal + Checkpoint + 物品模板去重 + 备份）。
- *
- * 架构与部分实现移植 / 参考自开源项目 SlimeAE（MIT License）：
- * https://github.com/TimetownDev/SlimeAE/tree/master
+ * AE 存储持久化层（WAL + Journal + Checkpoint + 模板去重 + 备份），架构参考 SlimeAE（MIT）。
  */
 package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence;
 
@@ -55,7 +52,7 @@ public class AEStorageDatabase {
         this.journalWriter = new JournalWriter(writeStrategy, dirtyTracker, connMgr);
         this.checkpointTask = new CheckpointTask(connMgr, writeStrategy, ddl, storageConfig);
         this.storageController = new AEStorageCellController(connMgr, bridge, dirtyTracker);
-        this.backupTask = new BackupTask(storageConfig);
+        this.backupTask = new BackupTask(storageConfig, connMgr);
     }
 
     public void init() {
@@ -100,20 +97,28 @@ public class AEStorageDatabase {
     }
 
     public void shutdown() {
-        if (backupExecutor != null) {
-            backupExecutor.shutdownNow();
-        }
-        if (checkpointExecutor != null) {
-            checkpointExecutor.shutdownNow();
-            try {
-                checkpointExecutor.awaitTermination(5, TimeUnit.SECONDS);
-            } catch (InterruptedException ignored) {
-            }
-        }
+        stopExecutor(backupExecutor, 5);
+        stopExecutor(checkpointExecutor, 15);
         journalWriter.flush();
         checkpointTask.doCheckpoint();
+        writeStrategy.shutdown();
         connMgr.shutdown();
         LOGGER.info(Networks.getLocalizationService().getString("messages.ae.persistence.db_closed"));
+    }
+
+    private static void stopExecutor(ScheduledExecutorService executor, long timeoutSeconds) {
+        if (executor == null) {
+            return;
+        }
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(timeoutSeconds, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     public AEStorageCellController getStorageController() {

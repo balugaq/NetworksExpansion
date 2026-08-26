@@ -1,11 +1,12 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.dao;
 
 import com.balugaq.netex.utils.Debug;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.item.ItemKey;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.connection.ConnectionManager;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.journal.DirtyTracker;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.journal.JournalOp;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.template.ItemKeyTplIdBridge;
 import io.github.sefiraat.networks.Networks;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.core.item.ItemKey;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -56,6 +56,7 @@ public class AEStorageCellController {
                 LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.cell_resolve_tpl_failed", row.tplId, cellUuid));
                 continue;
             }
+            // (cell_uuid, tpl_id) 为主键，同一 tpl 不会重复，直接 put 并累加 stored。
             data.storage.put(key.getItemStack(), row.amount);
             data.stored += row.amount;
         }
@@ -83,43 +84,29 @@ public class AEStorageCellController {
 
     public void markDirty(@NotNull UUID cellUuid, @NotNull ItemKey key, long finalAmount) {
         long tplId = bridge.getOrResolve(key);
-        dirtyTracker.record(cellUuid, tplId, finalAmount, finalAmount > 0 ? 'P' : 'R');
+        dirtyTracker.record(cellUuid, tplId, finalAmount, finalAmount > 0 ? JournalOp.PUT : JournalOp.REMOVE);
     }
 
     public void saveWhitelist(@NotNull UUID cellUuid, boolean whitelistEnabled, @NotNull List<ItemStack> whitelist) {
         byte[] whitelistBytes = serializeWhitelist(whitelist);
         long now = System.currentTimeMillis();
         String cellUuidStr = cellUuid.toString();
-        try (Connection conn = connMgr.getConnection()) {
-            int updated;
-            try (PreparedStatement ps = conn.prepareStatement(
-                "UPDATE ae_cell_meta SET whitelist_enabled = ?, whitelist = ?, updated_at = ? WHERE cell_uuid = ?")) {
-                ps.setInt(1, whitelistEnabled ? 1 : 0);
-                if (whitelistBytes == null) {
-                    ps.setNull(2, Types.BLOB);
-                } else {
-                    ps.setBytes(2, whitelistBytes);
-                }
-                ps.setLong(3, now);
-                ps.setString(4, cellUuidStr);
-                updated = ps.executeUpdate();
-            }
-            if (updated == 0) {
-                try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT OR REPLACE INTO ae_cell_meta (cell_uuid, whitelist_enabled, whitelist, stored, snapshot_hash, updated_at, created_at) "
-                        + "VALUES (?, ?, ?, 0, null, ?, ?)")) {
-                    ps.setString(1, cellUuidStr);
-                    ps.setInt(2, whitelistEnabled ? 1 : 0);
-                    if (whitelistBytes == null) {
-                        ps.setNull(3, Types.BLOB);
-                    } else {
-                        ps.setBytes(3, whitelistBytes);
-                    }
-                    ps.setLong(4, now);
-                    ps.setLong(5, now);
-                    ps.executeUpdate();
-                }
-            }
+        // 单条 upsert：行不存在时以 stored=0/snapshot_hash=null 插入；已存在时只更新白名单字段，
+        // 避免覆盖 checkpoint 写入的 stored/snapshot_hash。
+        String sql = "INSERT INTO ae_cell_meta (cell_uuid, whitelist_enabled, whitelist, stored, snapshot_hash, updated_at, created_at) "
+            + "VALUES (?, ?, ?, 0, null, ?, ?) "
+            + "ON CONFLICT(cell_uuid) DO UPDATE SET "
+            + "whitelist_enabled = excluded.whitelist_enabled, "
+            + "whitelist = excluded.whitelist, "
+            + "updated_at = excluded.updated_at";
+        try (Connection conn = connMgr.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, cellUuidStr);
+            ps.setInt(2, whitelistEnabled ? 1 : 0);
+            ps.setBytes(3, whitelistBytes);
+            ps.setLong(4, now);
+            ps.setLong(5, now);
+            ps.executeUpdate();
         } catch (SQLException e) {
             LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.cell_save_whitelist_failed", e.getMessage()));
             Debug.trace(e);
@@ -172,15 +159,26 @@ public class AEStorageCellController {
         }
         try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(data))) {
             int count = in.readInt();
+            // 校验条目数，避免恶意/损坏数据导致无界分配
+            if (count < 0 || count > data.length / 4) {
+                LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.cell_deserialize_whitelist_failed", "invalid entry count " + count));
+                return whitelist;
+            }
             for (int i = 0; i < count; i++) {
-                byte[] bytes = new byte[in.readInt()];
+                int length = in.readInt();
+                if (length < 0 || length > in.available()) {
+                    LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.cell_deserialize_whitelist_failed", "invalid entry length " + length));
+                    break;
+                }
+                byte[] bytes = new byte[length];
                 in.readFully(bytes);
                 try {
                     ItemStack item = ItemStack.deserializeBytes(bytes);
                     if (item != null && !item.getType().isAir()) {
                         whitelist.add(item);
                     }
-                } catch (Exception ignored) {
+                } catch (RuntimeException e) {
+                    Debug.trace(e, "白名单条目反序列化失败");
                 }
             }
         } catch (IOException e) {

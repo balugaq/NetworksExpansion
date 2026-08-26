@@ -1,5 +1,8 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.schema;
 
+/**
+ * DDL（Data Definition Language，数据定义语言）提供者：集中管理 AE 存储数据库各表的建表/索引 SQL。
+ */
 public class DDLProvider {
 
     public String createSchemaInfoTable() {
@@ -11,19 +14,17 @@ public class DDLProvider {
     public String createItemTemplatesTable() {
         return "CREATE TABLE IF NOT EXISTS ae_item_templates ("
             + "tpl_id INTEGER PRIMARY KEY, "
-            + "item_id VARCHAR(256) NOT NULL, "
-            + "item_data TEXT, "
+            + "item_data TEXT NOT NULL, "
             + "item_data_hash BIGINT NOT NULL, "
             + "crc32 INT NOT NULL, "
             + "created_at BIGINT NOT NULL)";
     }
 
+    /**
+     * 去重索引：相同 {@code item_data_hash} 的模板只保留一行，插入时配合 INSERT OR IGNORE 去重。
+     */
     public String createItemTemplatesDedup() {
-        return "CREATE UNIQUE INDEX IF NOT EXISTS idx_tpl_dedup ON ae_item_templates(item_id, item_data_hash)";
-    }
-
-    public String createItemTemplatesItemIdIndex() {
-        return "CREATE INDEX IF NOT EXISTS idx_tpl_item_id ON ae_item_templates(item_id)";
+        return "CREATE UNIQUE INDEX IF NOT EXISTS idx_tpl_dedup ON ae_item_templates(item_data_hash)";
     }
 
     public String createCellMetaTable() {
@@ -45,10 +46,6 @@ public class DDLProvider {
             + "crc32 INT NOT NULL, "
             + "updated_at BIGINT NOT NULL, "
             + "PRIMARY KEY (cell_uuid, tpl_id))";
-    }
-
-    public String createCellItemsIndex() {
-        return "CREATE INDEX IF NOT EXISTS idx_cell_items_uuid ON ae_cell_items(cell_uuid)";
     }
 
     public String createJournalTable() {

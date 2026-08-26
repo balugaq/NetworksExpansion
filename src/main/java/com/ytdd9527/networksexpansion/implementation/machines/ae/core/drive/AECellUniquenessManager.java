@@ -2,8 +2,8 @@ package com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive;
 
 import com.balugaq.netex.utils.Lang;
 import com.balugaq.netex.utils.NetworksVersionedParticle;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AECellPersistence;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.slot.AEDriveMenuSlots;
 import io.github.sefiraat.networks.Networks;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import org.bukkit.Color;
@@ -27,8 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class AECellUniquenessManager {
 
-    private static final int[] FACE_OFFSETS_X = new int[]{1, -1, 0, 0};
-    private static final int[] FACE_OFFSETS_Z = new int[]{0, 0, 1, -1};
     private static final Map<String, Set<Location>> UUID_TO_DRIVES = new ConcurrentHashMap<>();
 
     private AECellUniquenessManager() {
@@ -42,7 +40,7 @@ public final class AECellUniquenessManager {
     @NotNull
     public static Set<String> collectUuidStrings(@NotNull BlockMenu menu) {
         Set<String> uuids = new HashSet<>();
-        for (int slot : AEDriveMenuSlots.CELL_SLOTS) {
+        for (int slot : AEDrive.CELL_SLOTS) {
             ItemStack item = menu.getItemInSlot(slot);
             if (item == null || item.getType().isAir()) {
                 continue;
@@ -63,7 +61,7 @@ public final class AECellUniquenessManager {
         return collectUuidStrings(menu).contains(uuid);
     }
 
-    public static void registerCell(@NotNull Location driveLocation, @NotNull ItemStack cell) {
+    public static synchronized void registerCell(@NotNull Location driveLocation, @NotNull ItemStack cell) {
         String uuid = getUuidString(cell);
         if (uuid == null) {
             return;
@@ -71,10 +69,10 @@ public final class AECellUniquenessManager {
         UUID_TO_DRIVES.computeIfAbsent(uuid, k -> ConcurrentHashMap.newKeySet()).add(driveLocation);
     }
 
-    public static void registerDrive(@NotNull BlockMenu menu) {
+    public static synchronized void registerDrive(@NotNull BlockMenu menu) {
         Location location = menu.getLocation();
         unregisterDrive(location);
-        for (int slot : AEDriveMenuSlots.CELL_SLOTS) {
+        for (int slot : AEDrive.CELL_SLOTS) {
             ItemStack item = menu.getItemInSlot(slot);
             String uuid = getUuidString(item);
             if (uuid != null) {
@@ -83,7 +81,7 @@ public final class AECellUniquenessManager {
         }
     }
 
-    public static void unregisterDrive(@NotNull Location driveLocation) {
+    public static synchronized void unregisterDrive(@NotNull Location driveLocation) {
         if (UUID_TO_DRIVES.isEmpty()) {
             return;
         }
@@ -105,6 +103,11 @@ public final class AECellUniquenessManager {
         return uuid != null && isDuplicateAcrossDrives(currentDrive, uuid);
     }
 
+    /**
+     * 判断该 UUID 是否已经出现在其它驱动器里。
+     * UUID_TO_DRIVES 记录的是 uuid → 持有该 uuid 元件的驱动器位置集合，
+     * 因此只要集合中存在任意一个不等于当前驱动器的位置，就说明是跨驱动器重复。
+     */
     private static boolean isDuplicateAcrossDrives(@NotNull Location currentDrive, @NotNull String uuid) {
         Set<Location> drives = UUID_TO_DRIVES.get(uuid);
         if (drives == null || drives.isEmpty()) {
@@ -126,7 +129,7 @@ public final class AECellUniquenessManager {
         registerDrive(menu);
         Location location = menu.getLocation();
         Set<String> seen = new HashSet<>();
-        for (int slot : AEDriveMenuSlots.CELL_SLOTS) {
+        for (int slot : AEDrive.CELL_SLOTS) {
             ItemStack item = menu.getItemInSlot(slot);
             String uuid = getUuidString(item);
             if (uuid == null) {
@@ -143,7 +146,7 @@ public final class AECellUniquenessManager {
         if (item == null || item.getType().isAir()) {
             return;
         }
-        menu.toInventory().setItem(slot, null);
+        menu.replaceExistingItem(slot, null);
         returnItem(player, menu.getLocation(), item);
     }
 
@@ -153,37 +156,8 @@ public final class AECellUniquenessManager {
     }
 
     private static void returnItem(@NotNull Player player, @NotNull Location driveLocation, @NotNull ItemStack item) {
-        Location target = findEjectLocation(driveLocation);
-        if (target != null) {
-            dropItem(target, item);
-            return;
-        }
-        if (!player.getInventory().addItem(item).isEmpty()) {
-            dropItem(player.getLocation(), item);
-        }
-    }
-
-    @Nullable
-    private static Location findEjectLocation(@NotNull Location driveLocation) {
-        World world = driveLocation.getWorld();
-        if (world == null) {
-            return null;
-        }
-        Location above = driveLocation.clone().add(0, 1, 0);
-        if (isPassable(above)) {
-            return above;
-        }
-        for (int i = 0; i < FACE_OFFSETS_X.length; i++) {
-            Location side = driveLocation.clone().add(FACE_OFFSETS_X[i], 0, FACE_OFFSETS_Z[i]);
-            if (isPassable(side)) {
-                return side;
-            }
-        }
-        return null;
-    }
-
-    private static boolean isPassable(@NotNull Location location) {
-        return location.getBlock().isPassable();
+        // 直接弹到驱动器上方一格，避免复杂的可通行位置探测
+        dropItem(driveLocation.clone().add(0, 1, 0), item);
     }
 
     private static void dropItem(@NotNull Location location, @NotNull ItemStack item) {

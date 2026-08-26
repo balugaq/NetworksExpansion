@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class JournalWriter {
@@ -35,34 +34,30 @@ public class JournalWriter {
         }
 
         List<List<JournalRow>> batches = partition(allRows, FLUSH_BATCH_SIZE);
-        boolean allSuccess = true;
-        int flushedCount = 0;
+        List<JournalRow> failedRows = new ArrayList<>();
 
         for (List<JournalRow> batch : batches) {
             try {
-                if (!writeStrategy.acquire(5, TimeUnit.SECONDS)) {
-                    allSuccess = false;
-                    break;
-                }
-                try {
-                    batchInsertJournal(batch);
-                    flushedCount += batch.size();
-                } finally {
-                    writeStrategy.release();
-                }
+                writeStrategy.runExclusive(() -> {
+                    try {
+                        batchInsertJournal(batch);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return null;
+                });
             } catch (Exception e) {
-                allSuccess = false;
+                failedRows.addAll(batch);
                 LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.journal_flush_failed", e.getMessage()));
                 Debug.trace(e);
-                break;
             }
         }
 
-        if (allSuccess) {
+        if (failedRows.isEmpty()) {
             dirtyTracker.commitFlush();
         } else {
-            dirtyTracker.rollbackFlush();
-            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.journal_flush_partial", allRows.size() - flushedCount));
+            dirtyTracker.rollbackFlush(failedRows);
+            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.journal_flush_partial", failedRows.size()));
         }
     }
 

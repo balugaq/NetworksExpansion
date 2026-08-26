@@ -4,7 +4,7 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AECellUniquenessManager;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.item.AEStorageCell;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.slot.AEDriveMenuSlots;
+import com.ytdd9527.networksexpansion.utils.ReflectionUtil;
 import io.github.sefiraat.networks.Networks;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,11 @@ public final class AEDriveUniquenessListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
-        BlockMenu menu = resolveDriveMenu(event.getView().getTopInventory());
+        Inventory top = getTopInventory(event);
+        if (top == null) {
+            return;
+        }
+        BlockMenu menu = resolveDriveMenu(top);
         if (menu == null) {
             return;
         }
@@ -37,12 +42,17 @@ public final class AEDriveUniquenessListener implements Listener {
             return;
         }
         if (!AECellUniquenessManager.isDuplicate(menu, beingPlaced)) {
-            AECellUniquenessManager.registerCell(menu.getLocation(), beingPlaced);
+            if (event.getClick().isShiftClick()) {
+                // shift-click 的放置结果要等事件应用后才能确认（槽位可能已满），延迟到下一 tick 重建索引
+                Bukkit.getScheduler().runTask(Networks.getInstance(), () -> AECellUniquenessManager.registerDrive(menu));
+            } else {
+                AECellUniquenessManager.registerCell(menu.getLocation(), beingPlaced);
+            }
             return;
         }
         event.setCancelled(true);
         AECellUniquenessManager.notifyDuplicateRejected(player);
-        Bukkit.getScheduler().runTask(Networks.getInstance(), () -> AECellUniquenessManager.scanAndEjectDuplicates(menu, player));
+        AECellUniquenessManager.scanAndEjectDuplicates(menu, player);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -50,7 +60,11 @@ public final class AEDriveUniquenessListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player)) {
             return;
         }
-        BlockMenu menu = resolveDriveMenu(event.getView().getTopInventory());
+        Inventory top = getTopInventory(event);
+        if (top == null) {
+            return;
+        }
+        BlockMenu menu = resolveDriveMenu(top);
         if (menu == null) {
             return;
         }
@@ -58,7 +72,7 @@ public final class AEDriveUniquenessListener implements Listener {
         if (dragged == null || !AEStorageCell.isStorageCell(dragged)) {
             return;
         }
-        int topSize = event.getView().getTopInventory().getSize();
+        int topSize = top.getSize();
         boolean placed = false;
         for (int rawSlot : event.getRawSlots()) {
             if (rawSlot >= topSize || !isCellSlot(rawSlot)) {
@@ -68,7 +82,7 @@ public final class AEDriveUniquenessListener implements Listener {
             if (AECellUniquenessManager.isDuplicate(menu, dragged)) {
                 event.setCancelled(true);
                 AECellUniquenessManager.notifyDuplicateRejected(player);
-                Bukkit.getScheduler().runTask(Networks.getInstance(), () -> AECellUniquenessManager.scanAndEjectDuplicates(menu, player));
+                AECellUniquenessManager.scanAndEjectDuplicates(menu, player);
                 return;
             }
         }
@@ -79,7 +93,10 @@ public final class AEDriveUniquenessListener implements Listener {
 
     @Nullable
     private static ItemStack resolvePlacedItem(@NotNull InventoryClickEvent event) {
-        Inventory top = event.getView().getTopInventory();
+        Inventory top = getTopInventory(event);
+        if (top == null) {
+            return null;
+        }
         int rawSlot = event.getRawSlot();
         boolean clickedTop = rawSlot >= 0 && rawSlot < top.getSize();
         ClickType click = event.getClick();
@@ -117,7 +134,7 @@ public final class AEDriveUniquenessListener implements Listener {
     }
 
     private static boolean isCellSlot(int rawSlot) {
-        for (int slot : AEDriveMenuSlots.CELL_SLOTS) {
+        for (int slot : AEDrive.CELL_SLOTS) {
             if (slot == rawSlot) {
                 return true;
             }
@@ -132,5 +149,14 @@ public final class AEDriveUniquenessListener implements Listener {
         }
         SlimefunItem sf = StorageCacheUtils.getSfItem(menu.getLocation());
         return sf instanceof AEDrive ? menu : null;
+    }
+
+    @Nullable
+    private static Inventory getTopInventory(@NotNull InventoryEvent event) {
+        Object view = ReflectionUtil.invokeMethod(event, "getView");
+        if (view == null) {
+            return null;
+        }
+        return (Inventory) ReflectionUtil.invokeMethod(view, "getTopInventory");
     }
 }

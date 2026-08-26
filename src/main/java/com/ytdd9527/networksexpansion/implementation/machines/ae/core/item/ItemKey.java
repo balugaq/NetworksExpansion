@@ -8,12 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 /**
- * A canonical, immutable identity key for an {@link ItemStack}.
+ * 归一化物品身份键，忽略数量（{@code asOne()}），身份由物品种类与完整 NBT 字节决定.
  *
- * <p>The full item identity is captured via {@link ItemStack#serializeAsBytes()}
- * after the item has been reduced to a count of one and, when applicable,
- * canonicalized to its Slimefun template. An item matches another if and only if
- * they share the same material and full NBT data, ignoring stack size.</p>
+ * <p>已注册粘液物品未实现 {@link DistinctiveItem} 时以原型物品统一身份，
+ * 附魔、等级等实例差异不产生不同键。{@link #getItemStack()} 始终返回克隆副本。
+ * @author TimetownDev（SlimeAE，MIT）
  */
 public class ItemKey {
 
@@ -34,7 +33,7 @@ public class ItemKey {
 
     @NotNull
     public ItemStack getItemStack() {
-        return itemStack;
+        return itemStack.clone();
     }
 
     @Override
