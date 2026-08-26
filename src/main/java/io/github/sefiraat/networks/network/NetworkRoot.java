@@ -159,6 +159,8 @@ public class NetworkRoot extends NetworkNode {
     @Getter
     private final Set<Location> advancedWirelessTransmitters = ConcurrentHashMap.newKeySet();
     @Getter
+    private final Set<Location> aeSwitchers = ConcurrentHashMap.newKeySet();
+    @Getter
     private final Set<Location> itemDifferenters = ConcurrentHashMap.newKeySet();
     @Getter
     private final Set<Location> storageCardConverters = ConcurrentHashMap.newKeySet();
@@ -520,6 +522,7 @@ public class NetworkRoot extends NetworkNode {
             case CRAFTER_MANAGER -> crafterManagers.add(location);
             case FLOW_VIEWER -> itemFlowViewers.add(location);
             case ADVANCED_WIRELESS_TRANSMITTER -> advancedWirelessTransmitters.add(location);
+            case AE_SWITCHER -> aeSwitchers.add(location);
             case ITEM_DIFFERENTER -> itemDifferenters.add(location);
             case STORAGE_CARD_CONVERTER -> storageCardConverters.add(location);
             case FACING_PRESETTER -> facingPresetters.add(location);
@@ -618,7 +621,7 @@ public class NetworkRoot extends NetworkNode {
         }
 
         // AE Drives
-        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getOutputAbleAEDriveMenus());
+        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getAEDriveMenus());
         for (Map.Entry<ItemStack, Long> entry : aeItems.entrySet()) {
             ItemStack clone = entry.getKey().clone();
             clone.setAmount(1);

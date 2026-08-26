@@ -125,12 +125,17 @@ public class AEDrive extends SpecialSlimefunItem {
                 public void tick(@NotNull Block b, SlimefunItem item, SlimefunBlockData data) {
                     final Location location = b.getLocation();
                     final long now = System.currentTimeMillis();
-                    final Long last = displayRefreshTimestamps.get(location);
-                    if (last != null && now - last < DISPLAY_REFRESH_INTERVAL_MS) {
+                    // 原子地"检查间隔 + 保留时间戳"：并发异步 tick 也只会有一个拿到调度权
+                    boolean shouldRefresh = displayRefreshTimestamps.compute(location, (k, last) -> {
+                        if (last != null && now - last < DISPLAY_REFRESH_INTERVAL_MS) {
+                            return last;
+                        }
+                        return now;
+                    }) == now;
+                    if (!shouldRefresh) {
                         return;
                     }
-
-                    displayRefreshTimestamps.put(location, now);
+                    // isSynchronized=false：tick 在异步线程执行，菜单访问须回到主线程
                     Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
                         final BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
                         if (blockMenu == null || !blockMenu.hasViewer()) {
