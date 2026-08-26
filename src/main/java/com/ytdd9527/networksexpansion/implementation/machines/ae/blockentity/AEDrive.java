@@ -129,13 +129,13 @@ public class AEDrive extends SpecialSlimefunItem {
                     if (last != null && now - last < DISPLAY_REFRESH_INTERVAL_MS) {
                         return;
                     }
-                    // isSynchronized=false：tick 在异步线程执行，菜单访问须回到主线程
+
+                    displayRefreshTimestamps.put(location, now);
                     Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
                         final BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
                         if (blockMenu == null || !blockMenu.hasViewer()) {
                             return;
                         }
-                        displayRefreshTimestamps.put(location, System.currentTimeMillis());
                         updateMainDisplay(blockMenu);
                     });
                 }
