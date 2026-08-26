@@ -680,7 +680,7 @@ messages:
       cell_name: "<passive>  元件 · <white>{0}"
       item_types: "<passive>  物品种类 · <white>{0}"
       item_count: "<passive>  数量 · <white>{0}"
-      delete_hint: "<passive>  点击删除此物品"
+      delete_hint: "<passive>  Shift+点击删除此物品"
       no_cell: "<passive>  未放入元件"
       info_title: "<passive>元件清理台"
       prev_page: "<passive>◀ 上一页"
@@ -744,6 +744,10 @@ messages:
 icons:
   ae-back-button:
     name: "&c返回"
+  ae-drive-whitelist-add:
+    name: "&a添加玩家"
+    lore:
+      - "&7  &r点击后在聊天栏输入玩家名"
   ae-setting-slot:
     name: "&a白名单物品"
     lore:
@@ -1260,8 +1264,6 @@ icons:
     name: "&6点击升级"
     lore:
       - ""
-  ae_switcher:
-    name: "网络交换机"
   diff-button:
     name: "&6点击查看物品差异"
     lore:

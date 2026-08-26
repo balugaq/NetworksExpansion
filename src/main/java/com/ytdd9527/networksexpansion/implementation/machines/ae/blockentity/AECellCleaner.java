@@ -8,6 +8,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AESto
 import com.ytdd9527.networksexpansion.implementation.machines.ae.item.AEStorageCell;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.utils.AENumberFormat;
 import io.github.sefiraat.networks.Networks;
+import io.github.sefiraat.networks.utils.Keys;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -22,7 +23,6 @@ import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -60,9 +60,9 @@ import java.util.Map;
         46, 47, 48, 49, 50, 51, 52
     };
 
-    private static final NamespacedKey CELL_SLOT_MARKER_KEY =
-        new NamespacedKey("networks", "ae_cleaner_cell_slot_marker");
-    private static final ItemStack DISPLAY_PLACEHOLDER = buildDisplayPlaceholder();
+    private static final ItemStack DISPLAY_PLACEHOLDER = Lang.getIcon("ae-display-placeholder", Material.GREEN_STAINED_GLASS_PANE);
+    private static final ItemStack CELL_SLOT_MARKER = buildCellSlotMarker();
+    private static final ItemStack CLOSE_ICON = Lang.getIcon("ae-cleaner-close", Material.BARRIER);
 
     private final Map<Location, Integer> pageCache = new HashMap<>();
 
@@ -117,7 +117,7 @@ import java.util.Map;
             public void newInstance(@NotNull BlockMenu menu, @NotNull Block block) {
                 ItemStack existing = menu.getItemInSlot(CELL_SLOT);
                 if (existing == null || existing.getType().isAir()) {
-                    menu.replaceExistingItem(CELL_SLOT, createCellSlotMarker());
+                    menu.replaceExistingItem(CELL_SLOT, CELL_SLOT_MARKER);
                 }
                 for (int slot : DISPLAY_SLOTS) {
                     menu.replaceExistingItem(slot, DISPLAY_PLACEHOLDER.clone());
@@ -145,19 +145,15 @@ import java.util.Map;
             return false;
         }
         ItemMeta meta = itemStack.getItemMeta();
-        return meta != null && meta.getPersistentDataContainer().has(CELL_SLOT_MARKER_KEY, PersistentDataType.BOOLEAN);
+        return meta != null && meta.getPersistentDataContainer().has(Keys.AE_CELL_CLEANER_MARKER, PersistentDataType.BOOLEAN);
     }
 
     @NotNull
-    private static ItemStack createCellSlotMarker() {
-        ItemStack marker = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+    private static ItemStack buildCellSlotMarker() {
+        ItemStack marker = Lang.getIcon("ae-cleaner-cell-slot", Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = marker.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(Lang.getString("messages.ae.cleaner.cell_slot"));
-            List<String> lore = new ArrayList<>();
-            lore.add(Lang.getString("messages.ae.cleaner.cell_slot_lore"));
-            meta.setLore(lore);
-            meta.getPersistentDataContainer().set(CELL_SLOT_MARKER_KEY, PersistentDataType.BOOLEAN, true);
+            meta.getPersistentDataContainer().set(Keys.AE_CELL_CLEANER_MARKER, PersistentDataType.BOOLEAN, true);
             marker.setItemMeta(meta);
         }
         return marker;
@@ -204,7 +200,8 @@ import java.util.Map;
                 boolean cursorHasItem = cursor != null && !cursor.getType().isAir();
                 boolean slotHasCellItem = item != null && !item.getType().isAir()
                     && item.getType() != Material.GREEN_STAINED_GLASS_PANE;
-                if (slotHasCellItem && !cursorHasItem) {
+                // 需按住 Shift 点击才删除，避免误删整类物品
+                if (slotHasCellItem && !cursorHasItem && action.isShiftClicked()) {
                     deleteItem(menu, slot);
                 }
                 return false;
@@ -276,7 +273,7 @@ import java.util.Map;
         AEStorageCell.loadCellCache(cellItem, per);
         AEStorageCell.applyLore(cellItem, per, AEStorageCell.getCurrentPerTypeLimit(cellItem));
 
-        menu.replaceExistingItem(slot, createCellSlotMarker());
+        menu.replaceExistingItem(slot, CELL_SLOT_MARKER);
 
         clearDisplay(menu);
         pageCache.put(menu.getLocation(), 0);
@@ -290,12 +287,7 @@ import java.util.Map;
             player.setItemOnCursor(item);
             return;
         }
-        Map<Integer, ItemStack> leftover = player.getInventory().addItem(item);
-        if (!leftover.isEmpty()) {
-            for (ItemStack drop : leftover.values()) {
-                player.getWorld().dropItem(player.getLocation(), drop);
-            }
-        }
+        player.getWorld().dropItemNaturally(player.getLocation(), item);
     }
 
     private void deleteItem(@NotNull BlockMenu menu, int displaySlot) {
@@ -337,12 +329,12 @@ import java.util.Map;
         ItemStack cellItem = menu.getItemInSlot(CELL_SLOT);
 
         if (cellItem == null || !AEStorageCell.isStorageCell(cellItem)) {
-            menu.replaceExistingItem(CELL_SLOT, createCellSlotMarker());
+            menu.replaceExistingItem(CELL_SLOT, CELL_SLOT_MARKER);
             clearDisplay(menu);
             menu.replaceExistingItem(INFO, buildInfoItem(null, 0));
             menu.replaceExistingItem(PREV, buildPageButton(false, false));
             menu.replaceExistingItem(NEXT, buildPageButton(false, true));
-            menu.replaceExistingItem(CLOSE, buildCloseButton());
+            menu.replaceExistingItem(CLOSE, CLOSE_ICON);
             return;
         }
 
@@ -376,7 +368,7 @@ import java.util.Map;
         menu.replaceExistingItem(PREV, buildPageButton(page > 0, false));
         menu.replaceExistingItem(NEXT, buildPageButton(page < maxPages - 1, true));
         menu.replaceExistingItem(INFO, buildInfoItem(cellItem, entries.size()));
-        menu.replaceExistingItem(CLOSE, buildCloseButton());
+        menu.replaceExistingItem(CLOSE, CLOSE_ICON);
     }
 
     private void clearDisplay(@NotNull BlockMenu menu) {
@@ -453,27 +445,5 @@ import java.util.Map;
             button.setItemMeta(meta);
         }
         return button;
-    }
-
-    @NotNull
-    private static ItemStack buildCloseButton() {
-        ItemStack close = new ItemStack(Material.BARRIER);
-        ItemMeta meta = close.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(Lang.getString("messages.ae.cleaner.close"));
-            close.setItemMeta(meta);
-        }
-        return close;
-    }
-
-    @NotNull
-    private static ItemStack buildDisplayPlaceholder() {
-        ItemStack placeholder = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-        ItemMeta meta = placeholder.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(" ");
-            placeholder.setItemMeta(meta);
-        }
-        return placeholder;
     }
 }

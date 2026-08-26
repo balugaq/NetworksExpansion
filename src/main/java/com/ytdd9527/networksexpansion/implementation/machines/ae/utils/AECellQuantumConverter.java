@@ -50,7 +50,8 @@ public final class AECellQuantumConverter {
         return qsItem;
     }
 
-    public static void convert(@NotNull Player player) {        ItemStack cell = player.getInventory().getItemInMainHand();
+    public static void convert(@NotNull Player player) {
+        ItemStack cell = player.getInventory().getItemInMainHand();
         if (cell.getType() == Material.AIR || !AEStorageCell.isStorageCell(cell)) {
             player.sendMessage(Lang.getString("messages.commands.aetoquantum.need-cell"));
             return;

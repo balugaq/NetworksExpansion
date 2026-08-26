@@ -31,6 +31,7 @@ ae:
 ae-storage:
   wal-mode: true
   busy-timeout: 5000
+  write-timeout-seconds: 10
   journal-retention-minutes: 30
   archive-enabled: true
   archive-retention-days: 7

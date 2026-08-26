@@ -17,10 +17,6 @@ public class ConnectionManager {
     public ConnectionManager(StorageConfig config) {
         this.config = config;
         File file = config.getSqliteFile();
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
-        }
         this.jdbcUrl = "jdbc:sqlite:" + file.getAbsolutePath();
         // WAL 是持久化设置，仅需在初始化时设置一次
         if (config.isWalMode()) {

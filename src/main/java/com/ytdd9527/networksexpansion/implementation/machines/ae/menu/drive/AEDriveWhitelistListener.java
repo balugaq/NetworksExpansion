@@ -14,15 +14,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 /**
  * 白名单输入监听：玩家处于"输入玩家名"状态时拦截聊天并解析名称，
  * 其余聊天不受影响；玩家退出时清理残留状态。
  */
 public class AEDriveWhitelistListener implements Listener {
-
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{1,16}$");
 
     @EventHandler
     public void onQuit(@NotNull PlayerQuitEvent e) {
@@ -47,10 +44,6 @@ public class AEDriveWhitelistListener implements Listener {
         }
         if (name.length() > 16) {
             player.sendMessage(Lang.getString("messages.ae.drive.whitelist_name_too_long"));
-            return;
-        }
-        if (!USERNAME_PATTERN.matcher(name).matches()) {
-            player.sendMessage(Lang.getString("messages.ae.drive.whitelist_name_invalid"));
             return;
         }
 

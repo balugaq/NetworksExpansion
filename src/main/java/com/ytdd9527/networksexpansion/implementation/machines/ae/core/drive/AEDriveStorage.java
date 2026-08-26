@@ -14,9 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,17 +32,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * <p>缓存分三层：{@link #PLAIN_KEY_CACHE} 按物品种类缓存无 meta 原版物品的 ItemKey；
  * {@link #cellCache} 缓存"驱动器位置 → 元件列表"（位置全局唯一，跨网络共享），
  * 增删元件时经 {@link #invalidateCellCache} 失效并递增代数；
- * {@link NetworkCache} 由 NetworkRoot 按网络各持一份，其中 FlatView 为带 uuid 索引的
+ * {@link AENetworkCache} 由 NetworkRoot 按网络各持一份，其中 FlatView 为带 uuid 索引的
  * 展平元件列表，驱动器集合或代数变化时重建并清空条目级缓存；
  * pushCache / takeCache 记录上次成功存取的元件 uuid 供优先命中，
  * notIncluded 缓存已确认缺失的物品避免无效遍历，
  * cachedStorage / itemToStorageIndex 为全量库存快照与"物品 → uuid"索引，
- * 有效期 {@value #STORAGE_CACHE_INTERVAL_MS} ms，期间经 {@link NetworkCache#adjust}
+ * 有效期 {@value #STORAGE_CACHE_INTERVAL_MS} ms，期间经 {@link AENetworkCache#adjust}
  * 增量修正，过期后重新聚合。
  */
 public class AEDriveStorage {
 
-    private static final long STORAGE_CACHE_INTERVAL_MS = 200L;
     private static final Map<Material, ItemKey> PLAIN_KEY_CACHE = new ConcurrentHashMap<>();
 
     private final Map<Location, List<AECellHandle>> cellCache = new ConcurrentHashMap<>();
@@ -77,7 +75,7 @@ public class AEDriveStorage {
     }
 
     @NotNull
-    private FlatView getFlatView(@NotNull NetworkCache cache, @NotNull Collection<BlockMenu> menus) {
+    private FlatView getFlatView(@NotNull AENetworkCache cache, @NotNull Collection<BlockMenu> menus) {
         Set<Location> driveLocations = new HashSet<>();
         for (BlockMenu menu : menus) {
             driveLocations.add(menu.getLocation());
@@ -107,7 +105,7 @@ public class AEDriveStorage {
         return view;
     }
 
-    public boolean pushItems(@NotNull NetworkCache cache, @NotNull Collection<BlockMenu> menus, @NotNull Map<ItemStack, Long> items) {
+    public boolean pushItems(@NotNull AENetworkCache cache, @NotNull Collection<BlockMenu> menus, @NotNull Map<ItemStack, Long> items) {
         FlatView view = getFlatView(cache, menus);
         List<AECellHandle> cells = view.cells;
         if (cells.isEmpty()) {
@@ -154,7 +152,7 @@ public class AEDriveStorage {
     }
 
     @Nullable
-    public ItemStack takeItem(@NotNull NetworkCache cache, @NotNull Collection<BlockMenu> menus, @NotNull ItemRequest request) {
+    public ItemStack takeItem(@NotNull AENetworkCache cache, @NotNull Collection<BlockMenu> menus, @NotNull ItemRequest request) {
         ItemStack requested = request.getItemStack();
         if (requested == null) {
             return null;
@@ -238,7 +236,7 @@ public class AEDriveStorage {
     }
 
     @NotNull
-    public Map<ItemStack, Long> getAllCellItems(@NotNull NetworkCache cache, @NotNull Collection<BlockMenu> menus) {
+    public Map<ItemStack, Long> getAllCellItems(@NotNull AENetworkCache cache, @NotNull Collection<BlockMenu> menus) {
         FlatView view = getFlatView(cache, menus);
         ItemHashMap<Long> snapshot = cache.getStorage(view.cells);
         Map<ItemStack, Long> result = new HashMap<>();
@@ -265,7 +263,7 @@ public class AEDriveStorage {
         return result;
     }
 
-    public int getAmount(@NotNull NetworkCache cache, @NotNull Collection<BlockMenu> menus, @NotNull ItemStack itemStack) {
+    public int getAmount(@NotNull AENetworkCache cache, @NotNull Collection<BlockMenu> menus, @NotNull ItemStack itemStack) {
         ItemKey itemKey = getKey(itemStack);
         if (cache.getNotIncluded().contains(itemKey)) {
             return 0;
@@ -279,80 +277,6 @@ public class AEDriveStorage {
             return Integer.MAX_VALUE;
         }
         return (int) total;
-    }
-
-    public static final class NetworkCache {
-        private final Set<ItemKey> notIncluded = ConcurrentHashMap.newKeySet();
-        private final Map<ItemKey, UUID> pushCache = new ConcurrentHashMap<>();
-        private final Map<ItemKey, UUID> takeCache = new ConcurrentHashMap<>();
-        private volatile ItemHashMap<Long> cachedStorage = null;
-        private volatile Map<ItemKey, List<UUID>> itemToStorageIndex = null;
-        private volatile long lastCacheTime = 0;
-        private volatile FlatView flatView = null;
-
-        public Set<ItemKey> getNotIncluded() {
-            return notIncluded;
-        }
-
-        public Map<ItemKey, UUID> getPushCache() {
-            return pushCache;
-        }
-
-        public Map<ItemKey, UUID> getTakeCache() {
-            return takeCache;
-        }
-
-        @Nullable
-        public Map<ItemKey, List<UUID>> getItemToStorageIndex() {
-            return itemToStorageIndex;
-        }
-
-        @Nullable
-        public FlatView getFlatView() {
-            return flatView;
-        }
-
-        public void setFlatView(@NotNull FlatView flatView) {
-            this.flatView = flatView;
-        }
-
-        public synchronized ItemHashMap<Long> getStorage(@NotNull List<AECellHandle> cells) {
-            ItemHashMap<Long> cached = cachedStorage;
-            if (cached != null && System.currentTimeMillis() - lastCacheTime < STORAGE_CACHE_INTERVAL_MS) {
-                return cached;
-            }
-
-            ItemHashMap<Long> result = new ItemHashMap<>();
-            Map<ItemKey, List<UUID>> newIndex = new HashMap<>();
-            for (AECellHandle cell : cells) {
-                cell.accumulateInto(result, newIndex);
-            }
-            itemToStorageIndex = newIndex;
-            cachedStorage = result;
-            lastCacheTime = System.currentTimeMillis();
-            return result;
-        }
-
-        public synchronized void adjust(@NotNull ItemKey key, long delta) {
-            ItemHashMap<Long> cached = cachedStorage;
-            if (cached == null) {
-                return;
-            }
-            Long current = cached.getKey(key);
-            long newValue = (current != null ? current : 0L) + delta;
-            if (newValue <= 0) {
-                cached.removeKey(key);
-            } else {
-                cached.putKey(key, newValue);
-            }
-        }
-
-        public synchronized void clearItemCaches() {
-            cachedStorage = null;
-            itemToStorageIndex = null;
-            lastCacheTime = 0;
-            notIncluded.clear();
-        }
     }
 
     @Getter

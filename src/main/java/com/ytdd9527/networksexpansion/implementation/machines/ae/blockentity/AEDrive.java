@@ -81,8 +81,8 @@ public class AEDrive extends SpecialSlimefunItem {
 
     private static final AEDriveStorage storage = new AEDriveStorage();
 
-    private final Map<Location, Integer> itemAccessPageCache = new HashMap<>();
-    private final Map<Location, Long> displayRefreshTimestamps = new HashMap<>();
+    private final Map<Location, Integer> itemAccessPageCache = new ConcurrentHashMap<>();
+    private final Map<Location, Long> displayRefreshTimestamps = new ConcurrentHashMap<>();
 
     @NotNull
     public static AEDriveStorage getStorage() {
@@ -354,16 +354,7 @@ public class AEDrive extends SpecialSlimefunItem {
 
     @NotNull
     private static ItemStack buildAccessButton() {
-        ItemStack accessButton = new ItemStack(Material.CHEST);
-        ItemMeta accessMeta = accessButton.getItemMeta();
-        if (accessMeta != null) {
-            List<String> accessLore = new ArrayList<>();
-            accessLore.add(Lang.getString("messages.ae.drive.access_hint"));
-            accessMeta.setDisplayName(Lang.getString("messages.ae.drive.browse"));
-            accessMeta.setLore(accessLore);
-            accessButton.setItemMeta(accessMeta);
-        }
-        return accessButton;
+        return Lang.getIcon("ae-drive-browse", Material.CHEST);
     }
 
     @NotNull
@@ -404,13 +395,7 @@ public class AEDrive extends SpecialSlimefunItem {
         if (cached != null) {
             return cached;
         }
-        String owner;
-        try {
-            owner = StorageCacheUtils.getData(location, OWNER_KEY);
-        } catch (IllegalStateException e) {
-            // 方块数据正在移除（如破坏进行中），此时读不到 owner
-            return null;
-        }
+        String owner = StorageCacheUtils.getData(location, OWNER_KEY);
         UUID uuid = owner == null ? null : parseUuid(owner);
         if (uuid != null) {
             OWNER_CACHE.put(location.clone(), uuid);
