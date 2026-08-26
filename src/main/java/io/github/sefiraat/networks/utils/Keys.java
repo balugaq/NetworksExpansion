@@ -254,6 +254,12 @@ public class Keys {
 
     public static final NamespacedKey FACING_PRESET = newKey("facing_preset");
 
+    public static final NamespacedKey AE_CELL_UUID = newKey("ae_cell_uuid");
+    public static final NamespacedKey AE_CELL_CAPACITY = newKey("ae_cell_capacity");
+    public static final NamespacedKey AE_CELL_CURRENT_CAPACITY = newKey("ae_cell_current_capacity");
+    public static final NamespacedKey AE_CELL_CUSTOM_NAME = newKey("ae_cell_custom_name");
+    public static final NamespacedKey AE_CELL_SERVER = newKey("ae_cell_server");
+
     public static final NamespacedKey INFINITY_DISPLAY;
 
     static {
