@@ -377,9 +377,18 @@ public class AECellConverter extends SpecialSlimefunItem {
         boolean upgrade = brandNew && sameTier
             && amount <= remaining && cache.getCurrentPerTypeLimit() < cache.getMaxUnits();
 
-        cache.pushItemLong(targetKey, transferable);
+        // 升级先扩容再写入：若种类已占满当前等级，需先 +1 单元，否则 pushItemLong 会拒收导致丢物品
         if (upgrade) {
             AECellPersistence.setCurrentPerTypeLimit(cellItem, AEStorageCell.getCurrentPerTypeLimit(cellItem) + 1);
+        }
+
+        long pushed = cache.pushItemLong(targetKey, transferable);
+
+        // 升级后仍写入失败(理论不应发生)：回滚单元数并清空，避免 QS 被消费但物品未存入
+        if (upgrade && pushed <= 0) {
+            AECellPersistence.setCurrentPerTypeLimit(cellItem, AEStorageCell.getCurrentPerTypeLimit(cellItem) - 1);
+            player.sendMessage(Lang.getString("messages.ae.converter.item_capacity_full"));
+            return;
         }
 
         if (upgrade) {

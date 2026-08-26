@@ -70,11 +70,17 @@ public class AECellMenuListener implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     public void onChat(@NotNull AsyncChatEvent e) {
         Player player = e.getPlayer();
         UUID cellUuid = AECellMenu.getRenamingCell(player.getUniqueId());
         if (cellUuid == null) {
+            return;
+        }
+        // 聊天被其它插件先取消时，不消费消息，只清掉重命名状态以免卡住
+        if (e.isCancelled()) {
+            AECellMenu.stopRenaming(player.getUniqueId());
+            player.sendMessage(Lang.getString("messages.ae.cell.rename_cancelled"));
             return;
         }
         e.setCancelled(true);

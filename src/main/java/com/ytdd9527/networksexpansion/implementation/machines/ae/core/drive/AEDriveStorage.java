@@ -47,7 +47,8 @@ public class AEDriveStorage {
     private static final Map<Material, ItemKey> PLAIN_KEY_CACHE = new ConcurrentHashMap<>();
 
     private final Map<Location, List<AECellHandle>> cellCache = new ConcurrentHashMap<>();
-    private final AtomicLong cellCacheGeneration = new AtomicLong(0);
+    private final Map<Location, Long> cellCacheGenerations = new ConcurrentHashMap<>();
+    private final AtomicLong generationCounter = new AtomicLong();
 
     @NotNull
     private static ItemKey getKey(@NotNull ItemStack itemStack) {
@@ -72,7 +73,7 @@ public class AEDriveStorage {
 
     public void invalidateCellCache(@NotNull Location location) {
         cellCache.remove(location);
-        cellCacheGeneration.incrementAndGet();
+        cellCacheGenerations.put(location, generationCounter.incrementAndGet());
     }
 
     @NotNull
@@ -81,9 +82,13 @@ public class AEDriveStorage {
         for (BlockMenu menu : menus) {
             driveLocations.add(menu.getLocation());
         }
-        long generation = cellCacheGeneration.get();
+        Map<Location, Long> generations = new HashMap<>();
+        for (Location location : driveLocations) {
+            Long generation = cellCacheGenerations.get(location);
+            generations.put(location, generation != null ? generation : 0L);
+        }
         FlatView cached = cache.getFlatView();
-        if (cached != null && cached.locations.equals(driveLocations) && cached.generation == generation) {
+        if (cached != null && cached.locations.equals(driveLocations) && cached.generations.equals(generations)) {
             return cached;
         }
 
@@ -97,7 +102,7 @@ public class AEDriveStorage {
         }
 
         cache.clearItemCaches();
-        FlatView view = new FlatView(new HashSet<>(driveLocations), cells, byUuid, generation);
+        FlatView view = new FlatView(new HashSet<>(driveLocations), cells, byUuid, generations);
         cache.setFlatView(view);
         return view;
     }
@@ -356,6 +361,6 @@ public class AEDriveStorage {
         private final Set<Location> locations;
         private final List<AECellHandle> cells;
         private final Map<UUID, AECellHandle> byUuid;
-        private final long generation;
+        private final Map<Location, Long> generations;
     }
 }

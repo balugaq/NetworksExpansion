@@ -20,8 +20,9 @@ public class WriteStrategy {
     });
 
     public <T> T runExclusive(Supplier<T> task) {
+        CompletableFuture<T> future = CompletableFuture.supplyAsync(task, executor);
         try {
-            return CompletableFuture.supplyAsync(task, executor).get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("AE 写操作被中断", e);
@@ -32,11 +33,32 @@ public class WriteStrategy {
             }
             throw new IllegalStateException("AE 写操作失败", cause);
         } catch (TimeoutException e) {
-            throw new IllegalStateException("AE 写操作超时", e);
+            // 超时后任务仍在后台运行且可能已提交；继续等待它到终态，
+            // 避免调用方在该批写已落库后仍回滚，从而产生重复行。
+            try {
+                return future.get();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("AE 写操作被中断", ie);
+            } catch (ExecutionException ee) {
+                Throwable cause = ee.getCause();
+                if (cause instanceof RuntimeException re) {
+                    throw re;
+                }
+                throw new IllegalStateException("AE 写操作失败", cause);
+            }
         }
     }
 
     public void shutdown() {
         executor.shutdown();
+        try {
+            if (!executor.awaitTermination(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }

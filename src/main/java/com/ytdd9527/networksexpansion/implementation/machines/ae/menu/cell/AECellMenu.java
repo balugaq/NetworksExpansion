@@ -309,7 +309,7 @@ public final class AECellMenu {
                 continue;
             }
             SlimefunItem stackSf = SlimefunItem.getByItem(stack);
-            if (stackSf instanceof NetworkQuantumStorage && StackUtils.itemsMatch(stackSf.getItem(), stack, true)) {
+            if (stackSf == required && StackUtils.itemsMatch(required.getItem(), stack, true)) {
                 if (!isEmptyQuantumStorage(stack)) {
                     continue;
                 }

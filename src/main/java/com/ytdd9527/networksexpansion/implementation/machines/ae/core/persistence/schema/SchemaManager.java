@@ -68,9 +68,19 @@ public class SchemaManager {
         boolean legacy = hasColumn(conn, "ae_item_templates", "item_id");
         if (legacy) {
             List<Object[]> legacyRows = readLegacyTemplates(conn);
-            exec(conn, "DROP TABLE ae_item_templates");
-            exec(conn, ddl.createItemTemplatesTable());
-            migrateLegacyRows(conn, legacyRows);
+            boolean autoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                exec(conn, "DROP TABLE ae_item_templates");
+                exec(conn, ddl.createItemTemplatesTable());
+                migrateLegacyRows(conn, legacyRows);
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(autoCommit);
+            }
         } else {
             exec(conn, ddl.createItemTemplatesTable());
         }

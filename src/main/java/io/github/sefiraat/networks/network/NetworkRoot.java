@@ -621,7 +621,7 @@ public class NetworkRoot extends NetworkNode {
         }
 
         // AE Drives
-        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getAEDriveMenus());
+        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getOutputAbleAEDriveMenus());
         for (Map.Entry<ItemStack, Long> entry : aeItems.entrySet()) {
             ItemStack clone = entry.getKey().clone();
             clone.setAmount(1);
