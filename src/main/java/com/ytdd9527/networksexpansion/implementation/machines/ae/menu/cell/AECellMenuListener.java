@@ -1,28 +1,61 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.menu.cell;
 
 import com.balugaq.netex.utils.Lang;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AECellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.item.AEStorageCell;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.cell.AECellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.component.AECellLore;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.menu.component.AECellMenuPlayerState;
 import io.github.sefiraat.networks.Networks;
-import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public class AECellMenuListener implements Listener {
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onDrop(@NotNull PlayerDropItemEvent e) {
+        Player player = e.getPlayer();
+        if (!AECellMenu.isOpening(player.getUniqueId())) {
+            return;
+        }
+        if (AEStorageCell.isStorageCell(e.getItemDrop().getItemStack())) {
+            e.setCancelled(true);
+            player.sendMessage(Lang.getString("messages.ae.cell.cannot_drop"));
+        }
+    }
+
+    @EventHandler
+    public void onClose(@NotNull InventoryCloseEvent e) {
+        if (!(e.getPlayer() instanceof Player player)) {
+            return;
+        }
+        if (!AECellMenu.isOpening(player.getUniqueId())) {
+            return;
+        }
+        Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
+            InventoryView view = player.getOpenInventory();
+            if (view == null) {
+                AECellMenu.stopOpening(player.getUniqueId());
+                return;
+            }
+            switch (view.getType()) {
+                case CHEST, ENDER_CHEST, SHULKER_BOX -> {
+                }
+                default -> AECellMenu.stopOpening(player.getUniqueId());
+            }
+        });
+    }
 
     @EventHandler
     public void onQuit(@NotNull PlayerQuitEvent e) {
@@ -30,48 +63,8 @@ public class AECellMenuListener implements Listener {
         AECellMenu.stopRenaming(e.getPlayer().getUniqueId());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryClick(@NotNull InventoryClickEvent e) {
-        if (!(e.getWhoClicked() instanceof Player player)) {
-            return;
-        }
-        if (isOpeningCell(player, e.getCurrentItem())) {
-            closeCellView(player);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onInventoryDrag(@NotNull InventoryDragEvent e) {
-        if (!(e.getWhoClicked() instanceof Player player)) {
-            return;
-        }
-        if (isOpeningCell(player, e.getOldCursor())) {
-            closeCellView(player);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerDropItem(@NotNull PlayerDropItemEvent e) {
-        Player player = e.getPlayer();
-        if (isOpeningCell(player, e.getItemDrop().getItemStack())) {
-            closeCellView(player);
-        }
-    }
-
-    private static boolean isOpeningCell(@NotNull Player player, @Nullable ItemStack item) {
-        UUID cellUuid = AECellMenu.getOpeningCell(player.getUniqueId());
-        return cellUuid != null && cellUuid.equals(AEStorageCell.getCellUUID(item));
-    }
-
-    private static void closeCellView(@NotNull Player player) {
-        Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
-            AECellMenu.stopOpening(player.getUniqueId());
-            player.closeInventory();
-        });
-    }
-
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onChat(@NotNull AsyncChatEvent e) {
+    public void onChat(@NotNull AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
         UUID cellUuid = AECellMenu.getRenamingCell(player.getUniqueId());
         if (cellUuid == null) {
@@ -80,26 +73,24 @@ public class AECellMenuListener implements Listener {
         e.setCancelled(true);
         AECellMenu.stopRenaming(player.getUniqueId());
 
-        String name = PlainTextComponentSerializer.plainText().serialize(e.message()).trim();
+        String name = e.getMessage().trim();
         if (name.isEmpty()) {
             player.sendMessage(Lang.getString("messages.ae.cell.rename_cancelled"));
             return;
         }
 
-        // 重命名涉及物品 meta 与菜单打开，需在主线程执行
-        Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
-            ItemStack cell = AECellMenu.findCellInPlayer(player, cellUuid);
-            if (cell == null) {
-                player.sendMessage(Lang.getString("messages.ae.cell.rename_failed"));
-                return;
-            }
-            AECellPersistence.setCustomName(cell, name);
-            long per = AEStorageCell.getPerTypeLimit(cell);
-            long cur = AEStorageCell.getCurrentPerTypeLimit(cell);
-            AECellLore.applySpecLore(cell, per, cur);
-            AECellMenu.updateHeldCell(player, cell);
-            AECellMenu.open(player, cell);
-            player.sendMessage(Lang.getString("messages.ae.cell.rename_success", name));
-        });
+        ItemStack cell = AECellMenuPlayerState.findCellInPlayer(player, cellUuid);
+        if (cell == null) {
+            player.sendMessage(Lang.getString("messages.ae.cell.rename_failed"));
+            return;
+        }
+
+        AECellPersistence.setCustomName(cell, name);
+        long per = AEStorageCell.getPerTypeLimit(cell);
+        long cur = AEStorageCell.getCurrentPerTypeLimit(cell);
+        AECellLore.applySpecLore(cell, per, cur);
+        AECellMenuPlayerState.updateHeldCell(player, cell);
+        AECellMenu.open(player, cell);
+        player.sendMessage(Lang.getString("messages.ae.cell.rename_success", name));
     }
 }

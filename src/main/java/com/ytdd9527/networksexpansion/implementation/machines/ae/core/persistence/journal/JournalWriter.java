@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class JournalWriter {
@@ -34,30 +35,34 @@ public class JournalWriter {
         }
 
         List<List<JournalRow>> batches = partition(allRows, FLUSH_BATCH_SIZE);
-        List<JournalRow> failedRows = new ArrayList<>();
+        boolean allSuccess = true;
+        int flushedCount = 0;
 
         for (List<JournalRow> batch : batches) {
             try {
-                writeStrategy.runExclusive(() -> {
-                    try {
-                        batchInsertJournal(batch);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return null;
-                });
+                if (!writeStrategy.acquire(5, TimeUnit.SECONDS)) {
+                    allSuccess = false;
+                    break;
+                }
+                try {
+                    batchInsertJournal(batch);
+                    flushedCount += batch.size();
+                } finally {
+                    writeStrategy.release();
+                }
             } catch (Exception e) {
-                failedRows.addAll(batch);
+                allSuccess = false;
                 LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.journal_flush_failed", e.getMessage()));
                 Debug.trace(e);
+                break;
             }
         }
 
-        if (failedRows.isEmpty()) {
+        if (allSuccess) {
             dirtyTracker.commitFlush();
         } else {
-            dirtyTracker.rollbackFlush(failedRows);
-            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.journal_flush_partial", failedRows.size()));
+            dirtyTracker.rollbackFlush();
+            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.journal_flush_partial", allRows.size() - flushedCount));
         }
     }
 

@@ -50,7 +50,6 @@ messages:
     no_valid_recipe_found: "未找到有效配方"
     not_allowed_block: "不被允许的方块"
     not_blueprint: "不是蓝图"
-    not_enough_items: "没有足够的物品"
     not_enough_items_in_network: "网络中没有足够的物品"
     not_enough_power: "没有足够的网络能源"
     not_enough_resources: "网络中没有足够的原材料"
@@ -143,15 +142,9 @@ messages:
     selected-area-outline-hide-request: "&a已请求隐藏选中区域的轮廓."
     selected-area-outline-show-request: "&a已请求显示选中区域的轮廓."
     clear-selected-pos: "&a已清除选择的位置."
-    aetoquantum:
-      need-cell: "<error>你必须手持 AE 存储元件"
-      empty: "<warning>该元件为空"
-      converted: "<success>已将元件内容转换为对应等级的量子存储"
-      none-converted: "<warning>元件中没有可转换的物品"
     help:
       - "&6网络命令帮助:"
       - "&6/networks help - 显示此帮助信息."
-      - "&6/networks aetoquantum - 将手中 AE 存储元件内容转换为对应等级的量子存储."
       - "&6/networks fillquantum <amount> - 填充手持量子存储物品的存储量."
       - "&6/networks fixblueprint <keyInMeta> - 修复手持合成蓝图."
       - "&6/networks addstorageitem <amount> - 使看向的网络抽屉中添加物品."
@@ -165,9 +158,6 @@ messages:
       help:
         - "&6/networks help - 显示此帮助信息."
         - "&6ex: /networks help"
-      aetoquantum:
-        - "&6/networks aetoquantum - 将手中 AE 存储元件内容转换为对应等级的量子存储."
-        - "&6ex: /networks aetoquantum"
       fillquantum:
         - "&6/networks fillQuantum <amount> - 设置手持量子存储的存储量."
         - "&6ex: /networks fillQuantum 1000"
@@ -228,6 +218,8 @@ messages:
     quantum_storage:
       waiting_for_input_custom_max_amount: "<passive>[<gold>网络拓展<passive>] <warning>请输入网络高级量子存储的容量.最大限制为: 140737488355328"
       waiting_for_input_custom_max_amount_new: "<passive>[<gold>网络拓展<passive>] <warning>请输入网络高级量子存储的容量.最大限制为: 140737488355328"
+    ae_cell:
+      upgrade_success: "<success>升级成功: 容量 %s -> %s <passive>(消耗 %sx 量子储存)"
     grid:
       waiting_for_filter: "<warning>请输入你想要过滤的物品名称(显示名)或类型"
       item_amount: "{0}数量: {1}{2}"
@@ -455,6 +447,10 @@ messages:
       invalid_custom_max_amount_new: "<passive>[<gold>网络拓展<passive>] <error>网络高级量子存储必须为: 1 至 140737488355328"
       may_duping: "Player \"%s\" attempted to use quantum storage to dupe at %s. (see https://b23.tv/BV1ZMXuBpEAz)"
       dangerous_operation: "<error>高危操作，禁止同时连接量子存储和网络单元!"
+    ae_cell:
+      reached_limit: "<warning>已达容量上限: %s"
+      insufficient_material: "<error>量子储存不足: %s / %s"
+      cell_not_in_inventory: "<error>未在背包中找到该存储元件"
     configurator:
       not_a_copyable_block: "<error>该方块没有指定朝向"
       not_a_pasteable_block: "<error>你必须指向一个带方向选择的网络方块"
@@ -585,9 +581,8 @@ messages:
         close: "<error>关闭"
         back: "<warning>返回"
         upgrade: "<warning>升级"
-        no_upgrade_needed: "<gold>无需升级"
-        unlimited_hint: "<passive>  单格与种类均无限，无需升级"
         current_units: "<passive>  单元 · <white>{0}<passive> / <white>{1}"
+        upgrade_material_id: "<passive>  材料 ID · <white>{0}"
         upgrade_material: "<passive>  升级材料 · <white>{0}"
         upgrade_consume: "<passive>  消耗 1 个材料 · 单元 +1"
         no_upgrade_material: "<error>  无可用的升级材料"
@@ -600,7 +595,6 @@ messages:
       menu:
         title_view: "预览"
         title_whitelist: "存储元件 · 白名单"
-        opened_by_another: "<error>该元件正被其他玩家查看，请稍后再试"
         prev_page: "<white>上一页"
         first_page: "<passive>已是第一页"
         next_page: "<white>下一页"
@@ -608,31 +602,27 @@ messages:
       lore:
         capacity_line: "<passive>  单格容量 · <white>{0}"
         units_line: "<passive>  单元 · {0}<passive> / <white>{1}  {2}"
-        remaining_units: "<passive>  还可存入 · <white>{0}<passive> 种"
         upgrade_line: "<warning>  升级 · <white>{0}<warning> → +1 单元"
         not_configured: "未配置"
         hint_open: "<passive>  右键打开 · 管理元件"
         hint_drive: "<passive>  放入驱动器 · 接入网络"
         name_line: "<passive>  名称 · <white>{0}"
-        server_uuid: "<passive>  服务器 · <white>{0}"
         item_entry: "<white>  {0}<passive> · <white>{1}"
         and_more: "<passive>   ··· 还有 <white>{0}<passive> 项"
+      cannot_drop: "<error>元件界面打开时不能扔掉元件"
       whitelist_limit: "<error>白名单种类达到单元上限 ({0})，请先升级元件解锁更多单元"
       upgrade_maxed: "<error>该元件已达到最大单元数 ({0})"
       upgrade_no_material: "<error>该元件没有可用的升级材料"
       upgrade_missing: "<error>背包中缺少升级材料: {0}"
-      cell_not_in_inventory: "<error>未在背包中找到该存储元件"
       upgrade_success: "<success>升级成功！当前单元数: {0} / {1}"
       rename_prompt: "<success>请在聊天栏输入元件的新名称："
       rename_cancelled: "<error>重命名已取消"
       rename_failed: "<error>重命名失败，请确保元件在你的背包中"
       rename_success: "<success>元件已重命名为: {0}"
-      wrong_server: "<error>该元件属于其它服务器，无法使用"
-      whitelist_not_allowed: "<error>潜影盒与存储元件不能加入白名单"
     drive:
-      slot_marker: "元件槽位"
+      slot_marker: "存储元件槽位"
       slot_marker_lore: "<passive>  手持元件 · 点击放入"
-      display_name: "<passive>AE 驱动器"
+      display_name: "<gold>AE 驱动器"
       item_count: "<passive>  数量 · <white>{0}"
       cell_count: "<passive>  元件 · <white>{0}<passive> / <white>{1}"
       total_items: "<passive>  物品 · <white>{0}"
@@ -640,7 +630,7 @@ messages:
       more_items: "<passive>  ··· 还有更多"
       item_entry: "<white>  {0}<passive> · <white>{1}"
       access_hint: "<passive>  点击浏览全部库存"
-      browse: "<passive>浏览库存"
+      browse: "<white>浏览库存"
       prev_page: "<white>◀ 上一页"
       first_page: "<passive>◀ 已是第一页"
       next_page: "<white>下一页 ▶"
@@ -650,66 +640,23 @@ messages:
       saving: "正在保存驱动器元件数据..."
       saved: "保存成功"
       cell_uuid_duplicate: "<error>无法放入：该元件UUID已存在于当前驱动器"
-      whitelist_button: "<gold>权限 · 白名单"
-      whitelist_owner: "<passive>  所有者 · <white>{0}"
-      whitelist_count: "<passive>  白名单 · <white>{0}<passive> 人"
-      whitelist_no_owner: "<error>  该驱动器暂无所有者"
-      whitelist_open_hint: "<passive>  点击管理白名单玩家"
-      whitelist_title: "AE 驱动器 · 白名单"
-      whitelist_owner_head: "<gold>所有者 · {0}"
-      whitelist_owner_head_lore: "<passive>  放置此驱动器的玩家"
-      whitelist_add: "<success>添加玩家"
-      whitelist_add_lore: "<passive>  点击后在聊天栏输入玩家名"
-      whitelist_remove_hint: "<error>  点击移除此玩家"
-      whitelist_not_owner: "<error>你不是该驱动器的所有者"
-      whitelist_enter_name: "<success>请在聊天栏输入要添加的玩家名："
-      whitelist_player_not_found: "<error>找不到该玩家"
-      whitelist_name_invalid: "<error>玩家名无效，只能包含字母、数字、下划线"
-      whitelist_name_too_long: "<error>玩家名过长（最多 16 个字符）"
-      whitelist_is_owner: "<error>该玩家已是所有者"
-      whitelist_already: "<warning>该玩家已在白名单中"
-      whitelist_full: "<error>白名单已满，请先移除一些玩家"
-      whitelist_added: "<success>已将 {0} 加入白名单"
-      whitelist_removed: "<success>已将 {0} 移出白名单"
-      whitelist_add_timeout: "<warning>输入超时，已取消添加白名单"
-      break_not_allowed: "<error>你没有权限破坏这个驱动器"
-    cleaner:
-      title: "<passive>元件清理台"
-      cell_slot: "<passive>元件放置槽"
+    workbench:
+      title: "元件工作台"
+      cell_slot: "<success>元件放置槽"
       cell_slot_lore: "<passive>  手持元件点击放入"
       cell_name: "<passive>  元件 · <white>{0}"
       item_types: "<passive>  物品种类 · <white>{0}"
       item_count: "<passive>  数量 · <white>{0}"
-      delete_hint: "<passive>  点击删除此物品"
+      delete_hint: "<error>  点击删除此物品"
+      item_deleted: "<success>已删除此物品"
       no_cell: "<passive>  未放入元件"
-      info_title: "<passive>元件清理台"
-      prev_page: "<passive>◀ 上一页"
-      first_page: "<passive>◀ 已是第一页"
-      next_page: "<passive>下一页 ▶"
-      last_page: "<passive>已是最后一页 ▶"
-      close: "<passive>关闭"
-      display_placeholder: "<passive>  空槽位"
-    converter:
-      title: "<passive>元件量子转换机"
-      cell_slot: "<passive>元件放置槽"
-      cell_slot_lore: "<passive>  手持元件点击放入"
-      item_count: "<passive>  数量 · <white>{0}"
-      transfer_hint: "<passive>  点击转移"
-      output_full: "<passive>输出槽已满，取走后再转"
-      no_matching_storage: "<passive>该元件容量没有对应量子储存等级"
-      mode_transfer: "<passive>元件 → 量子储存"
-      mode_import: "<passive>量子储存 → 元件"
-      mode_hint: "<passive>  点击切换模式"
-      no_quantum_storage: "<passive>请先放入同级量子储存"
-      tier_mismatch: "<passive>量子储存等级与元件不符"
-      units_full: "<error>元件种类已满，先清理一部分"
-      whitelist_rejected: "<error>该物品不在白名单中"
-      item_capacity_full: "<error>该物品已达单格容量上限"
-      prev_page: "<white>◀ 上一页"
-      first_page: "<passive>◀ 已是第一页"
-      next_page: "<white>下一页 ▶"
-      last_page: "<passive>已是最后一页 ▶"
+      info_title: "<gold>元件工作台"
+      prev_page: "<white>上一页"
+      first_page: "<passive>已是第一页"
+      next_page: "<white>下一页"
+      last_page: "<passive>已是最后一页"
       close: "<error>关闭"
+      display_placeholder: "<passive>  空槽位"
     persistence:
       db_initialized: "AE 存储数据库初始化完成"
       db_closed: "AE 存储数据库已关闭"
@@ -730,7 +677,6 @@ messages:
       template_query_all_failed: "全量查询物品模板失败: {0}"
       template_load_failed: "从数据库加载物品模板失败: {0}"
       template_preload_failed: "预加载物品模板失败: {0}"
-      template_register_failed: "无法注册物品模板"
       journal_flush_failed: "Journal flush 批次失败: {0}"
       journal_flush_partial: "Journal 部分 flush 失败，回滚 {0} 行"
       checkpoint_failed: "Checkpoint 失败: {0}"
@@ -742,12 +688,6 @@ messages:
       checkpoint_archive_failed: "归档/清理失败: {0}"
       replay_lock_timeout: "Replay 获取锁超时"
 icons:
-  ae-back-button:
-    name: "&c返回"
-  ae-setting-slot:
-    name: "&a白名单物品"
-    lore:
-      - "&7手持物品点击此处添加"
   keybind-settings:
     name: "&6按键控制设置"
   light-gray-background:
@@ -4012,116 +3952,94 @@ items:
   NTW_EXPANSION_AE_DRIVE:
     name: "AE驱动器"
     lore:
-      - "<PASSIVE>为存储元件提供接入插槽"
-      - "<PASSIVE>放入元件后即可读写网络库存"
+      - "<PASSIVE>存储网络中枢"
+      - ""
+      - "<PASSIVE>放入至多 9 个 AE 存储元件"
+      - "<PASSIVE>接入网络，机器可直接读写库存"
 
-  NTW_EXPANSION_AE_CELL_CLEANER:
-    name: "AE元件清理台"
+  NTW_EXPANSION_AE_CELL_WORKBENCH:
+    name: "AE元件工作台"
     lore:
-      - "<PASSIVE>整理元件内不需要的物品"
-      - "<PASSIVE>放入元件，点击物品删除"
+      - "<PASSIVE>存储元件清理工作台"
+      - ""
+      - "<PASSIVE>放入 1 个 AE 存储元件"
+      - "<PASSIVE>点击物品可删除该种类"
+      - "<PASSIVE>删除后自动排序"
 
-  NTW_EXPANSION_AE_CELL_CONVERTER:
-    name: "AE元件量子转换机"
-    lore:
-      - "<PASSIVE>元件与量子储存互转"
-      - "<PASSIVE>放入元件，点击物品转换"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_L1:
+  NTW_EXPANSION_AE_STORAGE_CELL_64:
     name: "AE存储元件 <MACHINE>(64)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L2:
+  NTW_EXPANSION_AE_STORAGE_CELL_256:
     name: "AE存储元件 <MACHINE>(256)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L3:
+  NTW_EXPANSION_AE_STORAGE_CELL_1K:
     name: "AE存储元件 <MACHINE>(1K)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L4:
+  NTW_EXPANSION_AE_STORAGE_CELL_4K:
     name: "AE存储元件 <MACHINE>(4K)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L5:
+  NTW_EXPANSION_AE_STORAGE_CELL_32K:
     name: "AE存储元件 <MACHINE>(32K)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L6:
+  NTW_EXPANSION_AE_STORAGE_CELL_262K:
     name: "AE存储元件 <MACHINE>(262K)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L7:
+  NTW_EXPANSION_AE_STORAGE_CELL_2M:
     name: "AE存储元件 <MACHINE>(2M)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L8:
+  NTW_EXPANSION_AE_STORAGE_CELL_16M:
     name: "AE存储元件 <MACHINE>(16M)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L9:
+  NTW_EXPANSION_AE_STORAGE_CELL_134M:
     name: "AE存储元件 <MACHINE>(134M)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L10:
+  NTW_EXPANSION_AE_STORAGE_CELL_1B:
     name: "AE存储元件 <MACHINE>(1B)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L11:
+  NTW_EXPANSION_AE_STORAGE_CELL_2_1B:
     name: "AE存储元件 <MACHINE>(2.1B)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L12:
+  NTW_EXPANSION_AE_STORAGE_CELL_34_4B:
     name: "AE存储元件 <MACHINE>(34.4B)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L13:
+  NTW_EXPANSION_AE_STORAGE_CELL_549_8B:
     name: "AE存储元件 <MACHINE>(549.8B)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L14:
+  NTW_EXPANSION_AE_STORAGE_CELL_8_8T:
     name: "AE存储元件 <MACHINE>(8.8T)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<PASSIVE>存储网络的中转单元"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L15:
+  NTW_EXPANSION_AE_STORAGE_CELL_140_7T:
     name: "AE存储元件 <MACHINE>(140.7T)"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_UNLIMITED:
-    name: "AE无限元件 <MACHINE>(∞)"
-    lore:
-      - "<PASSIVE>单格与种类均无限"
-      - "<PASSIVE>无需升级，直接可用"
+      - "<PASSIVE>存储网络的中转单元"
 
 displays:
   quantum_storage:

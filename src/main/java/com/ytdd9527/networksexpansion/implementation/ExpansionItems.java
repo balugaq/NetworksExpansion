@@ -43,8 +43,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.manual.ItemDiffere
 import com.ytdd9527.networksexpansion.implementation.machines.manual.StorageCardConverter;
 import com.ytdd9527.networksexpansion.implementation.machines.manual.StorageUnitUpgradeTable;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AECellCleaner;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AECellConverter;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AECellWorkbench;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedExport;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedImport;
@@ -1493,131 +1492,116 @@ public class ExpansionItems {
         ExpansionWorkbench.TYPE,
         ExpansionRecipes.AE_DRIVE);
 
-    // AE Cell Cleaner
-    public static final AECellCleaner AE_CELL_CLEANER = new AECellCleaner(
+    // AE Cell Workbench
+    public static final AECellWorkbench AE_CELL_WORKBENCH = new AECellWorkbench(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_CELL_CLEANER,
+        ExpansionItemStacks.AE_CELL_WORKBENCH,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_CELL_CLEANER);
-
-    // AE Cell Converter
-    public static final AECellConverter AE_CELL_CONVERTER = new AECellConverter(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_CELL_CONVERTER,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_CELL_CONVERTER);
+        ExpansionRecipes.AE_CELL_WORKBENCH);
 
     // AE Storage Cells (non-placeable items)
-    public static final AEStorageCell AE_STORAGE_CELL_L1 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_64 = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L1,
+        ExpansionItemStacks.AE_STORAGE_CELL_64,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L1,
+        ExpansionRecipes.AE_STORAGE_CELL_64,
         64L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L2 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_256 = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L2,
+        ExpansionItemStacks.AE_STORAGE_CELL_256,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L2,
+        ExpansionRecipes.AE_STORAGE_CELL_256,
         256L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L3 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_1K = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L3,
+        ExpansionItemStacks.AE_STORAGE_CELL_1K,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L3,
+        ExpansionRecipes.AE_STORAGE_CELL_1K,
         1024L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L4 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_4K = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L4,
+        ExpansionItemStacks.AE_STORAGE_CELL_4K,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L4,
+        ExpansionRecipes.AE_STORAGE_CELL_4K,
         4096L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L5 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_32K = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L5,
+        ExpansionItemStacks.AE_STORAGE_CELL_32K,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L5,
+        ExpansionRecipes.AE_STORAGE_CELL_32K,
         32768L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L6 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_262K = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L6,
+        ExpansionItemStacks.AE_STORAGE_CELL_262K,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L6,
+        ExpansionRecipes.AE_STORAGE_CELL_262K,
         262144L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L7 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_2M = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L7,
+        ExpansionItemStacks.AE_STORAGE_CELL_2M,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L7,
+        ExpansionRecipes.AE_STORAGE_CELL_2M,
         2097152L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L8 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_16M = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L8,
+        ExpansionItemStacks.AE_STORAGE_CELL_16M,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L8,
+        ExpansionRecipes.AE_STORAGE_CELL_16M,
         16777216L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L9 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_134M = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L9,
+        ExpansionItemStacks.AE_STORAGE_CELL_134M,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L9,
+        ExpansionRecipes.AE_STORAGE_CELL_134M,
         134217728L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L10 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_1B = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L10,
+        ExpansionItemStacks.AE_STORAGE_CELL_1B,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L10,
+        ExpansionRecipes.AE_STORAGE_CELL_1B,
         1073741824L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L11 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_2_1B = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L11,
+        ExpansionItemStacks.AE_STORAGE_CELL_2_1B,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L11,
+        ExpansionRecipes.AE_STORAGE_CELL_2_1B,
         2147483647L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L12 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_34_4B = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L12,
+        ExpansionItemStacks.AE_STORAGE_CELL_34_4B,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L12,
+        ExpansionRecipes.AE_STORAGE_CELL_34_4B,
         34359738352L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L13 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_549_8B = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L13,
+        ExpansionItemStacks.AE_STORAGE_CELL_549_8B,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L13,
+        ExpansionRecipes.AE_STORAGE_CELL_549_8B,
         549755813888L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L14 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_8_8T = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L14,
+        ExpansionItemStacks.AE_STORAGE_CELL_8_8T,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L14,
+        ExpansionRecipes.AE_STORAGE_CELL_8_8T,
         8796093022208L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L15 = new AEStorageCell(
+    public static final AEStorageCell AE_STORAGE_CELL_140_7T = new AEStorageCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L15,
+        ExpansionItemStacks.AE_STORAGE_CELL_140_7T,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L15,
+        ExpansionRecipes.AE_STORAGE_CELL_140_7T,
         140737488355328L);
-
-    // 无限元件：单格容量 Long.MAX_VALUE + 无限单元(种类)，免升级
-    public static final AEStorageCell AE_STORAGE_CELL_UNLIMITED = new AEStorageCell(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_UNLIMITED,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_UNLIMITED,
-        Long.MAX_VALUE);
 }

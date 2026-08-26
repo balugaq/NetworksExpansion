@@ -12,7 +12,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/** 以 ItemKey 为键的 Map（material + NBT，忽略数量）。@author TimetownDev（SlimeAE，MIT） */
+/**
+ * A {@link Map} whose keys are {@link ItemStack}s compared by their canonical
+ * {@link ItemKey} identity (material + full NBT, ignoring stack size).
+ */
 public class ItemHashMap<V> implements Map<ItemStack, V> {
 
     private final Map<ItemKey, V> map;
@@ -52,9 +55,6 @@ public class ItemHashMap<V> implements Map<ItemStack, V> {
         if (key instanceof ItemStack) {
             return map.get(new ItemKey((ItemStack) key));
         }
-        if (key instanceof ItemKey itemKey) {
-            return map.get(itemKey);
-        }
         return null;
     }
 
@@ -75,9 +75,6 @@ public class ItemHashMap<V> implements Map<ItemStack, V> {
     public V remove(Object key) {
         if (key instanceof ItemStack) {
             return map.remove(new ItemKey((ItemStack) key));
-        }
-        if (key instanceof ItemKey itemKey) {
-            return map.remove(itemKey);
         }
         return null;
     }
