@@ -66,11 +66,14 @@ public class AEStorageDatabase {
             t.setDaemon(true);
             return t;
         });
-        checkpointExecutor.scheduleWithFixedDelay(
-            checkpointTask,
-            storageConfig.getCheckpointInterval(),
-            storageConfig.getCheckpointInterval(),
-            TimeUnit.SECONDS);
+        long checkpointInterval = storageConfig.getCheckpointInterval();
+        if (checkpointInterval > 0) {
+            checkpointExecutor.scheduleWithFixedDelay(
+                checkpointTask,
+                checkpointInterval,
+                checkpointInterval,
+                TimeUnit.SECONDS);
+        }
 
         if (storageConfig.isBackupEnabled()) {
             backupExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -78,11 +81,14 @@ public class AEStorageDatabase {
                 t.setDaemon(true);
                 return t;
             });
-            backupExecutor.scheduleWithFixedDelay(
-                backupTask,
-                storageConfig.getBackupIntervalHours() * 3600L,
-                storageConfig.getBackupIntervalHours() * 3600L,
-                TimeUnit.SECONDS);
+            long backupIntervalSeconds = storageConfig.getBackupIntervalHours() * 3600L;
+            if (backupIntervalSeconds > 0) {
+                backupExecutor.scheduleWithFixedDelay(
+                    backupTask,
+                    backupIntervalSeconds,
+                    backupIntervalSeconds,
+                    TimeUnit.SECONDS);
+            }
         }
 
         LOGGER.info(Networks.getLocalizationService().getString("messages.ae.persistence.db_initialized"));

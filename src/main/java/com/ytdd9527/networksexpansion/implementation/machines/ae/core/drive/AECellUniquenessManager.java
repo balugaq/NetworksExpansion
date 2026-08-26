@@ -147,11 +147,12 @@ public final class AECellUniquenessManager {
             return;
         }
         menu.replaceExistingItem(slot, null);
-        // 被丢弃的元件已不在该驱动器，把对应 UUID 从其驱动器集合移除，避免重复误判
+        // 被丢弃的元件已不在该驱动器。若驱动器里还残留同 UUID 元件，则保留该驱动器在索引中，
+        // 以便后续扫描仍能识别跨驱动器重复；仅当该 UUID 已完全离开此驱动器时才移除。
         String uuid = getUuidString(item);
         if (uuid != null) {
             Set<Location> drives = UUID_TO_DRIVES.get(uuid);
-            if (drives != null) {
+            if (drives != null && !collectUuidStrings(menu).contains(uuid)) {
                 drives.remove(menu.getLocation());
                 if (drives.isEmpty()) {
                     UUID_TO_DRIVES.remove(uuid);

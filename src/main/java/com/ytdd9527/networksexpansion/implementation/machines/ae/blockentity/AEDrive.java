@@ -25,6 +25,7 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -122,18 +123,21 @@ public class AEDrive extends SpecialSlimefunItem {
 
                 @Override
                 public void tick(@NotNull Block b, SlimefunItem item, SlimefunBlockData data) {
-                    final BlockMenu blockMenu = StorageCacheUtils.getMenu(b.getLocation());
-                    if (blockMenu == null || !blockMenu.hasViewer()) {
-                        return;
-                    }
                     final Location location = b.getLocation();
                     final long now = System.currentTimeMillis();
                     final Long last = displayRefreshTimestamps.get(location);
                     if (last != null && now - last < DISPLAY_REFRESH_INTERVAL_MS) {
                         return;
                     }
-                    displayRefreshTimestamps.put(location, now);
-                    updateMainDisplay(blockMenu);
+                    // isSynchronized=false：tick 在异步线程执行，菜单访问须回到主线程
+                    Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
+                        final BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
+                        if (blockMenu == null || !blockMenu.hasViewer()) {
+                            return;
+                        }
+                        displayRefreshTimestamps.put(location, System.currentTimeMillis());
+                        updateMainDisplay(blockMenu);
+                    });
                 }
             },
             new BlockBreakHandler(false, false) {
