@@ -1,6 +1,7 @@
 package com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity;
 
 import com.balugaq.netex.utils.Lang;
+import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.SpecialSlimefunItem;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.constants.AECellUpgradeMaterialRegistry;
@@ -23,7 +24,7 @@ import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
@@ -48,37 +49,38 @@ import java.util.Map;
 /**
  * 元件量子转换机。
  *
- * <p>支持两种模式：转出(元件→同级量子储存，产物进输出槽，转一种扣一个单元数)与
- * 灌入(同级量子储存→元件，物品入元件、量子储存消耗、新类型单元+1)。
+ * <p>支持两种模式：转出（元件 → 同级量子储存，产物进输出槽，每转出一种扣一个单元数）与
+ * 灌入（同级量子储存 → 元件，物品入元件、量子储存被消耗、新类型单元 +1）。
  *
- * <p>仅在槽位有元件且菜单被查看时刷新，并以 1 秒间隔节流，避免高频重绘。
+ * <p>有查看者时随 ticker 周期刷新界面。
  */
 public class AECellConverter extends SpecialSlimefunItem {
 
     public static final int CELL_SLOT = 4;
     public static final int PREV = 0;
     public static final int NEXT = 8;
+    public static final int INFO = 45;
     public static final int MODE_SLOT = 48;
     public static final int CLOSE = 53;
     public static final int[] DISPLAY_SLOTS = new int[]{
         9, 10, 11, 12, 13, 14, 15, 16, 17,
         18, 19, 20, 21, 22, 23, 24, 25, 26
     };
-    public static final int[] SEPARATOR_SLOTS = new int[]{
-        27, 28, 29, 30, 31, 32, 33, 34, 35
-    };
     public static final int[] OUTPUT_SLOTS = new int[]{
-        36, 37, 38, 39, 40, 41, 42, 43, 44,
-        45, 46, 47
+        27, 28, 29, 30, 31, 32, 33, 34, 35,
+        36, 37, 38
     };
     public static final int ITEMS_PER_PAGE = DISPLAY_SLOTS.length;
-    public static final int[] BACKGROUND_SLOTS = new int[]{1, 2, 3, 5, 6, 7, 49, 50, 51, 52};
+    public static final int[] BACKGROUND_SLOTS = new int[]{
+        1, 2, 3, 5, 6, 7,
+        39, 40, 41, 42, 43, 44,
+        46, 47, 49, 50, 51, 52
+    };
 
     private static final NamespacedKey CELL_SLOT_MARKER_KEY =
         new NamespacedKey("networks", "ae_converter_cell_slot_marker");
-    private static final ItemStack DISPLAY_PLACEHOLDER = Lang.getIcon("ae-display-placeholder", Material.GREEN_STAINED_GLASS_PANE);
-    private static final ItemStack BORDER_ICON = Lang.getIcon("ae-converter-border", Material.BLUE_STAINED_GLASS_PANE);
-    private static final ItemStack SEPARATOR_ICON = Lang.getIcon("ae-converter-separator", Material.GRAY_STAINED_GLASS_PANE);
+    private static final ItemStack DISPLAY_PLACEHOLDER = buildDisplayPlaceholder();
+    private static final ItemStack BORDER_ICON = buildBorderIcon();
 
     private final Map<Location, Integer> pageCache = new HashMap<>();
     private final Map<Location, Boolean> exportMode = new HashMap<>();
@@ -99,6 +101,20 @@ public class AECellConverter extends SpecialSlimefunItem {
     @Override
     public void preRegister() {
         addItemHandler(
+            new BlockTicker() {
+                @Override
+                public boolean isSynchronized() {
+                    return false;
+                }
+
+                @Override
+                public void tick(@NotNull Block b, SlimefunItem item, SlimefunBlockData data) {
+                    BlockMenu blockMenu = StorageCacheUtils.getMenu(b.getLocation());
+                    if (blockMenu != null && blockMenu.hasViewer()) {
+                        refresh(blockMenu);
+                    }
+                }
+            },
             new BlockBreakHandler(false, false) {
                 @Override
                 public void onPlayerBreak(@NotNull BlockBreakEvent event, @NotNull ItemStack item, @NotNull List<ItemStack> drops) {
@@ -117,9 +133,6 @@ public class AECellConverter extends SpecialSlimefunItem {
                 for (int slot : BACKGROUND_SLOTS) {
                     addItem(slot, BORDER_ICON.clone());
                 }
-                for (int slot : SEPARATOR_SLOTS) {
-                    addItem(slot, SEPARATOR_ICON.clone());
-                }
             }
 
             @Override
@@ -137,10 +150,7 @@ public class AECellConverter extends SpecialSlimefunItem {
 
             @Override
             public void newInstance(@NotNull BlockMenu menu, @NotNull Block block) {
-                ItemStack existing = menu.getItemInSlot(CELL_SLOT);
-                if (existing == null || existing.getType().isAir()) {
-                    menu.replaceExistingItem(CELL_SLOT, createCellSlotMarker());
-                }
+                menu.replaceExistingItem(CELL_SLOT, createCellSlotMarker());
                 for (int slot : DISPLAY_SLOTS) {
                     menu.replaceExistingItem(slot, DISPLAY_PLACEHOLDER.clone());
                 }
@@ -156,10 +166,8 @@ public class AECellConverter extends SpecialSlimefunItem {
         exportMode.remove(location);
         BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
         if (blockMenu != null) {
-            ItemStack cellItem = blockMenu.getItemInSlot(CELL_SLOT);
-            if (cellItem != null && AEStorageCell.isStorageCell(cellItem)) {
-                blockMenu.dropItems(location, CELL_SLOT);
-            }
+            blockMenu.dropItems(location, CELL_SLOT);
+            blockMenu.dropItems(location, OUTPUT_SLOTS);
         }
     }
 
@@ -192,9 +200,6 @@ public class AECellConverter extends SpecialSlimefunItem {
 
     private void setupHandlers(@NotNull BlockMenu menu) {
         menu.addMenuClickHandler(CELL_SLOT, (player, slot, item, action) -> {
-            if (action.isShiftClicked()) {
-                return true;
-            }
             ItemStack cursor = player.getItemOnCursor();
             boolean slotIsMarker = isCellSlotMarker(item);
             boolean cursorIsCell = cursor != null && AEStorageCell.isStorageCell(cursor);
@@ -238,6 +243,31 @@ public class AECellConverter extends SpecialSlimefunItem {
             });
         }
 
+        for (int outputSlot : OUTPUT_SLOTS) {
+            menu.addMenuClickHandler(outputSlot, (player, slot, item, action) -> {
+                ItemStack onSlot = menu.getItemInSlot(slot);
+                ItemStack cursor = player.getItemOnCursor();
+                if (onSlot != null && !onSlot.getType().isAir()
+                    && (cursor == null || cursor.getType().isAir())) {
+                    menu.replaceExistingItem(slot, null);
+                    player.setItemOnCursor(onSlot);
+                } else if ((onSlot == null || onSlot.getType().isAir()) && isQuantumStorage(cursor)) {
+                    menu.replaceExistingItem(slot, cursor.asQuantity(1));
+                    player.setItemOnCursor(cursor.getAmount() <= 1 ? null : cursor.asQuantity(cursor.getAmount() - 1));
+                    refresh(menu);
+                }
+                return false;
+            });
+        }
+
+        menu.addMenuClickHandler(MODE_SLOT, (player, slot, item, action) -> {
+            boolean exporting = isExportMode(menu);
+            exportMode.put(menu.getLocation(), !exporting);
+            pageCache.put(menu.getLocation(), 0);
+            refresh(menu);
+            return false;
+        });
+
         menu.addMenuClickHandler(PREV, (player, slot, item, action) -> {
             int page = pageCache.getOrDefault(menu.getLocation(), 0);
             if (page > 0) {
@@ -257,24 +287,15 @@ public class AECellConverter extends SpecialSlimefunItem {
             return false;
         });
 
-        menu.addMenuClickHandler(MODE_SLOT, (player, slot, item, action) -> {
-            boolean exporting = isExportMode(menu);
-            exportMode.put(menu.getLocation(), !exporting);
-            pageCache.put(menu.getLocation(), 0);
-            refresh(menu);
-            return false;
-        });
+        menu.addMenuClickHandler(INFO, (player, slot, item, action) -> false);
 
         menu.addMenuClickHandler(CLOSE, (player, slot, item, action) -> {
             player.closeInventory();
             return false;
         });
 
-        for (int slot : BACKGROUND_SLOTS) {
-            menu.addMenuClickHandler(slot, (p, s, i, a) -> false);
-        }
-        for (int slot : SEPARATOR_SLOTS) {
-            menu.addMenuClickHandler(slot, (p, s, i, a) -> false);
+        for (int bg : BACKGROUND_SLOTS) {
+            menu.addMenuClickHandler(bg, (p, s, i, a) -> false);
         }
     }
 
@@ -317,7 +338,6 @@ public class AECellConverter extends SpecialSlimefunItem {
         menu.replaceExistingItem(outputSlot, qsItem);
         cache.takeItem(target.sample, target.amount);
         AECellPersistence.setCurrentPerTypeLimit(cellItem, AEStorageCell.getCurrentPerTypeLimit(cellItem) - 1);
-        menu.replaceExistingItem(CELL_SLOT, cellItem);
         refresh(menu);
 
         if (Networks.getAeStorageDatabase() != null) {
@@ -348,7 +368,7 @@ public class AECellConverter extends SpecialSlimefunItem {
             player.sendMessage(Lang.getString("messages.ae.converter.no_quantum_storage"));
             return;
         }
-        NetworkQuantumStorage storage = asQuantumStorage(qsItem);
+        NetworkQuantumStorage storage = getQuantumStorageOf(qsItem);
         if (storage == null) {
             player.sendMessage(Lang.getString("messages.ae.converter.tier_mismatch"));
             return;
@@ -377,18 +397,9 @@ public class AECellConverter extends SpecialSlimefunItem {
         boolean upgrade = brandNew && sameTier
             && amount <= remaining && cache.getCurrentPerTypeLimit() < cache.getMaxUnits();
 
-        // 升级先扩容再写入：若种类已占满当前等级，需先 +1 单元，否则 pushItemLong 会拒收导致丢物品
+        cache.pushItemLong(targetKey, transferable);
         if (upgrade) {
             AECellPersistence.setCurrentPerTypeLimit(cellItem, AEStorageCell.getCurrentPerTypeLimit(cellItem) + 1);
-        }
-
-        long pushed = cache.pushItemLong(targetKey, transferable);
-
-        // 升级后仍写入失败(理论不应发生)：回滚单元数并清空，避免 QS 被消费但物品未存入
-        if (upgrade && pushed <= 0) {
-            AECellPersistence.setCurrentPerTypeLimit(cellItem, AEStorageCell.getCurrentPerTypeLimit(cellItem) - 1);
-            player.sendMessage(Lang.getString("messages.ae.converter.item_capacity_full"));
-            return;
         }
 
         if (upgrade) {
@@ -401,7 +412,6 @@ public class AECellConverter extends SpecialSlimefunItem {
                 AECellQuantumConverter.buildQuantumStorage(qc.getItemStack(), left, storage));
         }
 
-        menu.replaceExistingItem(CELL_SLOT, cellItem);
         refresh(menu);
 
         if (Networks.getAeStorageDatabase() != null) {
@@ -444,6 +454,26 @@ public class AECellConverter extends SpecialSlimefunItem {
         return slots;
     }
 
+    private static boolean isInCellWhitelist(@NotNull AEStorageCellCache cache, @NotNull ItemStack sample) {
+        for (ItemStack template : cache.getWhitelist()) {
+            if (StackUtils.itemsMatch(template, sample)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Nullable
+    private static NetworkQuantumStorage getQuantumStorageOf(@NotNull ItemStack item) {
+        SlimefunItem sf = SlimefunItem.getByItem(item);
+        return sf instanceof NetworkQuantumStorage storage ? storage : null;
+    }
+
+    private static boolean isQuantumStorage(@Nullable ItemStack item) {
+        return item != null && !item.getType().isAir() && item.hasItemMeta()
+            && Keys.getQuantumCache(item.getItemMeta()) != null;
+    }
+
     private void insertCell(@NotNull BlockMenu menu, @NotNull ItemStack cellItem, @NotNull Player player) {
         if (AECellPersistence.isWrongServer(player, cellItem)) {
             player.sendMessage(Lang.getString("messages.ae.cell.wrong_server"));
@@ -464,7 +494,6 @@ public class AECellConverter extends SpecialSlimefunItem {
 
         AEStorageCell.loadCellCache(cellItem, perTypeLimit);
         pageCache.put(menu.getLocation(), 0);
-        menu.replaceExistingItem(CELL_SLOT, cellItem);
         refresh(menu);
     }
 
@@ -484,21 +513,6 @@ public class AECellConverter extends SpecialSlimefunItem {
         pageCache.put(menu.getLocation(), 0);
         refresh(menu);
         return cellItem;
-    }
-
-    private static boolean isInCellWhitelist(@NotNull AEStorageCellCache cache, @NotNull ItemStack sample) {
-        for (ItemStack template : cache.getWhitelist()) {
-            if (StackUtils.itemsMatch(template, sample)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Nullable
-    private static NetworkQuantumStorage asQuantumStorage(@NotNull ItemStack item) {
-        SlimefunItem sf = SlimefunItem.getByItem(item);
-        return sf instanceof NetworkQuantumStorage storage ? storage : null;
     }
 
     private static void giveOrDrop(@NotNull Player player, @NotNull ItemStack item) {
@@ -524,6 +538,7 @@ public class AECellConverter extends SpecialSlimefunItem {
         if (cellItem == null || !AEStorageCell.isStorageCell(cellItem)) {
             menu.replaceExistingItem(CELL_SLOT, createCellSlotMarker());
             clearDisplay(menu);
+            menu.replaceExistingItem(INFO, buildInfoItem(null, 0, 0));
             menu.replaceExistingItem(PREV, buildPageButton(false, false));
             menu.replaceExistingItem(NEXT, buildPageButton(false, true));
             menu.replaceExistingItem(CLOSE, buildCloseButton());
@@ -532,6 +547,7 @@ public class AECellConverter extends SpecialSlimefunItem {
 
         long per = AEStorageCell.getPerTypeLimit(cellItem);
         AEStorageCellCache cache = AEStorageCell.loadCellCache(cellItem, per);
+
         AEStorageCell.applyLore(cellItem, per, AEStorageCell.getCurrentPerTypeLimit(cellItem));
         menu.replaceExistingItem(CELL_SLOT, cellItem);
 
@@ -542,7 +558,9 @@ public class AECellConverter extends SpecialSlimefunItem {
         }
 
         menu.replaceExistingItem(PREV, buildPageButton(pageCache.getOrDefault(menu.getLocation(), 0) > 0, false));
-        menu.replaceExistingItem(NEXT, buildPageButton(pageCache.getOrDefault(menu.getLocation(), 0) < maxPages(menu) - 1, true));
+        menu.replaceExistingItem(NEXT, buildPageButton(
+            pageCache.getOrDefault(menu.getLocation(), 0) < maxPages(menu) - 1, true));
+        menu.replaceExistingItem(INFO, buildInfoItem(cellItem, cache.getStoredItems().size(), countOutputUsed(menu)));
         menu.replaceExistingItem(CLOSE, buildCloseButton());
     }
 
@@ -610,9 +628,20 @@ public class AECellConverter extends SpecialSlimefunItem {
         return Math.max(1, (int) Math.ceil((double) count / ITEMS_PER_PAGE));
     }
 
+    private static int countOutputUsed(@NotNull BlockMenu menu) {
+        int used = 0;
+        for (int slot : OUTPUT_SLOTS) {
+            ItemStack onSlot = menu.getItemInSlot(slot);
+            if (onSlot != null && !onSlot.getType().isAir()) {
+                used++;
+            }
+        }
+        return used;
+    }
+
     @NotNull
     private static ItemStack buildDisplayItem(@NotNull ItemStack sample, long amount) {
-        ItemStack display = sample.clone();
+        ItemStack display = new ItemStack(sample.getType());
         display.setAmount(1);
         ItemMeta meta = display.getItemMeta();
         if (meta != null) {
@@ -629,6 +658,26 @@ public class AECellConverter extends SpecialSlimefunItem {
             display.setItemMeta(meta);
         }
         return display;
+    }
+
+    @NotNull
+    private static ItemStack buildInfoItem(@Nullable ItemStack cellItem, int types, int outputUsed) {
+        ItemStack info = new ItemStack(Material.PAPER);
+        ItemMeta meta = info.getItemMeta();
+        if (meta != null) {
+            List<String> lore = new ArrayList<>();
+            meta.setDisplayName(Lang.getString("messages.ae.converter.info_title"));
+            if (cellItem != null && AEStorageCell.isStorageCell(cellItem)) {
+                lore.add(Lang.getString("messages.ae.converter.cell_name", ItemStackHelper.getDisplayName(cellItem)));
+                lore.add(Lang.getString("messages.ae.converter.item_types", types));
+            } else {
+                lore.add(Lang.getString("messages.ae.converter.no_cell"));
+            }
+            lore.add(Lang.getString("messages.ae.converter.output_count", outputUsed, OUTPUT_SLOTS.length));
+            meta.setLore(lore);
+            info.setItemMeta(meta);
+        }
+        return info;
     }
 
     @NotNull
@@ -671,5 +720,23 @@ public class AECellConverter extends SpecialSlimefunItem {
             close.setItemMeta(meta);
         }
         return close;
+    }
+
+    @NotNull
+    private static ItemStack buildDisplayPlaceholder() {
+        ItemStack placeholder = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
+        ItemMeta meta = placeholder.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(" ");
+            placeholder.setItemMeta(meta);
+        }
+        return placeholder;
+    }
+
+    @NotNull
+    private static ItemStack buildBorderIcon() {
+        ItemStack border = new ItemStack(Material.BLUE_STAINED_GLASS_PANE);
+        border.editMeta(meta -> meta.setDisplayName(" "));
+        return border;
     }
 }

@@ -705,6 +705,11 @@ messages:
       units_full: "<error>元件种类已满，先清理一部分"
       whitelist_rejected: "<error>该物品不在白名单中"
       item_capacity_full: "<error>该物品已达单格容量上限"
+      info_title: "<passive>元件信息"
+      cell_name: "<passive>  元件 · <white>{0}"
+      item_types: "<passive>  物品种类 · <white>{0}"
+      no_cell: "<passive>  未放入元件"
+      output_count: "<passive>  输出占用 · <white>{0}<passive>/{1}"
       prev_page: "<white>◀ 上一页"
       first_page: "<passive>◀ 已是第一页"
       next_page: "<white>下一页 ▶"
@@ -748,6 +753,22 @@ icons:
     name: "&a添加玩家"
     lore:
       - "&7  &r点击后在聊天栏输入玩家名"
+  ae-drive-browse:
+    name: "&r浏览库存"
+    lore:
+      - "&7  &r点击浏览全部库存"
+  ae-cleaner-cell-slot:
+    name: "&a元件放置槽"
+    lore:
+      - "&7  &r手持元件点击放入"
+  ae-cleaner-close:
+    name: "&c关闭"
+  ae-display-placeholder:
+    name: " "
+  ae-converter-border:
+    name: " "
+  ae-converter-separator:
+    name: " "
   ae-setting-slot:
     name: "&a白名单物品"
     lore:

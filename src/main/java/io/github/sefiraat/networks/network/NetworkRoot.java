@@ -13,6 +13,7 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
 import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AEDriveStorage;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AENetworkCache;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.mooy1.infinityexpansion.items.storage.StorageCache;
@@ -159,8 +160,6 @@ public class NetworkRoot extends NetworkNode {
     @Getter
     private final Set<Location> advancedWirelessTransmitters = ConcurrentHashMap.newKeySet();
     @Getter
-    private final Set<Location> aeSwitchers = ConcurrentHashMap.newKeySet();
-    @Getter
     private final Set<Location> itemDifferenters = ConcurrentHashMap.newKeySet();
     @Getter
     private final Set<Location> storageCardConverters = ConcurrentHashMap.newKeySet();
@@ -199,7 +198,7 @@ public class NetworkRoot extends NetworkNode {
     private @Nullable Set<BlockMenu> aeDriveMenus = null;
     private @Nullable Set<BlockMenu> inputAbleAEDriveMenus = null;
     private @Nullable Set<BlockMenu> outputAbleAEDriveMenus = null;
-    private final AEDriveStorage.NetworkCache aeNetworkCache = new AEDriveStorage.NetworkCache();
+    private final AENetworkCache aeNetworkCache = new AENetworkCache();
     private Map<ItemStack, Long> allItemsView = null;
 
     @Setter
@@ -522,7 +521,6 @@ public class NetworkRoot extends NetworkNode {
             case CRAFTER_MANAGER -> crafterManagers.add(location);
             case FLOW_VIEWER -> itemFlowViewers.add(location);
             case ADVANCED_WIRELESS_TRANSMITTER -> advancedWirelessTransmitters.add(location);
-            case AE_SWITCHER -> aeSwitchers.add(location);
             case ITEM_DIFFERENTER -> itemDifferenters.add(location);
             case STORAGE_CARD_CONVERTER -> storageCardConverters.add(location);
             case FACING_PRESETTER -> facingPresetters.add(location);
@@ -621,23 +619,11 @@ public class NetworkRoot extends NetworkNode {
         }
 
         // AE Drives
-        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getAEDriveMenus());
+        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getOutputAbleAEDriveMenus());
         for (Map.Entry<ItemStack, Long> entry : aeItems.entrySet()) {
             ItemStack clone = entry.getKey().clone();
             clone.setAmount(1);
-            final Long currentAmount = itemStacks.get(clone);
-            long newAmount;
-            if (currentAmount == null) {
-                newAmount = entry.getValue();
-            } else {
-                long newLong = currentAmount + entry.getValue();
-                if (newLong < 0) {
-                    newAmount = 0;
-                } else {
-                    newAmount = currentAmount + entry.getValue();
-                }
-            }
-            itemStacks.put(clone, newAmount);
+            addAmount(itemStacks, clone, entry.getValue());
         }
 
         allItemsView = itemStacks;
