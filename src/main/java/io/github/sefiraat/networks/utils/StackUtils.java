@@ -56,6 +56,7 @@ public class StackUtils {
     private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMCVersion();
     public static final boolean IS_1_20_5 = MC_VERSION.isAtLeast(MinecraftVersion.V1_20_5);
     public static final boolean IS_1_21 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21);
+    public static final boolean IS_1_21_3 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_3);
     public static final boolean IS_1_21_4 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_4);
 
     @NotNull
@@ -735,6 +736,23 @@ public class StackUtils {
     }
 
     private static boolean isBundle(@NotNull Material material) {
-        return material == Material.BUNDLE || material.name().endsWith("_BUNDLE");
+        return material == Material.BUNDLE
+            || IS_1_21_3 && (
+                material == Material.BLACK_BUNDLE
+            || material == Material.BLUE_BUNDLE
+            || material == Material.BROWN_BUNDLE
+            || material == Material.CYAN_BUNDLE
+            || material == Material.GRAY_BUNDLE
+            || material == Material.GREEN_BUNDLE
+            || material == Material.LIGHT_BLUE_BUNDLE
+            || material == Material.LIGHT_GRAY_BUNDLE
+            || material == Material.LIME_BUNDLE
+            || material == Material.MAGENTA_BUNDLE
+            || material == Material.ORANGE_BUNDLE
+            || material == Material.PINK_BUNDLE
+            || material == Material.PURPLE_BUNDLE
+            || material == Material.RED_BUNDLE
+            || material == Material.WHITE_BUNDLE
+            || material == Material.YELLOW_BUNDLE);
     }
 }
