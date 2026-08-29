@@ -22,6 +22,25 @@ disable-profile-check: false
 
 fast-interact-quantum: true
 
+# AE storage cell settings
+ae:
+  # 元件可升级到的物品种类上限。新元件初始1种,每个量子储存+1,直至此上限。
+  max-item-types: 64
+
+# AE storage persistence (SQLite)
+ae-storage:
+  wal-mode: true
+  busy-timeout: 5000
+  write-timeout-seconds: 10
+  journal-retention-minutes: 30
+  archive-enabled: true
+  archive-retention-days: 7
+  archive-max-rows: 2000000
+  checkpoint-interval: 60
+  checkpoint-threshold: 5000
+  backup-enabled: true
+  backup-interval-hours: 24
+
 rpg-fix:
   force-check-lore: false
 

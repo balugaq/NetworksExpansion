@@ -147,6 +147,27 @@ public class SetupUtil {
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE.registerThis(),
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE_WITHHOLDING.registerThis());
 
+        ExpansionItemsMenus.SUB_MENU_AE.addTo(
+            ExpansionItems.AE_DRIVE.registerThis(),
+            ExpansionItems.AE_CELL_CLEANER.registerThis(),
+            ExpansionItems.AE_CELL_CONVERTER.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L1.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L2.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L3.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L4.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L5.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L6.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L7.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L8.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L9.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L10.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L11.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L12.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L13.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L14.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_L15.registerThis(),
+            ExpansionItems.AE_STORAGE_CELL_UNLIMITED.registerThis());
+
         ExpansionItemsMenus.SUB_MENU_BRIDGE.addTo(
             ExpansionItems.NETWORK_BRIDGE_ORDINAL.registerThis(),
             ExpansionItems.NETWORK_BRIDGE_WHITE.registerThis(),
@@ -277,11 +298,13 @@ public class SetupUtil {
             ExpansionItemsMenus.MAIN_MENU_CARGO_SYSTEM,
             ExpansionItemsMenus.SUB_MENU_ADVANCED_STORAGE,
             ExpansionItemsMenus.SUB_MENU_NETWORKS_DRAWERS,
-            ExpansionItemsMenus.SUB_MENU_CARGO);
+            ExpansionItemsMenus.SUB_MENU_CARGO,
+            ExpansionItemsMenus.SUB_MENU_AE);
         ExpansionItemsMenus.MAIN_MENU_CARGO_SYSTEM.addFrom(
             ExpansionItemsMenus.SUB_MENU_ADVANCED_STORAGE,
             ExpansionItemsMenus.SUB_MENU_NETWORKS_DRAWERS,
-            ExpansionItemsMenus.SUB_MENU_CARGO);
+            ExpansionItemsMenus.SUB_MENU_CARGO,
+            ExpansionItemsMenus.SUB_MENU_AE);
 
         ExpansionItemsMenus.MAIN_ITEM_GROUP.addTo(
             ExpansionItemsMenus.MAIN_MENU_FUNCTIONAL_MACHINE,

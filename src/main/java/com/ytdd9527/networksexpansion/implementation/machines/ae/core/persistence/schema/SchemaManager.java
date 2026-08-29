@@ -1,0 +1,74 @@
+package com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.schema;
+
+import com.balugaq.netex.utils.Debug;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.connection.ConnectionManager;
+import io.github.sefiraat.networks.Networks;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Logger;
+
+public class SchemaManager {
+
+    private static final Logger LOGGER = Networks.getInstance().getLogger();
+    private final ConnectionManager connMgr;
+    private final DDLProvider ddl = new DDLProvider();
+
+    public SchemaManager(ConnectionManager connMgr) {
+        this.connMgr = connMgr;
+    }
+
+    public DDLProvider getDDL() {
+        return ddl;
+    }
+
+    public void initSchema() {
+        try (Connection conn = connMgr.getConnection()) {
+            exec(conn, ddl.createSchemaInfoTable());
+            initItemTemplatesTable(conn);
+            exec(conn, ddl.createCellMetaTable());
+            exec(conn, ddl.createCellItemsTable());
+            exec(conn, ddl.createJournalTable());
+            exec(conn, ddl.createJournalIndex());
+            exec(conn, ddl.createJournalArchiveTable());
+            exec(conn, ddl.createArchiveIndexes());
+            exec(conn, ddl.createArchiveTimestampIndex());
+
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT config_value FROM ae_schema_info WHERE config_key = 'created_at'")) {
+                if (!rs.next()) {
+                    long now = System.currentTimeMillis();
+                    exec(conn, "INSERT INTO ae_schema_info (config_key, config_value) VALUES ('created_at', '" + now + "')");
+                    exec(conn, "INSERT INTO ae_schema_info (config_key, config_value) VALUES ('last_migrated', '" + now + "')");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.schema_init_failed", e.getMessage()));
+            Debug.trace(e);
+            throw new RuntimeException("Schema initialization failed", e);
+        }
+    }
+
+    // 建模板表
+    private void initItemTemplatesTable(Connection conn) throws SQLException {
+        exec(conn, ddl.createItemTemplatesTable());
+        exec(conn, ddl.createItemTemplatesDedup());
+    }
+
+    public void markSchemaVersion() {
+        try (Connection conn = connMgr.getConnection()) {
+            exec(conn, "INSERT OR REPLACE INTO ae_schema_info (config_key, config_value) VALUES ('schema_version', '1')");
+        } catch (SQLException e) {
+            LOGGER.warning(Networks.getLocalizationService().getString("messages.ae.persistence.schema_mark_version_failed", e.getMessage()));
+            Debug.trace(e);
+        }
+    }
+
+    private void exec(Connection conn, String sql) throws SQLException {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        }
+    }
+}

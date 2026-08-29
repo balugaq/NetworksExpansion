@@ -11,7 +11,10 @@ import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_BEST_PUSHER;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_BRIDGE;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CAPACITOR_1;
+import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CAPACITOR_2;
+import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CAPACITOR_3;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CAPACITOR_4;
+import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CELL;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CONFIGURATOR;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_CRAFTING_GRID;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_EXPORT;
@@ -37,6 +40,9 @@ import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_7;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_8;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_9;
+import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_11;
+import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_12;
+import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_13;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_WORKBENCH;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_RECIPE_ENCODER;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_VACUUM;
@@ -991,5 +997,121 @@ public class ExpansionRecipes {
         SYNTHETIC_EMERALD_SHARD.getItem(), NETWORK_PROBE.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(),
         OPTIC_CABLE.getItem(), SIMPLE_NANOBOTS.getItem(), OPTIC_CABLE.getItem(),
         SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.STATUS_VIEWER, SYNTHETIC_EMERALD_SHARD.getItem()
+    };
+
+    // AE Drive recipe
+    public static final ItemStack[] AE_DRIVE = new ItemStack[]{
+        NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem(),
+        NETWORK_BRIDGE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L3, NETWORK_BRIDGE.getItem(),
+        NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem()
+    };
+
+    public static final ItemStack[] AE_CELL_CLEANER = new ItemStack[]{
+        OPTIC_GLASS.getItem(), ExpansionItemStacks.AE_DRIVE, OPTIC_GLASS.getItem(),
+        NETWORK_BRIDGE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L2, NETWORK_BRIDGE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] AE_CELL_CONVERTER = new ItemStack[]{
+        OPTIC_GLASS.getItem(), ExpansionItemStacks.AE_CELL_CLEANER, OPTIC_GLASS.getItem(),
+        NETWORK_BRIDGE.getItem(), NETWORK_QUANTUM_STORAGE_0.getItem(), NETWORK_BRIDGE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
+    };  // 元件转量子储存：工作台换个芯，中间放个量子储存当核心
+
+    // AE Storage Cell recipes (progression)
+    public static final ItemStack[] AE_STORAGE_CELL_L1 = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_GLASS.getItem(), NETWORK_CELL.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L2 = new ItemStack[]{
+        OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_CABLE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L1, OPTIC_CABLE.getItem(),
+        OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L3 = new ItemStack[]{
+        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem(),
+        OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L2, OPTIC_STAR.getItem(),
+        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L4 = new ItemStack[]{
+        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem(),
+        OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L3, OPTIC_STAR.getItem(),
+        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L5 = new ItemStack[]{
+        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(),
+        RADIOACTIVE_OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L4, RADIOACTIVE_OPTIC_STAR.getItem(),
+        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L6 = new ItemStack[]{
+        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(),
+        RADIOACTIVE_OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L5, RADIOACTIVE_OPTIC_STAR.getItem(),
+        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L7 = new ItemStack[]{
+        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(),
+        SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L6, SYNTHETIC_EMERALD_SHARD.getItem(),
+        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L8 = new ItemStack[]{
+        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(),
+        SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L7, SYNTHETIC_EMERALD_SHARD.getItem(),
+        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L9 = new ItemStack[]{
+        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(),
+        SIMPLE_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L8, SIMPLE_NANOBOTS.getItem(),
+        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L10 = new ItemStack[]{
+        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(),
+        SIMPLE_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L9, SIMPLE_NANOBOTS.getItem(),
+        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L11 = new ItemStack[]{
+        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(),
+        ADVANCED_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L10, ADVANCED_NANOBOTS.getItem(),
+        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L12 = new ItemStack[]{
+        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(),
+        ADVANCED_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L11, ADVANCED_NANOBOTS.getItem(),
+        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L13 = new ItemStack[]{
+        SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem(),
+        SHRINKING_BASE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L12, SHRINKING_BASE.getItem(),
+        SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L14 = new ItemStack[]{
+        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(),
+        INTERDIMENSIONAL_PRESENCE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L13, INTERDIMENSIONAL_PRESENCE.getItem(),
+        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_L15 = new ItemStack[]{
+        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(),
+        INTERDIMENSIONAL_PRESENCE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L14, INTERDIMENSIONAL_PRESENCE.getItem(),
+        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem()
+    };
+
+    public static final ItemStack[] AE_STORAGE_CELL_UNLIMITED = new ItemStack[]{
+        RADIOACTIVE_OPTIC_STAR.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(),
+        INTERDIMENSIONAL_PRESENCE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L15, INTERDIMENSIONAL_PRESENCE.getItem(),
+        RADIOACTIVE_OPTIC_STAR.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), RADIOACTIVE_OPTIC_STAR.getItem()
     };
 }

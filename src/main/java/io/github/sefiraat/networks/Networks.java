@@ -10,6 +10,8 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.managers.ConfigManager;
 import com.ytdd9527.networksexpansion.core.services.LocalizationService;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.AEStorageDatabase;
 import com.ytdd9527.networksexpansion.setup.SetupUtil;
 import com.ytdd9527.networksexpansion.utils.databases.DataSource;
 import com.ytdd9527.networksexpansion.utils.databases.DataStorage;
@@ -65,6 +67,12 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
 
     @Getter
     private static BukkitRunnable autoSaveThread;
+
+    @Getter
+    private static BukkitRunnable aeAutoSaveThread;
+
+    @Getter
+    private static AEStorageDatabase aeStorageDatabase;
 
     private static MinecraftVersion minecraftVersion = MinecraftVersion.UNKNOWN;
     private final @NotNull String username;
@@ -168,6 +176,25 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         long period = 20L * seconds;
         autoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
 
+        // AE 驱动器元件数据自动保存
+        aeAutoSaveThread = new BukkitRunnable() {
+            @Override
+            public void run() {
+                AEDrive.saveAllDriveCells();
+            }
+        };
+        aeAutoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
+
+        getLogger().info(getLocalizationService().getString("messages.startup.initializing-ae-database"));
+        try {
+            aeStorageDatabase = new AEStorageDatabase();
+            aeStorageDatabase.init();
+        } catch (Exception e) {
+            aeStorageDatabase = null;
+            getLogger().warning(getLocalizationService().getString("messages.startup.failed-to-init-ae-database"));
+            Debug.trace(e);
+        }
+
         getLogger().info(getLocalizationService().getString("messages.startup.registering-items"));
         SetupUtil.setupAll();
 
@@ -242,7 +269,14 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         if (autoSaveThread != null) {
             autoSaveThread.cancel();
         }
+        if (aeAutoSaveThread != null) {
+            aeAutoSaveThread.cancel();
+        }
         DataStorage.saveAmountChange();
+        AEDrive.saveAllDriveCells();
+        if (aeStorageDatabase != null) {
+            aeStorageDatabase.shutdown();
+        }
         if (queryQueue != null) {
             while (!queryQueue.isAllDone()) {
                 getLogger()

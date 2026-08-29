@@ -514,6 +514,35 @@ public class ExpansionItemStacks {
     public static final SlimefunItemStack LINKER_GRID = Theme.themedSlimefunItemStack(
         Lang.getItem("NTW_EXPANSION_LINKER_GRID", Material.JUKEBOX), Theme.MACHINE);
 
+    // AE Drive and Storage Cells
+    public static final SlimefunItemStack AE_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_AE_DRIVE", Material.CHISELED_BOOKSHELF), Theme.MACHINE);
+    public static final SlimefunItemStack AE_CELL_CLEANER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_AE_CELL_CLEANER", Material.CARTOGRAPHY_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack AE_CELL_CONVERTER = Theme.random(
+        Lang.getItem("NTW_EXPANSION_AE_CELL_CONVERTER", Material.CHISELED_QUARTZ_BLOCK), Theme.MACHINE);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L1 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L1", Material.MUSIC_DISC_11);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L2 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L2", Material.MUSIC_DISC_13);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L3 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L3", Material.MUSIC_DISC_CAT);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L4 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L4", Material.MUSIC_DISC_BLOCKS);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L5 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L5", Material.MUSIC_DISC_CHIRP);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L6 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L6", Material.MUSIC_DISC_FAR);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L7 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L7", Material.MUSIC_DISC_MALL);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L8 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L8", Material.MUSIC_DISC_MELLOHI);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L9 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L9", Material.MUSIC_DISC_STAL);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L10 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L10", Material.MUSIC_DISC_STRAD);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L11 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L11", Material.MUSIC_DISC_WARD);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L12 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L12", Material.MUSIC_DISC_OTHERSIDE);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L13 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L13", Material.MUSIC_DISC_PIGSTEP);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L14 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L14", Material.MUSIC_DISC_5);
+    public static final SlimefunItemStack AE_STORAGE_CELL_L15 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L15", Material.MUSIC_DISC_RELIC);
+    public static final SlimefunItemStack AE_STORAGE_CELL_UNLIMITED = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_AE_STORAGE_CELL_UNLIMITED", enchanted(Material.MUSIC_DISC_OTHERSIDE)), Theme.MACHINE);
+
+
+    private static @NotNull SlimefunItemStack themedCell(@NotNull String key, @NotNull Material disc) {
+        return Theme.themedSlimefunItemStack(Lang.getItem(key, disc), Theme.MACHINE);
+    }
 
     public static @NotNull ItemStack enchanted(@NotNull Material material) {
         return ItemStackUtil.getPreEnchantedItemStack(material);

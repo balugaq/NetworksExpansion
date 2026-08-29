@@ -11,6 +11,9 @@ import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.NetworksVersionedParticle;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AEDriveStorage;
+import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AENetworkCache;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.mooy1.infinityexpansion.items.storage.StorageCache;
@@ -157,8 +160,6 @@ public class NetworkRoot extends NetworkNode {
     @Getter
     private final Set<Location> advancedWirelessTransmitters = ConcurrentHashMap.newKeySet();
     @Getter
-    private final Set<Location> aeSwitchers = ConcurrentHashMap.newKeySet();
-    @Getter
     private final Set<Location> itemDifferenters = ConcurrentHashMap.newKeySet();
     @Getter
     private final Set<Location> storageCardConverters = ConcurrentHashMap.newKeySet();
@@ -194,6 +195,10 @@ public class NetworkRoot extends NetworkNode {
     private @Nullable Map<Location, BarrelIdentity> mapOutputAbleBarrels = null;
     private @Nullable Map<Location, StorageUnitData> mapInputAbleCargoStorageUnits = null;
     private @Nullable Map<Location, StorageUnitData> mapOutputAbleCargoStorageUnits = null;
+    private @Nullable Set<BlockMenu> aeDriveMenus = null;
+    private @Nullable Set<BlockMenu> inputAbleAEDriveMenus = null;
+    private @Nullable Set<BlockMenu> outputAbleAEDriveMenus = null;
+    private final AENetworkCache aeNetworkCache = new AENetworkCache();
     private Map<ItemStack, Long> allItemsView = null;
 
     @Setter
@@ -516,7 +521,6 @@ public class NetworkRoot extends NetworkNode {
             case CRAFTER_MANAGER -> crafterManagers.add(location);
             case FLOW_VIEWER -> itemFlowViewers.add(location);
             case ADVANCED_WIRELESS_TRANSMITTER -> advancedWirelessTransmitters.add(location);
-            case AE_SWITCHER -> aeSwitchers.add(location);
             case ITEM_DIFFERENTER -> itemDifferenters.add(location);
             case STORAGE_CARD_CONVERTER -> storageCardConverters.add(location);
             case FACING_PRESETTER -> facingPresetters.add(location);
@@ -613,6 +617,15 @@ public class NetworkRoot extends NetworkNode {
                 }
             }
         }
+
+        // AE Drives
+        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getOutputAbleAEDriveMenus());
+        for (Map.Entry<ItemStack, Long> entry : aeItems.entrySet()) {
+            ItemStack clone = entry.getKey().clone();
+            clone.setAmount(1);
+            addAmount(itemStacks, clone, entry.getValue());
+        }
+
         allItemsView = itemStacks;
         return itemStacks;
     }
@@ -745,6 +758,68 @@ public class NetworkRoot extends NetworkNode {
             BlockMenu menu = StorageCacheUtils.getMenu(cellLocation);
             if (menu != null) {
                 menus.add(menu);
+            }
+        }
+        return menus;
+    }
+
+    @NotNull
+    public Set<BlockMenu> getAEDriveMenus() {
+        if (this.aeDriveMenus != null) {
+            return this.aeDriveMenus;
+        }
+        final Set<Location> monitor = new HashSet<>();
+        monitor.addAll(this.inputOnlyMonitors);
+        monitor.addAll(this.outputOnlyMonitors);
+        monitor.addAll(this.monitors);
+        this.aeDriveMenus = collectAEDriveMenus(monitor);
+        return this.aeDriveMenus;
+    }
+
+    @NotNull
+    public Set<BlockMenu> getInputAbleAEDriveMenus() {
+        if (this.inputAbleAEDriveMenus != null) {
+            return this.inputAbleAEDriveMenus;
+        }
+        final Set<Location> monitor = new HashSet<>();
+        monitor.addAll(this.inputOnlyMonitors);
+        monitor.addAll(this.monitors);
+        this.inputAbleAEDriveMenus = collectAEDriveMenus(monitor);
+        return this.inputAbleAEDriveMenus;
+    }
+
+    @NotNull
+    public Set<BlockMenu> getOutputAbleAEDriveMenus() {
+        if (this.outputAbleAEDriveMenus != null) {
+            return this.outputAbleAEDriveMenus;
+        }
+        final Set<Location> monitor = new HashSet<>();
+        monitor.addAll(this.outputOnlyMonitors);
+        monitor.addAll(this.monitors);
+        this.outputAbleAEDriveMenus = collectAEDriveMenus(monitor);
+        return this.outputAbleAEDriveMenus;
+    }
+
+    @NotNull
+    private Set<BlockMenu> collectAEDriveMenus(@NotNull Set<Location> monitors) {
+        final Set<BlockMenu> menus = new HashSet<>();
+        final Set<Location> addedLocations = ConcurrentHashMap.newKeySet();
+        for (Location monitorLocation : monitors) {
+            final BlockFace face = NetworkDirectional.getSelectedFace(monitorLocation);
+            if (face == null) {
+                continue;
+            }
+            final Location testLocation = monitorLocation.clone().add(face.getDirection());
+            if (addedLocations.contains(testLocation)) {
+                continue;
+            }
+            addedLocations.add(testLocation);
+            final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(testLocation);
+            if (slimefunItem instanceof AEDrive) {
+                BlockMenu menu = StorageCacheUtils.getMenu(testLocation);
+                if (menu != null) {
+                    menus.add(menu);
+                }
             }
         }
         return menus;
@@ -1114,6 +1189,13 @@ public class NetworkRoot extends NetworkNode {
             }
         }
 
+        // AE Drives
+        found += AEDrive.getStorage().getAmount(aeNetworkCache, getOutputAbleAEDriveMenus(), request.getItemStack());
+
+        if (found >= request.getAmount()) {
+            return true;
+        }
+
         return false;
     }
 
@@ -1164,6 +1246,10 @@ public class NetworkRoot extends NetworkNode {
                 }
             }
         }
+
+        // AE Drives
+        totalAmount += AEDrive.getStorage().getAmount(aeNetworkCache, getOutputAbleAEDriveMenus(), itemStack);
+
         if (totalAmount > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
         } else {
@@ -1237,6 +1323,14 @@ public class NetworkRoot extends NetworkNode {
                         }
                     }
                 }
+            }
+        }
+
+        // AE Drives
+        for (ItemStack itemStack : itemStacks) {
+            long aeAmount = AEDrive.getStorage().getAmount(aeNetworkCache, getOutputAbleAEDriveMenus(), itemStack);
+            if (aeAmount > 0) {
+                totalAmounts.put(itemStack, totalAmounts.getOrDefault(itemStack, 0L) + aeAmount);
             }
         }
 
@@ -1742,6 +1836,9 @@ public class NetworkRoot extends NetworkNode {
         this.outputAbleBarrels = null;
         this.inputAbleCargoStorageUnitDatas = null;
         this.outputAbleCargoStorageUnitDatas = null;
+        this.aeDriveMenus = null;
+        this.inputAbleAEDriveMenus = null;
+        this.outputAbleAEDriveMenus = null;
 
         getBarrels();
         getCargoStorageUnitDatas();
@@ -1989,6 +2086,23 @@ public class NetworkRoot extends NetworkNode {
                 }
             }
             // </editor-fold>
+        }
+
+        // AE Drives
+        ItemStack take = AEDrive.getStorage().takeItem(aeNetworkCache, getOutputAbleAEDriveMenus(), request);
+        if (take != null) {
+            if (stackToReturn == null) {
+                stackToReturn = take.clone();
+            } else {
+                stackToReturn.setAmount(stackToReturn.getAmount() + take.getAmount());
+            }
+            request.receiveAmount(take.getAmount());
+
+            if (request.getAmount() <= 0) {
+                uncontrolAccessOutput(accessor);
+                tryRecord(accessor, request);
+                return stackToReturn;
+            }
         }
 
         // Cells
@@ -2341,6 +2455,17 @@ public class NetworkRoot extends NetworkNode {
                 // Netex - Record end
                 return;
             }
+        }
+
+        // AE Drives
+        Map<ItemStack, Long> itemsToPush = new HashMap<>();
+        itemsToPush.put(incoming.clone(), (long) incoming.getAmount());
+        AEDrive.getStorage().pushItems(aeNetworkCache, getInputAbleAEDriveMenus(), itemsToPush);
+        incoming.setAmount(itemsToPush.values().iterator().next().intValue());
+        if (incoming.getAmount() == 0) {
+            uncontrolAccessInput(accessor);
+            tryRecord(accessor, beforeItemStack, 0);
+            return;
         }
 
         for (BlockMenu blockMenu : getCellMenus()) {

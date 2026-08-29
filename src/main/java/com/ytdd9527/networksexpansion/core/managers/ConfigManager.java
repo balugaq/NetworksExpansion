@@ -146,4 +146,56 @@ public class ConfigManager {
     public boolean isFastInteractQuantum() {
         return Networks.getInstance().getConfig().getBoolean("fast-interact-quantum", false);
     }
+
+    public int getAeMaxItemTypes() {
+        return getInt("ae.max-item-types", 64);
+    }
+
+    public long getAeStorageWriteTimeout() {
+        return getLong("ae-storage.write-timeout-seconds", 10L);
+    }
+
+    public boolean getBoolean(@NotNull String path, boolean defaultValue) {
+        return Networks.getInstance().getConfig().getBoolean(path, defaultValue);
+    }
+
+    public boolean getAeStorageWalMode() {
+        return getBoolean("ae-storage.wal-mode", true);
+    }
+
+    public int getAeStorageBusyTimeout() {
+        return getInt("ae-storage.busy-timeout", 5000);
+    }
+
+    public long getAeStorageJournalRetentionMinutes() {
+        return getLong("ae-storage.journal-retention-minutes", 30);
+    }
+
+    public boolean getAeStorageArchiveEnabled() {
+        return getBoolean("ae-storage.archive-enabled", true);
+    }
+
+    public int getAeStorageArchiveRetentionDays() {
+        return getInt("ae-storage.archive-retention-days", 7);
+    }
+
+    public int getAeStorageArchiveMaxRows() {
+        return getInt("ae-storage.archive-max-rows", 2000000);
+    }
+
+    public int getAeStorageCheckpointInterval() {
+        return getInt("ae-storage.checkpoint-interval", 60);
+    }
+
+    public int getAeStorageCheckpointThreshold() {
+        return getInt("ae-storage.checkpoint-threshold", 5000);
+    }
+
+    public boolean getAeStorageBackupEnabled() {
+        return getBoolean("ae-storage.backup-enabled", true);
+    }
+
+    public int getAeStorageBackupIntervalHours() {
+        return getInt("ae-storage.backup-interval-hours", 24);
+    }
 }
