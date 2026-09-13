@@ -652,23 +652,15 @@ public class LineOperationUtil {
                         existingCount += itemStack.getAmount();
                     }
                 }
-                if (existingCount < limitQuantity) {
-                    final int deficit = limitQuantity - existingCount;
-                    int availableSpace = 0;
-                    final ItemStack is = blockMenu.getItemInSlot(slot);
-                    if (is == null || is.getType() == Material.AIR) {
-                        availableSpace += template.getMaxStackSize();
-                    } else if (StackUtils.itemsMatch(itemRequest, is)) {
-                        availableSpace += Math.max(0, is.getMaxStackSize() - is.getAmount());
-                    }
-                    if (availableSpace <= 0) return;
 
-                    final int toRequest = Math.min(deficit, availableSpace);
-                    itemRequest.setAmount(toRequest);
-                    final ItemStack retrieved = root.getItemStack0(accessor, itemRequest);
-                    if (retrieved != null && retrieved.getType() != Material.AIR) {
-                        BlockMenuUtil.pushItem(blockMenu, retrieved, slots);
-                    }
+                int targetCount = template.getAmount();
+                int scheduleToMove = Math.min(targetCount - existingCount, limitQuantity);
+                if (scheduleToMove <= 0) return;
+
+                itemRequest.setAmount(scheduleToMove);
+                final ItemStack retrieved = root.getItemStack0(accessor, itemRequest);
+                if (retrieved != null && retrieved.getType() != Material.AIR) {
+                    BlockMenuUtil.pushItem(blockMenu, retrieved, slot);
                 }
             }
         }
