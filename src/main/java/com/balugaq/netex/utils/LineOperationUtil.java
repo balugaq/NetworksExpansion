@@ -230,7 +230,7 @@ public class LineOperationUtil {
                     }
                 }
             }
-            case NULL_ONLY, P2P -> {
+            case NULL_ONLY, P2P, P2P_SPECIFIED_QUANTITY -> {
                 /*
                  * Nothing to do.
                  */
@@ -637,6 +637,31 @@ public class LineOperationUtil {
 
                 int slot = slots[itemIndex];
                 pushSlot(accessor, root, itemRequest, blockMenu, template, slot, limitQuantity);
+            }
+
+            case P2P_SPECIFIED_QUANTITY -> {
+                if (itemIndex >= slots.length) {
+                    return;
+                }
+
+                int slot = slots[itemIndex];
+                int existingCount = 0;
+                final ItemStack itemStack = blockMenu.getItemInSlot(slot);
+                if (itemStack != null && itemStack.getType() != Material.AIR) {
+                    if (StackUtils.itemsMatch(itemRequest, itemStack)) {
+                        existingCount += itemStack.getAmount();
+                    }
+                }
+
+                int targetCount = template.getAmount();
+                int scheduleToMove = Math.min(targetCount - existingCount, limitQuantity);
+                if (scheduleToMove <= 0) return;
+
+                itemRequest.setAmount(scheduleToMove);
+                final ItemStack retrieved = root.getItemStack0(accessor, itemRequest);
+                if (retrieved != null && retrieved.getType() != Material.AIR) {
+                    BlockMenuUtil.pushItem(blockMenu, retrieved, slot);
+                }
             }
         }
     }
