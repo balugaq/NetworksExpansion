@@ -240,20 +240,15 @@ public class SetupUtil {
             ExpansionItems.AUTHOR_SEFIRAAT.registerThis(),
             ExpansionItems.AUTHOR_YBW0014.registerThis(),
             ExpansionItems.AUTHOR_YITOUDAIDAI.registerThis(),
-            ExpansionItems.AUTHOR_TINALNESS.registerThis());
+            ExpansionItems.AUTHOR_BALUGAQ.registerThis());
 
-        /* announce */
+        /* announcements */
         ExpansionItemsMenus.SUB_MENU_ANNOUNCE.addTo(
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_1.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_2.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_3.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_4.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_5.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_6.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_7.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_8.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_9.registerThis(),
-            ExpansionItems.NTW_EXPANSION_ANNOUNCE_10.registerThis());
+            ExpansionItems.NTW_EXPANSION_ANNOUNCEMENT_01.registerThis(),
+            ExpansionItems.NTW_EXPANSION_ANNOUNCEMENT_02.registerThis(),
+            ExpansionItems.NTW_EXPANSION_ANNOUNCEMENT_03.registerThis(),
+            ExpansionItems.NTW_EXPANSION_ANNOUNCEMENT_04.registerThis(),
+            ExpansionItems.NTW_EXPANSION_ANNOUNCEMENT_05.registerThis());
     }
 
     private static void setupMenu() {

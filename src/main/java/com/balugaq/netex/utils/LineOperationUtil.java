@@ -230,7 +230,7 @@ public class LineOperationUtil {
                     }
                 }
             }
-            case NULL_ONLY, P2P -> {
+            case NULL_ONLY, P2P, P2P_SPECIFIED_QUANTITY -> {
                 /*
                  * Nothing to do.
                  */
@@ -637,6 +637,39 @@ public class LineOperationUtil {
 
                 int slot = slots[itemIndex];
                 pushSlot(accessor, root, itemRequest, blockMenu, template, slot, limitQuantity);
+            }
+
+            case P2P_SPECIFIED_QUANTITY -> {
+                if (itemIndex >= slots.length) {
+                    return;
+                }
+
+                int slot = slots[itemIndex];
+                int existingCount = 0;
+                final ItemStack itemStack = blockMenu.getItemInSlot(slot);
+                if (itemStack != null && itemStack.getType() != Material.AIR) {
+                    if (StackUtils.itemsMatch(itemRequest, itemStack)) {
+                        existingCount += itemStack.getAmount();
+                    }
+                }
+                if (existingCount < limitQuantity) {
+                    final int deficit = limitQuantity - existingCount;
+                    int availableSpace = 0;
+                    final ItemStack is = blockMenu.getItemInSlot(slot);
+                    if (is == null || is.getType() == Material.AIR) {
+                        availableSpace += template.getMaxStackSize();
+                    } else if (StackUtils.itemsMatch(itemRequest, is)) {
+                        availableSpace += Math.max(0, is.getMaxStackSize() - is.getAmount());
+                    }
+                    if (availableSpace <= 0) return;
+
+                    final int toRequest = Math.min(deficit, availableSpace);
+                    itemRequest.setAmount(toRequest);
+                    final ItemStack retrieved = root.getItemStack0(accessor, itemRequest);
+                    if (retrieved != null && retrieved.getType() != Material.AIR) {
+                        BlockMenuUtil.pushItem(blockMenu, retrieved, slots);
+                    }
+                }
             }
         }
     }

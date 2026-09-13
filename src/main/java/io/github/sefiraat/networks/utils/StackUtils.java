@@ -285,7 +285,7 @@ public class StackUtils {
         }
 
         // Check the lore
-        if (shouldCompareLore(itemStack, checkLore)) {
+        if (shouldCompareLore(itemStack, checkLore) || shouldCompareLore(cache.getItemStack(), checkLore)) {
             if (itemMeta.hasLore() && cachedMeta.hasLore()) {
                 // Bukkit automatically handled unset style in lore, so it always downs to correct results.
                 if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
@@ -334,7 +334,7 @@ public class StackUtils {
             return false;
         }
 
-        if (shouldCompareLore(itemStack, checkLore)) {
+        if (shouldCompareLore(itemStack, checkLore) || shouldCompareLore(cacheItem, checkLore)) {
             // we have to check lore manually, otherwise `matchesWithoutData` cannot identify non-style-preset text.
             // of course, we can use CraftBukkit utils like `ItemMeta.getLore()`, but it needs reflection.
             return loreMatchesLoose(
