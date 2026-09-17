@@ -45,8 +45,8 @@ dependencies {
         exclude("net.jcip", "jcip-annotations")
         exclude("com.google.code.findbugs", "jsr305")
     }
-    compileOnly("org.projectlombok:lombok:1.18.46")
-    annotationProcessor("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
     compileOnly("com.github.houbb:pinyin:0.4.0")
 
     // Supported Plugins
