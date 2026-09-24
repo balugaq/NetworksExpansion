@@ -38,7 +38,7 @@ dependencies {
     // Tools etc.
     implementation("org.bstats:bstats-bukkit:3.2.1")
     implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
-    implementation("dev.sefiraat:SefiLib:0.2.6")
+    implementation("dev.sefiraat:SefiLib:0.3.0")
     implementation("net.byteflux:libby-bukkit:1.3.2")
 
     compileOnly("com.google.code.findbugs:annotations:3.0.1u2") {
