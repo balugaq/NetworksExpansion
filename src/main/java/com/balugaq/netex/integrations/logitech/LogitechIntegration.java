@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 public class LogitechIntegration {
     private final ItemStack hyp = SlimefunItem.getById("LOGITECH_HYPER_LINK").getItem();
     private final ItemStack qtl  = SlimefunItem.getById("LOGITECH_QUANTUM_LINK").getItem();
-    private final ItemStack tin = ItemStackUtil.getCleanItem(ExpansionItemStacks.AUTHOR_TINALNESS);
+    private final ItemStack tin = ItemStackUtil.getCleanItem(ExpansionItemStacks.AUTHOR_BALUGAQ);
     private final ItemStack gns = ItemStackUtil.getCleanItem(ExpansionItemStacks.HANGING_GRID_NEW_STYLE);
 
     public final ItemStack[] RECIPE_LINKER_GRID = new ItemStack[] {
