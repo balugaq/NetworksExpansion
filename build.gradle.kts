@@ -1,7 +1,7 @@
 plugins {
     java
-    id("com.gradleup.shadow") version "9.0.0"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.shadow") version "9.6.1"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 group = "com.ytdd9527.networksexpansion"
@@ -45,8 +45,8 @@ dependencies {
         exclude("net.jcip", "jcip-annotations")
         exclude("com.google.code.findbugs", "jsr305")
     }
-    compileOnly("org.projectlombok:lombok:1.18.46")
-    annotationProcessor("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
     compileOnly("com.github.houbb:pinyin:0.4.0")
 
     // Supported Plugins
@@ -62,7 +62,7 @@ dependencies {
         exclude("com.sk89q.worldguard", "worldguard-legacy")
         exclude("com.comphenix.protocol", "ProtocolLib")
     }
-    compileOnly("net.guizhanss:GuizhanLibPlugin:1.7.6")
+    compileOnly("net.guizhanss:GuizhanLibPlugin:2.5.0")
     compileOnly("com.github.balugaq:FluffyMachines:43d7444e4c")
     compileOnly("com.github.TimetownDev:GuguSlimefunLib:45627c6f8e")
     compileOnly("com.github.balugaq:JustEnoughGuide:7f21e113a2")
