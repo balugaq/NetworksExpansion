@@ -24,3 +24,6 @@
 另外，感谢 **mc.talosmp.net** 的 **[GentlemanCheesy](https://github.com/GentlemanCheesy)** 成为[本人](https://github.com/Sefiraat)的首位赞助者！每个月能多喝一杯咖啡让我能有动力更好地编写插件。
 
 感谢 [m1919810 / matl114](https://github.com/m1919810) — 帮助[我](https://github.com/balugaq)找到了一些[网络拓展](https://github.com/balugaq/NetworksExpansion)的 bug
+
+如果你觉得这个附属不错，可以请[作者](https://github.com/balugaq)喝一杯奶茶喵~
+<img width="657" height="657" alt="cd7ab045e33de6267ee2c167f1e63e9c" src="https://github.com/user-attachments/assets/cdcd8276-a24a-4614-a156-41dfbc328219" />
