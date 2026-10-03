@@ -3,6 +3,7 @@ package io.github.sefiraat.networks.listeners;
 import com.balugaq.netex.api.events.NetworksBlockBreakEvent;
 import com.balugaq.netex.api.events.NetworksBlockPlaceEvent;
 import com.balugaq.netex.api.gui.MatchOptionMenu;
+import com.balugaq.netex.api.visual.Screen;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.sefiraat.networks.NetworkStorage;
 import io.github.sefiraat.networks.Networks;
@@ -37,6 +38,7 @@ public class SyncListener implements Listener {
                 e.setCancelled(true);
             }
             MatchOptionMenu.MATCH_OPTION_MAP.remove(e.getBlock().getLocation());
+            Screen.delete(e.getBlock().getLocation());
         }
     }
 

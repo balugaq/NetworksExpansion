@@ -3,19 +3,19 @@ package com.ytdd9527.networksexpansion.implementation.machines.networks.grids.vi
 import com.balugaq.bim.grid.ActiveGrid;
 import com.balugaq.bim.grid.ActiveGridPreset;
 import com.balugaq.bim.grid.InteractUnit;
-import com.balugaq.jeg.utils.KeyUtil;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.visual.Screen;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
 import io.github.sefiraat.networks.NetworkStorage;
 import io.github.sefiraat.networks.slimefun.network.grid.GridCache;
+import io.github.sefiraat.networks.utils.Keys;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class VisualGridPreset extends ActiveGridPreset {
     public VisualGridPreset() {
-        super(KeyUtil.newKey("visual_grid"), 9, 9);
+        super(Keys.newKey("visual_grid"), 9, 9);
     }
 
     @Override
