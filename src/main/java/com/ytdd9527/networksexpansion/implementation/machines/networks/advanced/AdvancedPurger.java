@@ -1,6 +1,7 @@
 package com.ytdd9527.networksexpansion.implementation.machines.networks.advanced;
 
 import com.balugaq.netex.api.enums.FeedbackType;
+import com.balugaq.netex.api.gui.MatchOptionMenu;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.utils.Lang;
 import com.balugaq.netex.utils.NetworksVersionedParticle;
@@ -12,6 +13,7 @@ import io.github.sefiraat.networks.network.NodeDefinition;
 import io.github.sefiraat.networks.network.NodeType;
 import io.github.sefiraat.networks.network.stackcaches.ItemRequest;
 import io.github.sefiraat.networks.slimefun.network.NetworkObject;
+import io.github.sefiraat.networks.utils.MatchOption;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -40,6 +42,8 @@ import java.util.List;
 public class AdvancedPurger extends NetworkObject implements RecipeDisplayItem {
 
     private static final String KEY_UUID = "display-uuid";
+
+    private static final int MATCH_OPTION_SLOT = 53;
     private static final int[] TEST_ITEM_SLOT = {
         0, 1, 2, 3, 4, 5, 6, 7,
         9, 10, 11, 12, 13, 14, 15, 16,
@@ -48,7 +52,7 @@ public class AdvancedPurger extends NetworkObject implements RecipeDisplayItem {
         36, 37, 38, 39, 40, 41, 42, 43,
         45, 46, 47, 48, 49, 50, 51, 52
     };
-    private static final int[] TEST_ITEM_BACKDROP = {8, 17, 26, 35, 44, 53};
+    private static final int[] TEST_ITEM_BACKDROP = {8, 17, 26, 35, 44};
     private final @NotNull ItemSetting<Integer> tickRate;
 
     @Setter
@@ -124,8 +128,9 @@ public class AdvancedPurger extends NetworkObject implements RecipeDisplayItem {
             ItemStack clone = testItem.clone();
             clone.setAmount(1);
 
+            MatchOption matchOption = MatchOptionMenu.getMatchOption(blockMenu.getLocation());
             ItemRequest itemRequest = new ItemRequest(clone, clone.getMaxStackSize());
-            ItemStack retrieved = definition.getNode().getRoot().getItemStack0(blockMenu.getLocation(), itemRequest);
+            ItemStack retrieved = definition.getNode().getRoot().getItemStack0(blockMenu.getLocation(), itemRequest, matchOption);
             if (retrieved != null) {
                 retrieved.setAmount(0);
                 Location location = blockMenu.getLocation().clone().add(0.5, 1.2, 0.5);
@@ -144,6 +149,15 @@ public class AdvancedPurger extends NetworkObject implements RecipeDisplayItem {
             @Override
             public void init() {
                 drawBackground(Icon.PURGER_TEMPLATE_BACKGROUND_STACK, TEST_ITEM_BACKDROP);
+                addItem(MATCH_OPTION_SLOT, Icon.MATCH_OPTION_SETTINGS, (p, i, itemStack, clickAction) -> false);
+            }
+
+            @Override
+            public void newInstance(@NotNull BlockMenu menu, @NotNull Block b) {
+                menu.addMenuClickHandler(MATCH_OPTION_SLOT, (player, slot, itemStack, clickAction) -> {
+                    MatchOptionMenu.openMenu(menu.getLocation(), player);
+                    return false;
+                });
             }
 
             @Override
