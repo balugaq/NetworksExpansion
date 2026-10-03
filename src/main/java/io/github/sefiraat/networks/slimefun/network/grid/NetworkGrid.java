@@ -1,5 +1,6 @@
 package io.github.sefiraat.networks.slimefun.network.grid;
 
+import com.balugaq.netex.api.visual.Screen;
 import io.github.sefiraat.networks.slimefun.NetworkSlimefunItems;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -92,7 +93,7 @@ public class NetworkGrid extends AbstractGrid {
                             ? gridCache.getMaxPages()
                             : gridCache.getPage() + 1);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -101,7 +102,7 @@ public class NetworkGrid extends AbstractGrid {
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     AbstractGrid.updateSortOrder(gridCache, action, 2);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 

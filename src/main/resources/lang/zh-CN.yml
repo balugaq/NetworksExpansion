@@ -2693,6 +2693,11 @@ items:
     lore:
       - "网络拓展开发者"
 
+  NTW_EXPANSION_VISUAL_GRID:
+    name: "虚拟网格"
+    lore:
+      - "以更大的菜单显示物品"
+
   NTW_EXPANSION_CARGO_NODE_QUICK_TOOL:
     name: "货运节点快配工具"
     lore:

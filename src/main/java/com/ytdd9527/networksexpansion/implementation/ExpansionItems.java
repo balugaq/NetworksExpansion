@@ -49,18 +49,19 @@ import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedVacuum;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedWirelessTransmitter;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.DueMachine;
-import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.HangingGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.NetworkBlueprintDecoder;
-import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.NetworkCraftingGridNewStyle;
-import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.NetworkGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.NetworkInputOnlyMonitor;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.NetworkOutputOnlyMonitor;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.Offsetter;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SmartGrabber;
-import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SmartNetworkCraftingGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SmartPusher;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SuperTrash;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SwitchingMonitor;
+import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.HangingGridNewStyle;
+import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.NetworkCraftingGridNewStyle;
+import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.NetworkGridNewStyle;
+import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.SmartNetworkCraftingGridNewStyle;
+import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.visual.VisualGrid;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import com.ytdd9527.networksexpansion.implementation.machines.viewer.ItemFlowViewer;
 import com.ytdd9527.networksexpansion.implementation.tools.CargoNodeQuickTool;
@@ -1451,5 +1452,12 @@ public class ExpansionItems {
         ExpansionItemStacks.SUPER_TRASH,
         ExpansionWorkbench.TYPE,
         ExpansionRecipes.SUPER_TRASH
+    );
+
+    public static final VisualGrid VISUAL_GRID = new VisualGrid(
+        ExpansionItemsMenus.MENU_FUNCTIONAL_MACHINE,
+        ExpansionItemStacks.VISUAL_GRID,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.VISUAL_GRID
     );
 }

@@ -1,6 +1,7 @@
 package com.balugaq.netex.api.keybind;
 
 import com.balugaq.netex.api.helpers.Icon;
+import com.balugaq.netex.api.visual.Screen;
 import com.balugaq.netex.utils.Lang;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -22,7 +23,11 @@ public interface Keybindable {
     List<Keybinds> keybinds();
 
     default void addKeybindSettingsButton(BlockMenu menu, int slot) {
-        menu.addItem(slot, Icon.KEYBIND_SETTINGS, (p, s, i, a) -> {
+        addKeybindSettingsButton(Screen.of(menu), slot);
+    }
+
+    default void addKeybindSettingsButton(Screen menu, int slot) {
+        menu.setItem(slot, Icon.KEYBIND_SETTINGS, (p, s, i, a) -> {
             openMenu(menu.getLocation(), p, keybinds());
             return false;
         });
