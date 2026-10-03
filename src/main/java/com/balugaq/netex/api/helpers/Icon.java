@@ -162,6 +162,12 @@ public class Icon {
     public static final ItemStack SCRIPT_CENTER =
         Lang.getIcon("script-center", Material.COMPASS);
 
+    public static final ItemStack MATCH_OPTION_SETTINGS =
+        Lang.getIcon("match-option-settings", Material.COMPASS);
+
+    public static final ItemStack MATCH_OPTION_CLOSE =
+        Lang.getIcon("match-option-close", Material.RED_CONCRETE);
+
     public static final ItemStack RETURN_INGREDIENT =
         Lang.getIcon("return-ingredient", Material.FLOWER_POT);
 

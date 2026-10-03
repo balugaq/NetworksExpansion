@@ -556,9 +556,46 @@ messages:
           - "这种植物成熟后,"
           - "收获时将获得人造绿宝石碎片."
   save-all: "正在保存网络拓展数据."
+  match-option:
+    title: "物品匹配选项"
+    click_tip: "点击切换该忽略项"
+    enabled: "当前：已忽略"
+    disabled: "当前：不忽略"
+  purger:
+    match_option_settings: "左键点击设置物品的比较方式"
 icons:
   keybind-settings:
     name: "&6按键控制设置"
+  match-option-settings:
+    name: "&6物品匹配选项"
+    lore:
+      - "&a设置此清除器匹配网络内物品时"
+      - "&a忽略哪些属性（默认全部不忽略）"
+  match-option-close:
+    name: "&c关闭"
+    lore:
+      - "&a关闭此界面"
+  match-option:
+    ignore-durability:
+      name: "&6忽略物品耐久"
+      lore:
+        - "&a匹配时不再比较物品的耐久"
+    ignore-enchantment:
+      name: "&6忽略物品附魔"
+      lore:
+        - "&a匹配时不再比较物品的附魔"
+    ignore-attribute:
+      name: "&6忽略物品属性"
+      lore:
+        - "&a匹配时不再比较物品的属性加成"
+    ignore-lore:
+      name: "&6忽略物品描述"
+      lore:
+        - "&a匹配时不再比较物品的lore"
+    ignore-custom-model-data:
+      name: "&6忽略自定义模型"
+      lore:
+        - "&a匹配时不再比较物品的自定义模型数据"
   light-gray-background:
     name: "&7"
   yellow-border:

@@ -1,7 +1,6 @@
 package io.github.sefiraat.networks.utils;
 
 import com.balugaq.netex.api.enums.MinecraftVersion;
-import com.balugaq.netex.utils.DataComponentsCache;
 import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.stackcaches.ItemStackCache;
@@ -41,8 +40,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SuspiciousStewMeta;
 import org.bukkit.inventory.meta.TropicalFishBucketMeta;
 import org.bukkit.inventory.meta.WritableBookMeta;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -51,6 +50,7 @@ import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 @UtilityClass
+@NullMarked
 public class StackUtils {
     private static final boolean FORCE_CHECK_LORE = Networks.getConfigManager().isForceCheckLore();
     private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMCVersion();
@@ -59,11 +59,25 @@ public class StackUtils {
     public static final boolean IS_1_21_3 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_3);
     public static final boolean IS_1_21_4 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_4);
 
-    @NotNull
+    /**
+     * 把历史上 {@code itemsMatch} 的「check」参数翻译成 {@link MatchOption} 的「ignore」位。
+     * <p>
+     * check 与 ignore 互为反义：{@code checkLore = false}（不比较 lore）即 {@code ignoreLore = true}。
+     * 因此这里对 {@code false} 的调用方保持逐位等价，{@code true} 的调用方则额外打开强制比较 lore 的开关，
+     * 使 {@code shouldCompareLore} 的短路语义不丢失。
+     */
+    private static MatchOption toOption(
+        boolean checkLore, boolean checkAmount, boolean checkCustomModelId) {
+        long flags                      = MatchOption.NO_IGNORE;
+        if (!checkLore)          flags |= MatchOption.IGNORE_LORE;
+        if (!checkCustomModelId) flags |= MatchOption.IGNORE_CUSTOM_MODEL_DATA;
+        if (!checkAmount)        flags |= MatchOption.IGNORE_AMOUNT;
+        return MatchOption.of(flags);
+    }
+    
     public static ItemStack getAsQuantity(@Nullable ItemStack itemStack, int amount) {
-        if (itemStack == null) {
-            return new ItemStack(Material.AIR);
-        }
+        if (itemStack == null) return ItemStackUtil.AIR;
+
         ItemStack clone = itemStack.clone();
         clone.setAmount(amount);
         return clone;
@@ -75,56 +89,57 @@ public class StackUtils {
         boolean checkLore,
         boolean checkAmount,
         boolean checkCustomModelId) {
-        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, checkLore, checkAmount, checkCustomModelId);
+        return itemsMatch(
+            new ItemStackCache(itemStack1), itemStack2, toOption(checkLore, checkAmount, checkCustomModelId));
     }
 
     public static boolean itemsMatch(
         @Nullable ItemStack itemStack1, @Nullable ItemStack itemStack2, boolean checkLore, boolean checkAmount) {
-        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, checkLore, checkAmount, true);
+        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, toOption(checkLore, checkAmount, true));
     }
 
     public static boolean itemsMatch(
         @Nullable ItemStack itemStack1, @Nullable ItemStack itemStack2, boolean checkLore) {
-        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, checkLore, false, true);
+        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, toOption(checkLore, false, true));
     }
 
     public static boolean itemsMatch(@Nullable ItemStack itemStack1, @Nullable ItemStack itemStack2) {
-        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, false, false, true);
+        return itemsMatch(new ItemStackCache(itemStack1), itemStack2, MatchOption.DEFAULT);
     }
 
     public static boolean itemsMatch(
-        @NotNull ItemStackCache cache, @Nullable ItemStack itemStack, boolean checkLore, boolean checkAmount) {
-        return itemsMatch(cache, itemStack, checkLore, checkAmount, true);
+        ItemStackCache cache, @Nullable ItemStack itemStack, boolean checkLore, boolean checkAmount) {
+        return itemsMatch(cache, itemStack, toOption(checkLore, checkAmount, true));
     }
 
-    public static boolean itemsMatch(@NotNull ItemStackCache cache, @Nullable ItemStack itemStack, boolean checkLore) {
-        return itemsMatch(cache, itemStack, checkLore, false, true);
+    public static boolean itemsMatch(ItemStackCache cache, @Nullable ItemStack itemStack, boolean checkLore) {
+        return itemsMatch(cache, itemStack, toOption(checkLore, false, true));
     }
 
-    public static boolean itemsMatch(@NotNull ItemStackCache cache, @Nullable ItemStack itemStack) {
-        return itemsMatch(cache, itemStack, false, false, true);
+    public static boolean itemsMatch(ItemStackCache cache, @Nullable ItemStack itemStack) {
+        return itemsMatch(cache, itemStack, MatchOption.DEFAULT);
     }
 
     public static boolean itemsMatch(
         @Nullable ItemStack itemStack,
-        @NotNull ItemStackCache cache,
+        ItemStackCache cache,
         boolean checkLore,
         boolean checkAmount,
         boolean checkCustomModelId) {
-        return itemsMatch(cache, itemStack, checkLore, checkAmount, checkCustomModelId);
+        return itemsMatch(cache, itemStack, toOption(checkLore, checkAmount, checkCustomModelId));
     }
 
     public static boolean itemsMatch(
-        @Nullable ItemStack itemStack, @NotNull ItemStackCache cache, boolean checkLore, boolean checkAmount) {
-        return itemsMatch(cache, itemStack, checkLore, checkAmount, true);
+        @Nullable ItemStack itemStack, ItemStackCache cache, boolean checkLore, boolean checkAmount) {
+        return itemsMatch(cache, itemStack, toOption(checkLore, checkAmount, true));
     }
 
-    public static boolean itemsMatch(@Nullable ItemStack itemStack, @NotNull ItemStackCache cache, boolean checkLore) {
-        return itemsMatch(cache, itemStack, checkLore, false, true);
+    public static boolean itemsMatch(@Nullable ItemStack itemStack, ItemStackCache cache, boolean checkLore) {
+        return itemsMatch(cache, itemStack, toOption(checkLore, false, true));
     }
 
-    public static boolean itemsMatch(@Nullable ItemStack itemStack, @NotNull ItemStackCache cache) {
-        return itemsMatch(cache, itemStack, false, false, true);
+    public static boolean itemsMatch(@Nullable ItemStack itemStack, ItemStackCache cache) {
+        return itemsMatch(cache, itemStack, MatchOption.DEFAULT);
     }
 
     /**
@@ -132,15 +147,16 @@ public class StackUtils {
      *
      * @param cache     The cached {@link ItemStack} to compare against
      * @param itemStack The {@link ItemStack} being evaluated
+     * @param option    The {@link MatchOption} describing what to ignore, null means {@link MatchOption#DEFAULT}
+     *                  (which does not ignore anything)
      * @return True if items match
      */
-    @SuppressWarnings("UnstableApiUsage")
     public static boolean itemsMatch(
-        @NotNull ItemStackCache cache,
-        @Nullable ItemStack itemStack,
-        boolean checkLore,
-        boolean checkAmount,
-        boolean checkCustomModelId) {
+        ItemStackCache cache, @Nullable ItemStack itemStack, @Nullable MatchOption option) {
+        final MatchOption matchOption = option == null ? MatchOption.DEFAULT : option;
+        // Ignore options
+        final boolean ignoreAmount = matchOption.isIgnoreAmount();
+
         // Null check
         if (cache.getItemStack() == null || itemStack == null) {
             return itemStack == null && cache.getItemStack() == null;
@@ -152,7 +168,7 @@ public class StackUtils {
         }
 
         // If amounts do not match, then the items cannot possibly match
-        if (checkAmount && itemStack.getAmount() > cache.getItemStack().getAmount()) {
+        if (!matchOption.isIgnoreAmount() && itemStack.getAmount() > cache.getItemStack().getAmount()) {
             return false;
         }
 
@@ -167,9 +183,18 @@ public class StackUtils {
 
         // Use DataComponent API
         if (IS_1_21_4) {
-            return itemsMatchModern(ItemStackUtil.asCraftItemStack(cache.getItemStack()), ItemStackUtil.asCraftItemStack(itemStack), checkLore, checkCustomModelId);
+            return itemsMatchModern(ItemStackUtil.asCraftItemStack(cache.getItemStack()), ItemStackUtil.asCraftItemStack(itemStack), matchOption);
         }
 
+        return legacyItemsMatch(cache, itemStack, matchOption);
+    }
+    
+    private static boolean legacyItemsMatch(ItemStackCache cache, ItemStack itemStack, MatchOption matchOption) {
+        final boolean ignoreDurability = matchOption.isIgnoreDurability();
+        final boolean ignoreEnchantment = matchOption.isIgnoreEnchantment();
+        final boolean ignoreAttribute = matchOption.isIgnoreAttribute();
+        final boolean ignoreLore = matchOption.isIgnoreLore();
+        final boolean ignoreCustomModelData = matchOption.isIgnoreCustomModelData();
         // below 1.21.4
 
         // If either item does not have a meta then either a mismatch or both without meta = vanilla
@@ -191,7 +216,7 @@ public class StackUtils {
         }
 
         // Quick meta-extension escapes
-        if (canQuickEscapeMetaVariant(itemMeta, cachedMeta)) {
+        if (canQuickEscapeMetaVariant(itemMeta, cachedMeta, ignoreDurability)) {
             return false;
         }
 
@@ -206,7 +231,7 @@ public class StackUtils {
         }
 
         // Make sure enchantments match
-        if (!itemMeta.getEnchants().equals(cachedMeta.getEnchants())) {
+        if (!ignoreEnchantment && !itemMeta.getEnchants().equals(cachedMeta.getEnchants())) {
             return false;
         }
 
@@ -216,15 +241,17 @@ public class StackUtils {
         }
 
         // Check the attribute modifiers
-        final boolean hasAttributeOne = itemMeta.hasAttributeModifiers();
-        final boolean hasAttributeTwo = cachedMeta.hasAttributeModifiers();
-        if (hasAttributeOne) {
-            if (!hasAttributeTwo
-                || !Objects.equals(itemMeta.getAttributeModifiers(), cachedMeta.getAttributeModifiers())) {
+        if (!ignoreAttribute) {
+            final boolean hasAttributeOne = itemMeta.hasAttributeModifiers();
+            final boolean hasAttributeTwo = cachedMeta.hasAttributeModifiers();
+            if (hasAttributeOne) {
+                if (!hasAttributeTwo
+                    || !Objects.equals(itemMeta.getAttributeModifiers(), cachedMeta.getAttributeModifiers())) {
+                    return false;
+                }
+            } else if (hasAttributeTwo) {
                 return false;
             }
-        } else if (hasAttributeTwo) {
-            return false;
         }
 
         if (IS_1_20_5) {
@@ -285,7 +312,7 @@ public class StackUtils {
         }
 
         // Check the lore
-        if (shouldCompareLore(itemStack, checkLore) || shouldCompareLore(cache.getItemStack(), checkLore)) {
+        if (!ignoreLore || shouldCompareLore(itemStack) || shouldCompareLore(cache.getItemStack())) {
             if (itemMeta.hasLore() && cachedMeta.hasLore()) {
                 // Bukkit automatically handled unset style in lore, so it always downs to correct results.
                 if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
@@ -304,7 +331,7 @@ public class StackUtils {
         }
         if (optionalStackId1.isPresent()) {
             if (optionalStackId1.get().equals(optionalStackId2.get())) {
-                if (checkCustomModelId) {
+                if (!ignoreCustomModelData) {
                     // Custom model data is different, no match
                     final boolean hasCustomOne = itemMeta.hasCustomModelData();
                     final boolean hasCustomTwo = cachedMeta.hasCustomModelData();
@@ -325,16 +352,16 @@ public class StackUtils {
 
     @SuppressWarnings("UnstableApiUsage")
     private static boolean itemsMatchModern(
-        @NotNull ItemStack cacheItem,
-        @NotNull ItemStack itemStack,
-        boolean checkLore,
-        boolean checkCustomModelId) {
+        ItemStack cacheItem,
+        ItemStack itemStack,
+        MatchOption option) {
         // most case pdc and others are enough
-        if (!cacheItem.matchesWithoutData(itemStack, checkCustomModelId ? DataComponentsCache.EXCLUDE_LORE : DataComponentsCache.EXCLUDE_LORE_AND_CMD, true)) {
+        // always ignore lore
+        if (!cacheItem.matchesWithoutData(itemStack, option.toDataComponentSet(), true)) {
             return false;
         }
 
-        if (shouldCompareLore(itemStack, checkLore) || shouldCompareLore(cacheItem, checkLore)) {
+        if (!option.isIgnoreLore() || shouldCompareLore(itemStack) || shouldCompareLore(cacheItem)) {
             // we have to check lore manually, otherwise `matchesWithoutData` cannot identify non-style-preset text.
             // of course, we can use CraftBukkit utils like `ItemMeta.getLore()`, but it needs reflection.
             return loreMatchesLoose(
@@ -358,9 +385,8 @@ public class StackUtils {
         return true;
     }
 
-    private static boolean shouldCompareLore(@NotNull ItemStack itemStack, boolean checkLore) {
-        return checkLore
-            || FORCE_CHECK_LORE
+    private static boolean shouldCompareLore(ItemStack itemStack) {
+        return FORCE_CHECK_LORE
             || itemStack.getMaxStackSize() == 1 // Fix RPG weapons
             || itemStack.getType()
             == Material.PLAYER_HEAD // Fix Soul jars in SoulJars & Number Components in MomoTech
@@ -372,29 +398,36 @@ public class StackUtils {
     }
 
     @SuppressWarnings("removal")
-    public static boolean canQuickEscapeMetaVariant(@NotNull ItemMeta metaOne, @NotNull ItemMeta metaTwo) {
+    public static boolean canQuickEscapeMetaVariant(ItemMeta metaOne, ItemMeta metaTwo) {
+        return canQuickEscapeMetaVariant(metaOne, metaTwo, false);
+    }
+
+    @SuppressWarnings("removal")
+    public static boolean canQuickEscapeMetaVariant(ItemMeta metaOne, ItemMeta metaTwo, boolean ignoreDurability) {
 
         // Damageable (first as everything can be damageable apparently)
-        if (metaOne instanceof Damageable instanceOne && metaTwo instanceof Damageable instanceTwo) {
-            if (instanceOne.hasDamage() != instanceTwo.hasDamage()) {
-                return true;
-            }
-
-            if (instanceOne.hasDamage()) {
-                if (instanceOne.getDamage() != instanceTwo.getDamage()) {
+        if (!ignoreDurability) {
+            if (metaOne instanceof Damageable instanceOne && metaTwo instanceof Damageable instanceTwo) {
+                if (instanceOne.hasDamage() != instanceTwo.hasDamage()) {
                     return true;
                 }
-            }
-        }
 
-        if (metaOne instanceof Repairable instanceOne && metaTwo instanceof Repairable instanceTwo) {
-            if (instanceOne.hasRepairCost() != instanceTwo.hasRepairCost()) {
-                return true;
+                if (instanceOne.hasDamage()) {
+                    if (instanceOne.getDamage() != instanceTwo.getDamage()) {
+                        return true;
+                    }
+                }
             }
 
-            if (instanceOne.hasRepairCost()) {
-                if (instanceOne.getRepairCost() != instanceTwo.getRepairCost()) {
+            if (metaOne instanceof Repairable instanceOne && metaTwo instanceof Repairable instanceTwo) {
+                if (instanceOne.hasRepairCost() != instanceTwo.hasRepairCost()) {
                     return true;
+                }
+
+                if (instanceOne.hasRepairCost()) {
+                    if (instanceOne.getRepairCost() != instanceTwo.getRepairCost()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -728,14 +761,14 @@ public class StackUtils {
         return false;
     }
 
-    public static boolean isBlacklisted(@NotNull ItemStack itemStack) {
+    public static boolean isBlacklisted(ItemStack itemStack) {
         return itemStack.getType() == Material.AIR
             || itemStack.getType().getMaxDurability() < 0
             || Tag.SHULKER_BOXES.isTagged(itemStack.getType())
             || isBundle(itemStack.getType());
     }
 
-    private static boolean isBundle(@NotNull Material material) {
+    private static boolean isBundle(Material material) {
         return material == Material.BUNDLE
             || IS_1_21_3 && (
                 material == Material.BLACK_BUNDLE

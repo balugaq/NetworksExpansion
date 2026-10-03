@@ -27,6 +27,7 @@ import io.github.sefiraat.networks.slimefun.network.NetworkDirectional;
 import io.github.sefiraat.networks.slimefun.network.NetworkGreedyBlock;
 import io.github.sefiraat.networks.slimefun.network.NetworkPowerNode;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
+import io.github.sefiraat.networks.utils.MatchOption;
 import io.github.sefiraat.networks.utils.StackUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.ncbpfluffybear.fluffymachines.items.Barrel;
@@ -1799,6 +1800,17 @@ public class NetworkRoot extends NetworkNode {
     }
 
     public ItemStack getItemStack0(@NotNull Location accessor, @NotNull ItemRequest request) {
+        return getItemStack0(accessor, request, null);
+    }
+
+    /**
+     * @param accessor 取物的机器位置
+     * @param request  请求（会被消费，{@code receiveAmount} 递减剩余需求）
+     * @param option   物品匹配选项（忽略项），为 null 时使用 {@link MatchOption#DEFAULT}
+     * @return 匹配 {@code option} 的物品；数量为 0 时返回 null
+     */
+    public ItemStack getItemStack0(
+        @NotNull Location accessor, @NotNull ItemRequest request, @Nullable MatchOption option) {
         ItemStack stackToReturn = null;
 
         if (request.getAmount() <= 0) {
@@ -1824,7 +1836,7 @@ public class NetworkRoot extends NetworkNode {
                     // <editor-fold desc="do barrel">
                     final ItemStack itemStack = barrelIdentity.getItemStack();
 
-                    if (itemStack == null || !StackUtils.itemsMatch(request, itemStack)) {
+                    if (itemStack == null || !StackUtils.itemsMatch(request, itemStack, option)) {
                         // Netex - Cache start
                         misses.add(entry.getKey());
                         // Netex - Cache end
@@ -1923,7 +1935,7 @@ public class NetworkRoot extends NetworkNode {
             // <editor-fold desc="do barrel">
             final ItemStack itemStack = barrelIdentity.getItemStack();
 
-            if (itemStack == null || !StackUtils.itemsMatch(request, itemStack)) {
+            if (itemStack == null || !StackUtils.itemsMatch(request, itemStack, option)) {
                 continue;
             }
 
@@ -1998,7 +2010,7 @@ public class NetworkRoot extends NetworkNode {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack == null
                     || itemStack.getType() == Material.AIR
-                    || !StackUtils.itemsMatch(request, itemStack)) {
+                    || !StackUtils.itemsMatch(request, itemStack, option)) {
                     continue;
                 }
 
@@ -2038,7 +2050,7 @@ public class NetworkRoot extends NetworkNode {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack == null
                     || itemStack.getType() == Material.AIR
-                    || !StackUtils.itemsMatch(request, itemStack)) {
+                    || !StackUtils.itemsMatch(request, itemStack, option)) {
                     continue;
                 }
 
@@ -2072,7 +2084,7 @@ public class NetworkRoot extends NetworkNode {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack == null
                     || itemStack.getType() == Material.AIR
-                    || !StackUtils.itemsMatch(request, itemStack)) {
+                    || !StackUtils.itemsMatch(request, itemStack, option)) {
                     continue;
                 }
 
@@ -2106,7 +2118,7 @@ public class NetworkRoot extends NetworkNode {
             final ItemStack itemStack = blockMenu.getItemInSlot(slots[0]);
             if (itemStack == null
                 || itemStack.getType() == Material.AIR
-                || !StackUtils.itemsMatch(request, itemStack)) {
+                || !StackUtils.itemsMatch(request, itemStack, option)) {
                 continue;
             }
 
