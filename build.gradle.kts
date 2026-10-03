@@ -135,7 +135,7 @@ tasks {
             "-Dnet.kyori.adventure.text.warn_when_legacy_formatting_detected=false"
         )
         maxHeapSize = "4G"
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.21.11")
     }
 }
 
