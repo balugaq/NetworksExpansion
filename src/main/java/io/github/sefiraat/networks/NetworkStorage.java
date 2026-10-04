@@ -1,8 +1,8 @@
 package io.github.sefiraat.networks;
 
-import io.github.bakedlibs.dough.blocks.ChunkPosition;
 import io.github.sefiraat.networks.network.NetworkNode;
 import io.github.sefiraat.networks.network.NodeDefinition;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.ChunkPosition;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Chunk;
 import org.bukkit.Location;

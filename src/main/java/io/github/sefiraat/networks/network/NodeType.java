@@ -46,6 +46,7 @@ public enum NodeType {
     ITEM_DIFFERENTER,
     STORAGE_CARD_CONVERTER,
     FACING_PRESETTER,
+    VISUAL_GRID,
 
     // Hanging blocks
     @Deprecated

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.ytdd9527.networksexpansion"
-version = "2.1.122"
+version = "2.1.123"
 
 java {
     toolchain {
@@ -38,8 +38,9 @@ dependencies {
     // Tools etc.
     implementation("org.bstats:bstats-bukkit:3.2.1")
     implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
-    implementation("dev.sefiraat:SefiLib:0.2.6")
+    implementation("dev.sefiraat:SefiLib:0.3.0")
     implementation("net.byteflux:libby-bukkit:1.3.2")
+    implementation("com.github.balugaq:BigInteractionMenu:8991544824")
 
     compileOnly("com.google.code.findbugs:annotations:3.0.1u2") {
         exclude("net.jcip", "jcip-annotations")
@@ -65,7 +66,7 @@ dependencies {
     compileOnly("net.guizhanss:GuizhanLibPlugin:2.5.0")
     compileOnly("com.github.balugaq:FluffyMachines:43d7444e4c")
     compileOnly("com.github.TimetownDev:GuguSlimefunLib:45627c6f8e")
-    compileOnly("com.github.balugaq:JustEnoughGuide:7f21e113a2")
+    compileOnly("com.github.balugaq:JustEnoughGuide:09e106914d")
     // System-scoped local JARs
     compileOnly(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
 }

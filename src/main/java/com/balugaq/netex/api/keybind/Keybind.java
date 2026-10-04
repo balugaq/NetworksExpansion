@@ -2,6 +2,7 @@ package com.balugaq.netex.api.keybind;
 
 import com.balugaq.netex.api.enums.AmountHandleStrategy;
 import com.balugaq.netex.api.interfaces.BaseGrid;
+import com.balugaq.netex.api.visual.Screen;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.sefiraat.networks.NetworkStorage;
 import io.github.sefiraat.networks.network.GridItemRequest;
@@ -83,7 +84,7 @@ public interface Keybind extends Keyed, Comparable<Keybind> {
                 if (gridCache.getDisplayMode() == GridCache.DisplayMode.DISPLAY) {
                     gridCache.addPullItemHistory(clone);
                 }
-                grid.updateDisplay(menu);
+                grid.updateDisplay(Screen.of(menu));
             });
 
             return ActionResult.of(MultiActionHandle.BREAK, false);

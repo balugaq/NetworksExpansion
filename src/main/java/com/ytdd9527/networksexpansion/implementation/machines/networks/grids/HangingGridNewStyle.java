@@ -1,8 +1,9 @@
-package com.ytdd9527.networksexpansion.implementation.machines.networks.advanced;
+package com.ytdd9527.networksexpansion.implementation.machines.networks.grids;
 
 import com.balugaq.netex.api.enums.FeedbackType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.interfaces.HangingBlock;
+import com.balugaq.netex.api.visual.Screen;
 import com.balugaq.netex.utils.Lang;
 import com.balugaq.netex.utils.MapUtil;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
@@ -39,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -104,7 +106,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
     public void onTick(Location attachon, BlockFace attachSide, ItemFrame entityBlock) {
         Location fixed = getFixedLocation(attachon, attachSide);
         BlockMenu menu = getOrCreateMenu(fixed);
-        updateDisplay(menu, attachon, attachSide);
+        updateDisplay(Screen.of(menu), attachon, attachSide);
     }
 
     @Override
@@ -127,10 +129,10 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
 
     @SuppressWarnings("deprecation")
     protected void updateDisplay(
-        @NotNull BlockMenu blockMenu, @NotNull Location attachon, @NotNull BlockFace attachSide) {
+        @NotNull Screen screen, @NotNull Location attachon, @NotNull BlockFace attachSide) {
         // No viewer - lets not bother updating
-        if (!blockMenu.hasViewer()) {
-            sendFeedback(blockMenu.getLocation(), FeedbackType.AFK);
+        if (!screen.hasViewer()) {
+            sendFeedback(screen.getLocation(), FeedbackType.AFK);
             return;
         }
 
@@ -138,15 +140,15 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
 
         // No node located, weird
         if (definition == null || definition.getNode() == null) {
-            clearDisplay(blockMenu);
-            sendFeedback(blockMenu.getLocation(), FeedbackType.NO_NETWORK_FOUND);
+            clearDisplay(screen);
+            sendFeedback(screen.getLocation(), FeedbackType.NO_NETWORK_FOUND);
             return;
         }
 
         // Update Screen
         final NetworkRoot root = definition.getNode().getRoot();
 
-        final GridCache gridCache = getCacheMap().get(blockMenu.getLocation().clone());
+        final GridCache gridCache = getCacheMap().get(screen.getLocation().clone());
 
         SlimefunBlockData data = StorageCacheUtils.getBlock(attachon);
         if (data == null) {
@@ -169,7 +171,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
 
             // Set everything to blank and return if there are no pages (no items)
             if (pages < 0) {
-                clearDisplay(blockMenu);
+                clearDisplay(screen);
                 return;
             }
 
@@ -185,7 +187,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
             final int end = Math.min(start + getDisplaySlots().length, entries.size());
             final List<Map.Entry<ItemStack, Long>> validEntries = entries.subList(start, end);
 
-            getCacheMap().put(blockMenu.getLocation(), gridCache);
+            getCacheMap().put(screen.getLocation(), gridCache);
 
             for (int i = 0; i < getDisplaySlots().length; i++) {
                 if (validEntries.size() > i) {
@@ -205,16 +207,14 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
 
                     itemMeta.setLore(lore);
                     displayStack.setItemMeta(itemMeta);
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], displayStack);
-                    blockMenu.addMenuClickHandler(getDisplaySlots()[i], (player, slot, item, action) -> {
+                    screen.setItem(getDisplaySlots()[i], displayStack, (player, slot, item, action) -> {
                         displayKeybinds().onClick(player, slot, item, action);
-                        updateDisplay(blockMenu, attachon, attachSide);
+                        updateDisplay(screen, attachon, attachSide);
                         return false;
                     });
                 } else {
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], getBlankSlotStack());
-                    blockMenu.addMenuClickHandler(getDisplaySlots()[i], (p, slot, item, action) -> {
-                        receiveItem(p, action, blockMenu);
+                    screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
+                        receiveItem(p, action, screen);
                         return false;
                     });
                 }
@@ -231,7 +231,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
 
             // Set everything to blank and return if there are no pages (no items)
             if (pages < 0) {
-                clearDisplay(blockMenu);
+                clearDisplay(screen);
                 return;
             }
 
@@ -244,7 +244,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
             final int end = Math.min(start + getDisplaySlots().length, history.size());
             final List<ItemStack> validHistory = history.subList(start, end);
 
-            getCacheMap().put(blockMenu.getLocation(), gridCache);
+            getCacheMap().put(screen.getLocation(), gridCache);
 
             for (int i = 0; i < getDisplaySlots().length; i++) {
                 if (validHistory.size() > i) {
@@ -263,30 +263,28 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
 
                     itemMeta.setLore(lore);
                     displayStack.setItemMeta(itemMeta);
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], displayStack);
-                    blockMenu.addMenuClickHandler(getDisplaySlots()[i], (player, slot, item, action) -> {
+                    screen.setItem(getDisplaySlots()[i], displayStack, (player, slot, item, action) -> {
                         displayKeybinds().onClick(player, slot, item, action);
-                        updateDisplay(blockMenu, attachon, attachSide);
+                        updateDisplay(screen, attachon, attachSide);
                         return false;
                     });
                 } else {
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], getBlankSlotStack());
-                    blockMenu.addMenuClickHandler(getDisplaySlots()[i], (p, slot, item, action) -> {
-                        receiveItem(p, action, blockMenu, attachon, attachSide);
+                    screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
+                        receiveItem(p, action, screen, attachon, attachSide);
                         return false;
                     });
                 }
             }
         }
 
-        blockMenu.replaceExistingItem(
+        screen.setItem(
             getPagePrevious(),
             Icon.getPageStack(getPagePreviousStack(), gridCache.getPage() + 1, gridCache.getMaxPages() + 1));
-        blockMenu.replaceExistingItem(
+        screen.setItem(
             getPageNext(),
             Icon.getPageStack(getPageNextStack(), gridCache.getPage() + 1, gridCache.getMaxPages() + 1));
 
-        sendFeedback(blockMenu.getLocation(), FeedbackType.WORKING);
+        sendFeedback(screen.getLocation(), FeedbackType.WORKING);
     }
 
     @SuppressWarnings("deprecation")
@@ -323,15 +321,14 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                 }
 
                 data.setData(fixedKey(BS_FILTER_KEY, attachSide), s);
-                updateDisplay(blockMenu, attachon, attachSide);
+                updateDisplay(Screen.of(blockMenu), attachon, attachSide);
                 blockMenu.open(player);
             });
         }
     }
 
     @Override
-    @NotNull
-    protected BlockMenuPreset getPreset() {
+    protected @NonNull BlockMenuPreset getPreset() {
         if (preset != null) {
             return preset;
         }
@@ -369,7 +366,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                     getCacheMap().put(menu.getLocation(), gridCache);
                     Location attachon = getAttachon(menu.getLocation());
                     BlockFace attachSide = getAttachSideFromFixed(menu.getLocation());
-                    updateDisplay(menu, attachon, attachSide);
+                    updateDisplay(Screen.of(menu), attachon, attachSide);
                     return false;
                 });
 
@@ -383,7 +380,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                     getCacheMap().put(menu.getLocation(), gridCache);
                     Location attachon = getAttachon(menu.getLocation());
                     BlockFace attachSide = getAttachSideFromFixed(menu.getLocation());
-                    updateDisplay(menu, attachon, attachSide);
+                    updateDisplay(Screen.of(menu), attachon, attachSide);
                     return false;
                 });
 
@@ -394,7 +391,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                     getCacheMap().put(menu.getLocation(), gridCache);
                     Location attachon = getAttachon(menu.getLocation());
                     BlockFace attachSide = getAttachSideFromFixed(menu.getLocation());
-                    updateDisplay(menu, attachon, attachSide);
+                    updateDisplay(Screen.of(menu), attachon, attachSide);
                     return false;
                 });
 
@@ -414,7 +411,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                         menu.replaceExistingItem(getToggleModeSlot(), getModeStack(gridCache));
                         Location attachon = getAttachon(menu.getLocation());
                         BlockFace attachSide = getAttachSideFromFixed(menu.getLocation());
-                        updateDisplay(menu, attachon, attachSide);
+                        updateDisplay(Screen.of(menu), attachon, attachSide);
                     }
                     return false;
                 });
@@ -438,7 +435,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                     Location attachon = getAttachon(fixedLocation);
                     BlockFace attachSide = getAttachSideFromFixed(fixedLocation);
                     // Shift+Left-click
-                    receiveItem(p, i, a, menu, attachon, attachSide);
+                    receiveItem(p, i, a, Screen.of(menu), attachon);
                     return false;
                 });
             }
@@ -487,24 +484,24 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
     public void receiveItem(
         @NotNull Player player,
         ClickAction action,
-        @NotNull BlockMenu blockMenu,
+        @NotNull Screen screen,
         @NotNull Location attachon,
         BlockFace attachSide) {
         NodeDefinition definition = NetworkStorage.getNode(attachon);
         if (definition == null || definition.getNode() == null) {
-            clearDisplay(blockMenu);
-            blockMenu.close();
+            clearDisplay(screen);
+            screen.close();
             Networks.getInstance()
                 .getLogger()
                 .warning(String.format(
                     Lang.getString("messages.unsupported-operation.grid.may_duping"),
                     player.getName(),
-                    blockMenu.getLocation()));
+                    screen.getLocation()));
             return;
         }
 
         ItemStack cursor = player.getItemOnCursor();
-        receiveItem(definition.getNode().getRoot(), player, cursor, action, blockMenu, attachon, attachSide);
+        receiveItem(definition.getNode().getRoot(), cursor, screen);
     }
 
     @SuppressWarnings("deprecation")
@@ -512,13 +509,12 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
         @NotNull Player player,
         ItemStack itemStack,
         ClickAction action,
-        @NotNull BlockMenu blockMenu,
-        @NotNull Location attachon,
-        @NotNull BlockFace attachSide) {
+        @NotNull Screen screen,
+        @NotNull Location attachon) {
         NodeDefinition definition = NetworkStorage.getNode(attachon);
         if (definition == null || definition.getNode() == null) {
-            clearDisplay(blockMenu);
-            blockMenu.close();
+            clearDisplay(screen);
+            screen.close();
             Networks.getInstance()
                 .getLogger()
                 .warning(String.format(
@@ -528,20 +524,16 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
             return;
         }
 
-        receiveItem(definition.getNode().getRoot(), player, itemStack, action, blockMenu, attachon, attachSide);
+        receiveItem(definition.getNode().getRoot(), itemStack, screen);
     }
 
-    @SuppressWarnings({"deprecation", "unused"})
+    @SuppressWarnings("unused")
     public void receiveItem(
         @NotNull NetworkRoot root,
-        Player player,
         @Nullable ItemStack itemStack,
-        ClickAction action,
-        @NotNull BlockMenu blockMenu,
-        @NotNull Location attachon,
-        BlockFace attachSide) {
+        @NotNull Screen screen) {
         if (itemStack != null && itemStack.getType() != Material.AIR) {
-            root.addItemStack0(blockMenu.getLocation(), itemStack);
+            root.addItemStack0(screen.getLocation(), itemStack);
         }
     }
 }

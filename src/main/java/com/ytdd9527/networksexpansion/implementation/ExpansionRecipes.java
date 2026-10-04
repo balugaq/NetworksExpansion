@@ -992,4 +992,10 @@ public class ExpansionRecipes {
         OPTIC_CABLE.getItem(), SIMPLE_NANOBOTS.getItem(), OPTIC_CABLE.getItem(),
         SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.STATUS_VIEWER, SYNTHETIC_EMERALD_SHARD.getItem()
     };
+
+    public static final ItemStack[] VISUAL_GRID = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_GLASS.getItem(), NETWORK_GRID.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
+    };
 }

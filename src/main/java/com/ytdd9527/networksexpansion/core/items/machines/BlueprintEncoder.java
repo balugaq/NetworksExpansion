@@ -4,7 +4,6 @@ import com.balugaq.netex.api.enums.CraftType;
 import com.balugaq.netex.api.enums.FeedbackType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.interfaces.CraftTyped;
-import com.balugaq.netex.api.interfaces.RecipeCompletableWithGuide;
 import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class BlueprintEncoder extends NetworkObject implements CraftTyped, RecipeCompletableWithGuide {
+public class BlueprintEncoder extends NetworkObject implements CraftTyped {
     private static final int[] BACKGROUND = new int[]{
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 17, 18, 20, 24, 25, 27, 28, 29, 33, 36, 37, 38, 39, 40, 41,
         42, 43, 44
@@ -90,7 +89,6 @@ public class BlueprintEncoder extends NetworkObject implements CraftTyped, Recip
                     }
                     return false;
                 });
-                // addJEGButton(menu, JEG_SLOT);
                 var fix = menu.getItemInSlot(ITEM_TARGET_SLOT);
                 if (StackUtils.itemsMatch(fix, ChestMenuUtils.getBackground())) {
                     menu.replaceExistingItem(ITEM_TARGET_SLOT, null);
@@ -292,11 +290,5 @@ public class BlueprintEncoder extends NetworkObject implements CraftTyped, Recip
 
     public boolean canTestVanillaRecipe(ItemStack[] inputs) {
         return true;
-    }
-
-    @Override
-    @NotNull
-    public SlimefunItem getSlimefunItem() {
-        return this;
     }
 }

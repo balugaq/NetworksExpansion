@@ -1,9 +1,9 @@
-package com.ytdd9527.networksexpansion.implementation.machines.networks.advanced;
+package com.ytdd9527.networksexpansion.implementation.machines.networks.grids;
 
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.helpers.SupportedCraftingTableRecipes;
-import com.balugaq.netex.api.interfaces.RecipeCompletableWithGuide;
 import com.balugaq.netex.api.keybind.Keybinds;
+import com.balugaq.netex.api.visual.Screen;
 import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
@@ -33,7 +33,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.HashMap;
@@ -42,7 +41,7 @@ import java.util.Map;
 
 @NullMarked
 @SuppressWarnings("DuplicatedCode")
-public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements RecipeCompletableWithGuide {
+public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle {
 
     private static final int[] BACKGROUND_SLOTS = {5, 14, 23, 32, 41, 43, 50, 51};
 
@@ -68,15 +67,14 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
     private static final Map<Location, GridCache> CACHE_MAP = new HashMap<>();
 
     public NetworkCraftingGridNewStyle(
-        @NotNull ItemGroup itemGroup,
-        @NotNull SlimefunItemStack item,
-        @NotNull RecipeType recipeType,
-        ItemStack @NotNull [] recipe) {
+        ItemGroup itemGroup,
+        SlimefunItemStack item,
+        RecipeType recipeType,
+        ItemStack [] recipe) {
         super(itemGroup, item, recipeType, recipe);
     }
 
     @Override
-    @NotNull
     protected BlockMenuPreset getPreset() {
         return new BlockMenuPreset(this.getId(), this.getItemName()) {
 
@@ -88,7 +86,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
             }
 
             @Override
-            public boolean canOpen(@NotNull Block block, @NotNull Player player) {
+            public boolean canOpen(Block block, Player player) {
                 return player.hasPermission("slimefun.inventory.bypass")
                     || (ExpansionItems.NETWORK_CRAFTING_GRID_NEW_STYLE.canUse(player, false)
                     && Slimefun.getProtectionManager()
@@ -101,7 +99,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
             }
 
             @Override
-            public void newInstance(@NotNull BlockMenu menu, @NotNull Block b) {
+            public void newInstance(BlockMenu menu, Block b) {
                 getCacheMap().put(menu.getLocation(), new GridCache(0, 0, GridCache.SortOrder.ALPHABETICAL));
 
                 menu.replaceExistingItem(getPagePrevious(), getPagePreviousStack());
@@ -121,7 +119,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
                             ? gridCache.getMaxPages()
                             : gridCache.getPage() + 1);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -130,7 +128,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     AbstractGrid.updateSortOrder(gridCache, action, 4);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -174,7 +172,6 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
         };
     }
 
-    @NotNull
     public Map<Location, GridCache> getCacheMap() {
         return CACHE_MAP;
     }
@@ -214,7 +211,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
     }
 
     @SuppressWarnings("deprecation")
-    private synchronized void tryCraft(@NotNull BlockMenu menu, @NotNull Player player, @NotNull ClickAction action) {
+    private synchronized void tryCraft(BlockMenu menu, Player player, ClickAction action) {
         int times = 1;
         if (action.isRightClicked()) {
             times = 64;
@@ -304,12 +301,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle implements
     }
 
     @Override
-    public @NotNull List<Keybinds> keybinds() {
+    public List<Keybinds> keybinds() {
         return List.of(displayKeybinds(), outsideKeybinds());
-    }
-
-    @Override
-    public @NotNull SlimefunItem getSlimefunItem() {
-        return this;
     }
 }
