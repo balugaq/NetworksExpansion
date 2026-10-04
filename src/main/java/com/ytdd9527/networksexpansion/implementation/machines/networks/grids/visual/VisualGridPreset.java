@@ -7,6 +7,7 @@ import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.visual.Screen;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
 import io.github.sefiraat.networks.NetworkStorage;
+import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.slimefun.network.grid.GridCache;
 import io.github.sefiraat.networks.utils.Keys;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
@@ -15,12 +16,11 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class VisualGridPreset extends ActiveGridPreset {
     public VisualGridPreset() {
-        super(Keys.newKey("visual_grid"), 9, 9);
+        super(Networks.getInstance(), Keys.newKey("visual_grid"), 9, 9);
     }
 
     @Override
-    public void init(ActiveGrid active, int idx, InteractUnit unit) {
-        super.init(active, idx, unit);
+    public void postInit(ActiveGrid active) {
         var v = ExpansionItems.VISUAL_GRID;
         var screen = Screen.of(active);
         for (var s : VisualGrid.BACKGROUND_SLOTS) {

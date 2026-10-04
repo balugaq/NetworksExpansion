@@ -10,6 +10,7 @@ import com.balugaq.netex.api.keybind.Keybinds;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
 import io.github.sefiraat.networks.NetworkStorage;
+import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.NodeType;
 import io.github.sefiraat.networks.slimefun.network.grid.GridCache;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
@@ -70,23 +71,24 @@ public class VisualGrid extends AbstractGridNewStyle implements Keybindable {
         addItemHandler(new BlockPlaceHandler(false) {
             @Override
             public void onPlayerPlace(BlockPlaceEvent e) {
+                if (true) { // todo: 实验物品先不开放，不仅是很卡而且还错位了，BIM 的坐标计算有大问题
+                    e.setCancelled(true);
+                    return;
+                }
                 var block = e.getBlockPlaced();
-                ActiveGrid active = GridDataCache.activeGrids().get(BlockPos.from(block.getLocation()));
+                ActiveGrid active = Networks.getBIMLoader().getCache().activeGrids().get(BlockPos.from(block.getLocation()));
                 if (active == null || active.getOption() != PRESET) {
-                    var c = block.getLocation().clone();
-                    c.setYaw(e.getPlayer().getYaw());
-                    c.setPitch(e.getPlayer().getPitch());
-                    active = PRESET.place(c);
+                    var pl = e.getPlayer().getLocation();
+                    active = PRESET.place(BlockPos.from(block.getLocation()), GridOrientation.fromYawPitch(pl.getYaw(), pl.getPitch()).reverse());
                 }
             }
         });
         addItemHandler(new BlockBreakHandler(false, false) {
             @Override
             public void onPlayerBreak(BlockBreakEvent e, ItemStack item, List<ItemStack> drops) {
+                if (true) return; // todo
                 var pos = BlockPos.from(e.getBlock().getLocation());
-                for (var ori : GridOrientation.values()) {
-                    GridUtil.removeGrid(pos, PRESET.getOccupiedBoundingBox(e.getBlock().getLocation(), ori));
-                }
+                Networks.getBIMLoader().getGridUtil().removeGrid(pos, PRESET);
             }
         });
         addItemHandler(new BlockTicker() {
@@ -100,9 +102,10 @@ public class VisualGrid extends AbstractGridNewStyle implements Keybindable {
 
             @Override
             public void tick(Block block, SlimefunItem item, SlimefunBlockData data) {
+                if (true) return; // todo
                 if (tick > 1) return;
                 addToRegistry(block);
-                ActiveGrid active = GridDataCache.activeGrids().get(BlockPos.from(block.getLocation()));
+                ActiveGrid active = Networks.getBIMLoader().getCache().activeGrids().get(BlockPos.from(block.getLocation()));
                 if (active == null || active.getOption() != PRESET) {
                     return;
                 }
