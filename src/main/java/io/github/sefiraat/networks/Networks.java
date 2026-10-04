@@ -370,7 +370,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     }
 
     public void setupMetrics() {
-        final Metrics metrics = new Metrics(this, 34489);
+        final Metrics metrics = new Metrics(this, 34492);
 
         AdvancedPie networksChart = new AdvancedPie("networks", () -> {
             Map<String, Integer> networksMap = new HashMap<>();
