@@ -10,7 +10,6 @@ import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.Net
 import io.github.sefiraat.networks.slimefun.network.grid.NetworkCraftingGrid;
 import io.github.sefiraat.networks.slimefun.network.grid.NetworkGrid;
 import io.github.sefiraat.networks.utils.Keys;
-import io.github.sefiraat.networks.utils.Theme;
 import io.github.sefiraat.networks.utils.datatypes.DataTypeMethods;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -115,7 +114,7 @@ public class NetworkRemote extends SpecialSlimefunItem {
     public static void openGrid(@NotNull Location location, @NotNull Player player) {
         SlimefunBlockData blockData = StorageCacheUtils.getBlock(location);
         if (blockData == null) {
-            player.sendMessage(Theme.ERROR + "无法找到绑定的网格");
+            player.sendMessage(Lang.getString("messages.unsupported-operation.remote.not_a_grid_found"));
             return;
         }
 

@@ -4,6 +4,19 @@ messages:
     click-to-research: "&7点击解锁物品"
     cost: "花费 "
     cost-level: " 级"
+    grid-new-style-custom-amount:
+      display-name: "&a高级网格自定义单次取出数量"
+      current-amount: "&7当前数量: %s (限制范围: 1~%s)"
+      click-tip: "&7⇨ &e点击设置数量"
+      input-prompt: "&e请输入高级网格自定义单次取出数量"
+    quantum-hud-display-mode:
+      display-name-percent: "&b量子存储HUD显示方式: &a百分比显示"
+      display-name-value: "&b量子存储HUD显示方式: &4数值显示"
+      click-tip-to-percent: "&7⇨ &e点击使用量子存储HUD显示方式为 百分比显示"
+      click-tip-to-value: "&7⇨ &e点击使用量子存储HUD显示方式为 数值显示"
+    invalid-amount-input: "&e请输入 1 ~ %s 之间的正整数"
+    amount-input-prompt: "&e输入取出数量"
+    quantity-input-prompt: "&e输入数量"
   keybind:
     title: "&a选择你要编辑的按键控制集"
     sub-title: "&a点击你要修改的按键触发"
