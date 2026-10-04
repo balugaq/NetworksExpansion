@@ -28,7 +28,6 @@ import io.github.thebusybiscuit.slimefun4.api.items.settings.IntRangeSetting;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.common.ChatColors;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils;
@@ -375,7 +374,7 @@ public class LinkerGrid extends NetworkObject {
 
         if (tp == LinkerType.QuantumLink) {
             sendFeedback(blockMenu.getLocation(), FeedbackType.WORKING);
-            player.sendMessage(ChatColors.color("messages.completed-operation.viewer.linked-stack"));
+            player.sendMessage(Lang.getString("messages.completed-operation.viewer.linked-stack"));
         }
     }
 

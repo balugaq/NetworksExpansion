@@ -197,8 +197,11 @@ public class CargoNodeQuickTool extends SpecialSlimefunItem {
                                     "messages.unsupported-operation.cargo_node_quick_tool.not-enough-items"));
                                 for (ItemStack item : itemList.keySet()) {
                                     if (!itemList.get(item)) {
-                                        p.sendMessage(TextUtil.color("- &e" + ItemStackHelper.getDisplayName(item) + "x"
-                                            + item.getAmount()));
+                                        p.sendMessage(TextUtil.color(String.format(
+                                            Lang.getString(
+                                                "messages.unsupported-operation.cargo_node_quick_tool.missing-item-entry"),
+                                            ItemStackHelper.getDisplayName(item),
+                                            item.getAmount())));
                                     } else {
                                         for (int slot : listSlots) {
                                             inv.replaceExistingItem(slot, null);

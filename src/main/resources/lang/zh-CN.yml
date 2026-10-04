@@ -423,6 +423,7 @@ messages:
       not-enough-items: "&c没有足够的材料"
       node-type-not-same: "&c储存的配置种类与目标不一致"
       no-config: "&c请先加载一个配置"
+      missing-item-entry: "- &e%sx%s"
     display:
       unknown_type: "未知的展示组类型 '%s', 特殊模型已禁用。"
     memory_card:
@@ -433,6 +434,7 @@ messages:
     drawer:
       wrong_server: "<warning>请将此物品放置在正确的服务器中，抽屉所在服务器: %s ; 当前服务器: %s"
       already_exists: "&c该容器已在其它位置存在!"
+      unknown-world: "未知世界"
       invalid_container: "&c请在量子存储槽放入量子存储 或 物品转移棒"
       invalid_container_amount: "&c量子存储槽只能放入一个物品!"
       invalid_chosen_item: "&c请在下方放入你要传输的物品"
