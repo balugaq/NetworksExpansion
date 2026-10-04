@@ -1153,14 +1153,14 @@ icons:
 
 items:
   # DO NOT CHANGE OR DELETE THESE ANNOUNCEMENTS
-  NTW_EXPANSION_ANNOUNCE_01:
+  NTW_EXPANSION_ANNOUNCEMENT_01:
     name: "<color_random_string>定义"
     lore:
       - "<warning> 1) 声明 指代此处的所有声明。"
       - "<warning> 2) 网络(Networks) 是指一个粘液附属，而不是互联网、物联网等意义上的网络，或其他传统意义上的网络。"
       - "<warning> 3) 网络拓展(NetworksExpansion) (下称\"网络拓展\"、\"此附属\"或\"此项目\") 是指一个粘液附属，由网络拓展开发组在网络的基础上，完全遵守 GPLv3 协议，进行适当增删修改，基于 Paper 1.20.1，汉化版 Slimefun 开发的，兼容 Paper 1.20.1 及以上版本的粘液科技附属。"
       - "<warning> 4) 网络拓展开发者们(下称\"网络拓展开发组\",\"网络拓展创作者们\") 是开发网络拓展的群体，并非由任何公司或组织所拥有。"
-  NTW_EXPANSION_ANNOUNCE_02:
+  NTW_EXPANSION_ANNOUNCEMENT_02:
     name: "<color_random_string>网络拓展作品声明"
     lore:
       - "<warning> 1) 网络拓展是完全免费、共享、开源在 GitHub 上的，供广大支持者、维护者、创作者学习和使用。"
@@ -1174,7 +1174,7 @@ items:
       - "<warning> 9) 对于侵权人，应当根据情况，承担停止侵害、消除影响、赔礼道歉、赔偿损失等民事责任；同时损害公共利益的，可以由著作权行政管理部门责令停止侵权行为，没收违法所得，没收、销毁侵权复制品，并可处以罚款；情节严重构成犯罪的，依法追究刑事责任。"
       - "<warning> 10) 当网络拓展开发者们不追究侵权人的侵权行为时，不代表网络拓展开发者们对侵权行为的认可。也不代表侵权人无需承担任何责任。"
       - "<warning> 请您务必遵守上述声明。"
-  NTW_EXPANSION_ANNOUNCE_03:
+  NTW_EXPANSION_ANNOUNCEMENT_03:
     name: "<color_random_string>网络拓展作者声明"
     lore:
       - "<passive> 此附属由 Sefiraat 编写而成，经 ybw0014 汉化，并由 yitoudaidai 与 balugaq 进行了增添删改及后续维护。"
@@ -1183,7 +1183,7 @@ items:
       - "<passive> 此附属灵感来源于广大玩家。"
       - "<passive> 尤其要感谢 Utoboy，TouRuya，haiman233，matl114 等玩家的意见提供。"
       - "<passive> 感谢 Utoboy，TouRuya，haiman233，yitoudaidai，tinalness，matl114，lengshang 等测试员的测试。"
-  NTW_EXPANSION_ANNOUNCE_04:
+  NTW_EXPANSION_ANNOUNCEMENT_04:
     name: "<color_random_string>网络拓展相关链接"
     lore:
       - "<passive> 网络拓展构建站链接: <click_info>https://builds.guizhanss.com/ytdd9527/NetworksExpansion/master/builds"
@@ -1195,7 +1195,7 @@ items:
       - "<warning> 网络拓展开发版不接受 GitHub PR"
       - "<passive> 网络拓展作者 GitHub 页面: <click_info>https://github.com/ytdd9527"
       - "<passive> 网络拓展作者 GitHub 页面: <click_info>https://github.com/balugaq"
-  NTW_EXPANSION_ANNOUNCE_05:
+  NTW_EXPANSION_ANNOUNCEMENT_05:
     name: "<color_random_string>网络拓展相关链接"
     lore:
       - "<passive> 开发者（们）: ytdd9527, balugaq"
@@ -2688,15 +2688,23 @@ items:
     lore:
       - "网络拓展开发者"
 
-  NTW_EXPANSION_AUTHOR_BALUGAQ:
+  NTW_EXPANSION_AUTHOR_TINALNESS:
     name: "balugaq"
     lore:
       - "网络拓展开发者"
 
   NTW_EXPANSION_VISUAL_GRID:
-    name: "虚拟网格"
+    name: "交互式网格"
     lore:
-      - "以更大的菜单显示物品"
+      - "交互式允许你查看网络中所有的物品"
+      - "你也可以直接放入或取出物品"
+      - "支持自定义按键控制"
+      - "排序方式: "
+      - "&eAZ&7: &e按字母顺序排序"
+      - "&e数量&7: &e按物品数量排序"
+      - "&e数量倒序&7: &e按物品数量倒序排序"
+      - "&e附属&7: &e按物品所属附属字母顺序排序"
+      - "支持拼音搜索"
 
   NTW_EXPANSION_CARGO_NODE_QUICK_TOOL:
     name: "货运节点快配工具"
