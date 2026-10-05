@@ -5,6 +5,7 @@ import com.balugaq.netex.api.enums.FeedbackType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.Lang;
+import com.balugaq.netex.utils.RootWriteLock;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.SpecialSlimefunItem;
@@ -280,23 +281,25 @@ public class NetworkQuantumStorage extends SpecialSlimefunItem implements Distin
     }
 
     public static void setItem(@NotNull BlockMenu blockMenu, @NotNull Player player) {
-        final ItemStack itemStack = player.getItemOnCursor().clone();
+        synchronized (RootWriteLock.get()) {
+            final ItemStack itemStack = player.getItemOnCursor().clone();
 
-        if (StackUtils.isBlacklisted(itemStack)) {
-            return;
-        }
+            if (StackUtils.isBlacklisted(itemStack)) {
+                return;
+            }
 
-        final QuantumCache cache = CACHES.get(blockMenu.getLocation());
-        if (cache == null || cache.getAmountLong() > 0) {
-            player.sendMessage(
-                Lang.getString("messages.unsupported-operation.quantum_storage.quantum_storage_not_empty"));
-            return;
+            final QuantumCache cache = CACHES.get(blockMenu.getLocation());
+            if (cache == null || cache.getAmountLong() > 0) {
+                player.sendMessage(
+                    Lang.getString("messages.unsupported-operation.quantum_storage.quantum_storage_not_empty"));
+                return;
+            }
+            itemStack.setAmount(1);
+            cache.setItemStack(itemStack);
+            updateDisplayItem(blockMenu, cache);
+            syncBlock(blockMenu.getLocation(), cache);
+            CACHES.put(blockMenu.getLocation(), cache);
         }
-        itemStack.setAmount(1);
-        cache.setItemStack(itemStack);
-        updateDisplayItem(blockMenu, cache);
-        syncBlock(blockMenu.getLocation(), cache);
-        CACHES.put(blockMenu.getLocation(), cache);
     }
 
     @Override
