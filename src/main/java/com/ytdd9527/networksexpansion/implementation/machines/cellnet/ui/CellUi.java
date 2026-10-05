@@ -9,7 +9,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

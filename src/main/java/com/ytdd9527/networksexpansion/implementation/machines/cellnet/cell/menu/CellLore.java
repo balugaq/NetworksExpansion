@@ -6,7 +6,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledge
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

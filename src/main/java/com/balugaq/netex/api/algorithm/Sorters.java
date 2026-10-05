@@ -6,7 +6,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.managers.DrawerMan
 import com.ytdd9527.networksexpansion.utils.TextUtil;
 import io.github.sefiraat.networks.network.stackcaches.BarrelIdentity;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NullMarked;
 
