@@ -71,7 +71,6 @@ public class NetworkController extends NetworkObject {
                 addToRegistry(block);
                 NetworkRoot networkRoot = new NetworkRoot(
                     block.getLocation(),
-                    NodeType.CONTROLLER,
                     maxNodes.getValue(),
                     recordFlow.getOrDefault(block.getLocation(), false),
                     records.get(block.getLocation()));

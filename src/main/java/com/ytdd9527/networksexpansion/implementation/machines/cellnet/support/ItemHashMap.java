@@ -24,6 +24,8 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.support;
 
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -44,6 +46,7 @@ import java.util.stream.Collectors;
  * @author Ddggdd135
  * @author ytdd9526
  */
+@NullMarked
 public class ItemHashMap<V> implements Map<ItemStack, V> {
 
     private final Map<ItemKey, V> map;
@@ -89,21 +92,21 @@ public class ItemHashMap<V> implements Map<ItemStack, V> {
         return null;
     }
 
-    public V getKey(ItemKey key) {
+    public @Nullable V getKey(ItemKey key) {
         return map.get(key);
     }
 
     @Override
-    public V put(ItemStack key, V value) {
+    public @Nullable V put(ItemStack key, V value) {
         return map.put(new ItemKey(key), value);
     }
 
-    public V putKey(ItemKey key, V value) {
+    public @Nullable V putKey(ItemKey key, V value) {
         return map.put(key, value);
     }
 
     @Override
-    public V remove(Object key) {
+    public @Nullable V remove(Object key) {
         if (key instanceof ItemStack) {
             return map.remove(new ItemKey((ItemStack) key));
         }
@@ -113,7 +116,7 @@ public class ItemHashMap<V> implements Map<ItemStack, V> {
         return null;
     }
 
-    public V removeKey(ItemKey key) {
+    public @Nullable  removeKey(ItemKey key) {
         return map.remove(key);
     }
 

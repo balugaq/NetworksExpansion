@@ -203,13 +203,13 @@ public class DrawerManager extends NetworkObject {
         if (itemContainers.isEmpty()) {
             return null;
         } else {
-            return itemContainers.get(0).getSample();
+            return itemContainers.getFirst().getSample();
         }
     }
 
     public static @NotNull List<StorageUnitData> getStorageUnitDatas(
         @NotNull NetworkRoot root, @NotNull GridCache cache) {
-        return root.getCargoStorageUnitDatas(MANAGER_STRATEGY, true).keySet().stream()
+        return root.getDrawerData(MANAGER_STRATEGY, true).keySet().stream()
             .filter(entry -> {
                 if (cache.getFilter() == null) {
                     return true;
