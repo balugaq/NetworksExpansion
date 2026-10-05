@@ -1264,11 +1264,11 @@ public class ExpansionItems {
     public static final SpecialSlimefunItem AUTHOR_YITOUDAIDAI =
         new AuthorHead(ExpansionItemsMenus.MENU_TROPHY, ExpansionItemStacks.AUTHOR_YITOUDAIDAI);
 
-    public static final SpecialSlimefunItem AUTHOR_BALUGAQ = new AuthorHead(
+    public static final SpecialSlimefunItem AUTHOR_TINALNESS = new AuthorHead(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.AUTHOR_BALUGAQ,
+        ExpansionItemStacks.AUTHOR_TINALNESS,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AUTHOR_BALUGAQ
+        ExpansionRecipes.AUTHOR_TINALNESS
     );
 
     public static final DueMachineConfigurator DUE_MACHINE_CONFIGURATOR = new DueMachineConfigurator(
@@ -1374,33 +1374,62 @@ public class ExpansionItems {
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_01 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_1 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_01,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_1,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_02 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_2 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_02,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_2,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_03 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_3 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_03,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_3,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_04 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_4 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_04,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_4,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_05 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_5 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_05,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_5,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_6 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_6,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_7 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_7,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_8 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_8,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_9 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_9,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_10 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_10,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 

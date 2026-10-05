@@ -27,7 +27,10 @@ public class JournalWriter {
         this.connMgr = connMgr;
     }
 
-    public void flush() {
+    // Auto-save thread and main-thread menu paths may flush concurrently; serializing the
+    // drain→write→commit/rollback cycle is what keeps pendingFlush from being clobbered
+    // (a clobbered snapshot silently drops failed rows forever).
+    public synchronized void flush() {
         List<JournalRow> allRows = dirtyTracker.drainPhase1();
         if (allRows.isEmpty()) {
             return;

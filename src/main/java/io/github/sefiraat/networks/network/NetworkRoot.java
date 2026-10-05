@@ -193,10 +193,10 @@ public class NetworkRoot extends NetworkNode {
 
     private @Nullable Map<StorageUnitData, Location> inputAbleCargoStorageUnitDatas = null;
     private @Nullable Map<StorageUnitData, Location> outputAbleCargoStorageUnitDatas = null;
-    private @Nullable Map<Location, BarrelIdentity> mapInputAbleBarrels = null;
-    private @Nullable Map<Location, BarrelIdentity> mapOutputAbleBarrels = null;
-    private @Nullable Map<Location, StorageUnitData> mapInputAbleCargoStorageUnits = null;
-    private @Nullable Map<Location, StorageUnitData> mapOutputAbleCargoStorageUnits = null;
+    private volatile @Nullable Map<Location, BarrelIdentity> mapInputAbleBarrels = null;
+    private volatile @Nullable Map<Location, BarrelIdentity> mapOutputAbleBarrels = null;
+    private volatile @Nullable Map<Location, StorageUnitData> mapInputAbleCargoStorageUnits = null;
+    private volatile @Nullable Map<Location, StorageUnitData> mapOutputAbleCargoStorageUnits = null;
     private @Nullable Set<BlockMenu> cellDriveMenus = null;
     private @Nullable Set<BlockMenu> inputAbleCellDriveMenus = null;
     private @Nullable Set<BlockMenu> outputAbleCellDriveMenus = null;
@@ -287,7 +287,7 @@ public class NetworkRoot extends NetworkNode {
 
     @Setter
     @Getter
-    private long rootPower = 0;
+    private volatile long rootPower = 0;
 
     @Setter
     @Getter
@@ -1608,7 +1608,7 @@ public class NetworkRoot extends NetworkNode {
             return;
         }
 
-        int removed = 0;
+        long removed = 0;
         for (Location node : powerNodes) {
             final SlimefunItem item = StorageCacheUtils.getSfItem(node);
             if (item instanceof NetworkPowerNode powerNode) {
@@ -1618,13 +1618,13 @@ public class NetworkRoot extends NetworkNode {
                 }
                 final int toRemove = (int) Math.min(power - removed, charge);
                 powerNode.removeCharge(node, toRemove);
-                this.rootPower -= power;
-                removed = removed + toRemove;
+                removed += toRemove;
             }
             if (removed >= power) {
-                return;
+                break;
             }
         }
+        this.rootPower -= removed;
     }
 
     @Warning(
@@ -1838,10 +1838,11 @@ public class NetworkRoot extends NetworkNode {
         }
 
         this.inputAbleBarrels = barrelSet;
-        this.mapInputAbleBarrels = new ConcurrentHashMap<>();
+        final Map<Location, BarrelIdentity> inputAbleBarrelMap = new ConcurrentHashMap<>();
         for (BarrelIdentity storage : barrelSet) {
-            this.mapInputAbleBarrels.put(storage.getLocation(), storage);
+            inputAbleBarrelMap.put(storage.getLocation(), storage);
         }
+        this.mapInputAbleBarrels = inputAbleBarrelMap;
         NetworkRootLocateStorageEvent event =
             new NetworkRootLocateStorageEvent(this, StorageType.BARREL, true, false, Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(event);
@@ -1914,10 +1915,11 @@ public class NetworkRoot extends NetworkNode {
         }
 
         this.outputAbleBarrels = barrelSet;
-        this.mapOutputAbleBarrels = new ConcurrentHashMap<>();
+        final Map<Location, BarrelIdentity> outputAbleBarrelMap = new ConcurrentHashMap<>();
         for (BarrelIdentity storage : barrelSet) {
-            this.mapOutputAbleBarrels.put(storage.getLocation(), storage);
+            outputAbleBarrelMap.put(storage.getLocation(), storage);
         }
+        this.mapOutputAbleBarrels = outputAbleBarrelMap;
         NetworkRootLocateStorageEvent event =
             new NetworkRootLocateStorageEvent(this, StorageType.BARREL, false, true, Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(event);
@@ -1962,10 +1964,11 @@ public class NetworkRoot extends NetworkNode {
         }
 
         this.inputAbleCargoStorageUnitDatas = dataSet;
-        this.mapInputAbleCargoStorageUnits = new ConcurrentHashMap<>();
+        final Map<Location, StorageUnitData> inputAbleCargoMap = new ConcurrentHashMap<>();
         for (Map.Entry<StorageUnitData, Location> entry : dataSet.entrySet()) {
-            mapInputAbleCargoStorageUnits.put(entry.getValue(), entry.getKey());
+            inputAbleCargoMap.put(entry.getValue(), entry.getKey());
         }
+        this.mapInputAbleCargoStorageUnits = inputAbleCargoMap;
         NetworkRootLocateStorageEvent event =
             new NetworkRootLocateStorageEvent(this, StorageType.DRAWER, true, false, Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(event);
@@ -2010,10 +2013,11 @@ public class NetworkRoot extends NetworkNode {
         }
 
         this.outputAbleCargoStorageUnitDatas = dataSet;
-        this.mapOutputAbleCargoStorageUnits = new ConcurrentHashMap<>();
+        final Map<Location, StorageUnitData> outputAbleCargoMap = new ConcurrentHashMap<>();
         for (Map.Entry<StorageUnitData, Location> entry : dataSet.entrySet()) {
-            mapOutputAbleCargoStorageUnits.put(entry.getValue(), entry.getKey());
+            outputAbleCargoMap.put(entry.getValue(), entry.getKey());
         }
+        this.mapOutputAbleCargoStorageUnits = outputAbleCargoMap;
         NetworkRootLocateStorageEvent event =
             new NetworkRootLocateStorageEvent(this, StorageType.DRAWER, false, true, Bukkit.isPrimaryThread());
         Bukkit.getPluginManager().callEvent(event);
@@ -3346,11 +3350,12 @@ public class NetworkRoot extends NetworkNode {
             return this.mapInputAbleBarrels;
         }
 
-        this.mapInputAbleBarrels = new ConcurrentHashMap<>();
+        final Map<Location, BarrelIdentity> map = new ConcurrentHashMap<>();
         for (BarrelIdentity barrel : getInputAbleBarrels()) {
-            this.mapInputAbleBarrels.put(barrel.getLocation(), barrel);
+            map.put(barrel.getLocation(), barrel);
         }
-        return this.mapInputAbleBarrels;
+        this.mapInputAbleBarrels = map;
+        return map;
     }
 
     public Map<Location, BarrelIdentity> getMapOutputAbleBarrels() {
@@ -3358,11 +3363,12 @@ public class NetworkRoot extends NetworkNode {
             return this.mapOutputAbleBarrels;
         }
 
-        this.mapOutputAbleBarrels = new ConcurrentHashMap<>();
+        final Map<Location, BarrelIdentity> map = new ConcurrentHashMap<>();
         for (BarrelIdentity barrel : getOutputAbleBarrels()) {
-            this.mapOutputAbleBarrels.put(barrel.getLocation(), barrel);
+            map.put(barrel.getLocation(), barrel);
         }
-        return this.mapOutputAbleBarrels;
+        this.mapOutputAbleBarrels = map;
+        return map;
     }
 
     public Map<Location, StorageUnitData> getMapInputAbleCargoStorageUnits() {
@@ -3370,12 +3376,13 @@ public class NetworkRoot extends NetworkNode {
             return this.mapInputAbleCargoStorageUnits;
         }
 
+        final Map<Location, StorageUnitData> map = new ConcurrentHashMap<>();
         for (Map.Entry<StorageUnitData, Location> entry :
             getInputAbleCargoStorageUnitDatas().entrySet()) {
-            this.mapInputAbleCargoStorageUnits.put(entry.getValue(), entry.getKey());
+            map.put(entry.getValue(), entry.getKey());
         }
-
-        return this.mapInputAbleCargoStorageUnits;
+        this.mapInputAbleCargoStorageUnits = map;
+        return map;
     }
 
     public Map<Location, StorageUnitData> getMapOutputAbleCargoStorageUnits() {
@@ -3383,12 +3390,13 @@ public class NetworkRoot extends NetworkNode {
             return this.mapOutputAbleCargoStorageUnits;
         }
 
+        final Map<Location, StorageUnitData> map = new ConcurrentHashMap<>();
         for (Map.Entry<StorageUnitData, Location> entry :
             getOutputAbleCargoStorageUnitDatas().entrySet()) {
-            this.mapOutputAbleCargoStorageUnits.put(entry.getValue(), entry.getKey());
+            map.put(entry.getValue(), entry.getKey());
         }
-
-        return this.mapOutputAbleCargoStorageUnits;
+        this.mapOutputAbleCargoStorageUnits = map;
+        return map;
     }
 
 

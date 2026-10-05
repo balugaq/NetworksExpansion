@@ -154,7 +154,8 @@ public final class ItemStackUtil {
                     nmsClass, "hashItemAndComponents", MethodType.methodType(int.class, nmsClass));
                 ok = true;
             } catch (final ClassNotFoundException | IllegalAccessException | NoSuchFieldException | NoSuchMethodException exception) {
-                Debug.debug(exception);
+                Debug.debug("Components bridge unavailable: NMS reflection lookup failed, hasCustomComponents() falls back to hasItemMeta()");
+                Debug.trace(exception);
             }
         }
         COMPONENTS_BRIDGE_OK = ok;

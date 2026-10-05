@@ -126,9 +126,11 @@ public class ContainerFiller extends SpecialSlimefunItem {
                 }
                 ensureNetworkNode(loc);
                 s.nextRun = now + ROUND_INTERVAL_MS;
-                BlockMenu menu = StorageCacheUtils.getMenu(b.getLocation());
+                BlockMenu menu = data.getBlockMenu();
                 if (menu != null) {
-                    processRound(menu, b.getLocation());
+                    // processRound reads/writes the inventory and drops items: main-thread work
+                    Location location = b.getLocation();
+                    Bukkit.getScheduler().runTask(Networks.getInstance(), () -> processRound(menu, location));
                 }
             }
         });

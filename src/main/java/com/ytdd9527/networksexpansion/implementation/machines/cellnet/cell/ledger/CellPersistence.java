@@ -212,17 +212,21 @@ public final class CellPersistence {
             ? Long.MAX_VALUE
             : Math.min(getCurrentPerTypeLimit(itemStack),
                 Math.min(perTypeLimit, CellLedger.getMaxUnitCount()));
-        cache = CellLedger.getOrCreate(uuid, perTypeLimit, currentPerTypeLimit);
-        cache.setUnlimited(unlimited);
+        // First load must be atomic: a plain get→create sequence lets two threads run
+        // restoreStoredItems against the same ledger and double every stored amount.
+        return CellLedger.getActiveCaches().computeIfAbsent(uuid, k -> {
+            CellLedger created = new CellLedger(uuid, perTypeLimit, currentPerTypeLimit);
+            created.setUnlimited(unlimited);
 
-        loadMetaFromItem(cache, itemStack);
-        restoreStoredItems(cache, uuid);
-        loadReservedFromItem(cache, itemStack);
-        loadVoidExcessFromItem(cache, itemStack);
-        if (hasLegacyVoidExcess(itemStack)) {
-            cache.migrateLegacyVoidExcess();
-        }
-        return cache;
+            loadMetaFromItem(created, itemStack);
+            restoreStoredItems(created, uuid);
+            loadReservedFromItem(created, itemStack);
+            loadVoidExcessFromItem(created, itemStack);
+            if (hasLegacyVoidExcess(itemStack)) {
+                created.migrateLegacyVoidExcess();
+            }
+            return created;
+        });
     }
 
     public static void saveReservedItems(@NotNull ItemStack itemStack) {

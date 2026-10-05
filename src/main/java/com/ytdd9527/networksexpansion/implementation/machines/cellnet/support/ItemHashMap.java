@@ -12,6 +12,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+/**
+ * An ItemStack-keyed map backed by an internal {@link ConcurrentHashMap}.
+ * <p>
+ * Derived from Applied Energistics 2's ItemHashMap (MIT License, see licenses/MIT.md),
+ * adapted to the Bukkit ItemStack API with an {@link ItemKey} wrapper key.
+ *
+ * @author AlgorithmX2 (original AE2 implementation)
+ * @author ytdd9526 (Bukkit adaptation)
+ */
 public class ItemHashMap<V> implements Map<ItemStack, V> {
 
     private final Map<ItemKey, V> map;

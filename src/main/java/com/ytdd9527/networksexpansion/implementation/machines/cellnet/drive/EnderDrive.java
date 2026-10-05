@@ -272,6 +272,8 @@ public class EnderDrive extends CellDrive {
                 String channel = getChannel(location);
                 dropState(location);
                 CellDrive.clearLocalState(location);
+                CellUniqueness.unregisterDrive(location);
+                CellDrive.getStorage().dropCellCache(location);
                 BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
                 if (blockMenu != null) {
                     EnderChannelController controller = EnderChannelController.getInstance();

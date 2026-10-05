@@ -48,6 +48,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+import io.github.sefiraat.networks.Networks;
+import org.bukkit.Bukkit;
 public class CellConverter extends CellBrowserBase {
 
     public static final int MODE_SLOT = 48;
@@ -253,10 +255,16 @@ public class CellConverter extends CellBrowserBase {
 
                 @Override
                 public void tick(@NotNull Block b, SlimefunItem item, SlimefunBlockData data) {
-                    BlockMenu blockMenu = StorageCacheUtils.getMenu(b.getLocation());
-                    if (blockMenu != null && blockMenu.hasViewer()) {
-                        refresh(blockMenu);
+                    // Async tick must not touch inventories; the refresh goes back to the main thread
+                    BlockMenu blockMenu = data.getBlockMenu();
+                    if (blockMenu == null || !blockMenu.hasViewer()) {
+                        return;
                     }
+                    Bukkit.getScheduler().runTask(Networks.getInstance(), () -> {
+                        if (blockMenu.hasViewer()) {
+                            refresh(blockMenu);
+                        }
+                    });
                 }
             },
             new BlockBreakHandler(false, false) {

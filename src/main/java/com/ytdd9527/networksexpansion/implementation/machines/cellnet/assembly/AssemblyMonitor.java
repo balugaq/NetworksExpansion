@@ -580,7 +580,7 @@ public class AssemblyMonitor extends NetworkObject {
                     continue;
                 }
                 Location neighbor = nodeLocation.clone().add(face.getDirection());
-                if (!visited.add(neighbor) || !AssemblyMonitorBridge.activeDrives().contains(neighbor)) {
+                if (!AssemblyMonitorBridge.activeDrives().contains(neighbor) || !visited.add(neighbor)) {
                     continue;
                 }
                 AssemblyMonitorBridge.DriveOverview overview = AssemblyMonitorBridge.readOverview(neighbor);
