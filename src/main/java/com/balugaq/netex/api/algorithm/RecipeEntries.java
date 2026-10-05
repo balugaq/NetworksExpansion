@@ -35,7 +35,8 @@ public class RecipeEntries {
         loadRecipe(SupportedPressureChamberRecipes.getRecipes());
         loadRecipe(SupportedQuantumWorkbenchRecipes.getRecipes());
         loadRecipe(SupportedSmelteryRecipes.getRecipes());
-        // copy more ae
+
+
     }
 
     private static void loadRecipe(Map<ItemStack[], ItemStack> recipes) {

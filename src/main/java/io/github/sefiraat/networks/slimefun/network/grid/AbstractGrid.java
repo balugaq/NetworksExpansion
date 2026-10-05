@@ -107,6 +107,7 @@ public abstract class AbstractGrid extends NetworkObject {
                         return;
                     }
                     addToRegistry(block);
+                    syncSkin(block);
                     tryAddItem(blockMenu);
                     GridCache cache = getCacheMap().get(block.getLocation());
                     if (cache != null) {
@@ -126,6 +127,9 @@ public abstract class AbstractGrid extends NetworkObject {
                 return Optional.empty();
             }
         });
+    }
+
+    protected void syncSkin(@NotNull Block block) {
     }
 
     @NotNull
@@ -155,7 +159,7 @@ public abstract class AbstractGrid extends NetworkObject {
             return;
         }
 
-        definition.getNode().getRoot().addItemStack(itemStack);
+        definition.getNode().getRoot().addItemStack0(blockMenu.getLocation(), itemStack);
     }
 
     public ItemStack getFilterStack(@Nullable String filter) {
@@ -284,29 +288,37 @@ public abstract class AbstractGrid extends NetworkObject {
         if (cache.getEntriesCache() != null) {
             return cache.getEntriesCache();
         }
-        var entries = networkRoot.getAllNetworkItemsLongTypeView().entrySet().stream()
+        var entries = filterAndSort(networkRoot.getAllNetworkItemsLongTypeView(), cache.getFilter(), cache.getSortOrder());
+        cache.setEntriesCache(entries);
+        return entries;
+    }
+
+    @NotNull
+    public static List<Map.Entry<ItemStack, Long>> filterAndSort(
+        @NotNull Map<ItemStack, Long> items,
+        @Nullable String filter,
+        @NotNull GridCache.SortOrder sortOrder) {
+        return items.entrySet().stream()
             .filter(entry -> {
-                if (cache.getFilter() == null) {
+                if (filter == null) {
                     return true;
                 }
 
                 final ItemStack itemStack = entry.getKey();
                 String name = TextUtil.stripColor(
                     ItemStackHelper.getDisplayName(itemStack).toLowerCase(Locale.ROOT));
-                if (cache.getFilter().matches("^[a-zA-Z]+$")) {
+                if (filter.matches("^[a-zA-Z]+$")) {
                     final String pinyinName = PinyinHelper.toPinyin(name, PinyinStyleEnum.INPUT, "");
                     final String pinyinFirstLetter = PinyinHelper.toPinyin(name, PinyinStyleEnum.FIRST_LETTER, "");
-                    return name.contains(cache.getFilter())
-                        || pinyinName.contains(cache.getFilter())
-                        || pinyinFirstLetter.contains(cache.getFilter());
+                    return name.contains(filter)
+                        || pinyinName.contains(filter)
+                        || pinyinFirstLetter.contains(filter);
                 } else {
-                    return name.contains(cache.getFilter());
+                    return name.contains(filter);
                 }
             })
-            .sorted(SORT_MAP.get(cache.getSortOrder()))
+            .sorted(SORT_MAP.get(sortOrder))
             .toList();
-        cache.setEntriesCache(entries);
-        return entries;
     }
 
     protected void setFilter(
@@ -400,12 +412,12 @@ public abstract class AbstractGrid extends NetworkObject {
             return;
         }
 
-        final ItemStack cursor = player.getItemOnCursor();
-        if (cursor.getType() != Material.AIR
-            && !StackUtils.itemsMatch(clone, StackUtils.getAsQuantity(player.getItemOnCursor(), 1))) {
-            root.addItemStack(player.getItemOnCursor());
-            return;
-        }
+          final ItemStack cursor = player.getItemOnCursor();
+          if (cursor.getType() != Material.AIR
+              && !StackUtils.itemsMatch(clone, StackUtils.getAsQuantity(player.getItemOnCursor(), 1))) {
+              root.addItemStack0(blockMenu.getLocation(), player.getItemOnCursor());
+              return;
+          }
 
         int amount = 1;
 
@@ -434,10 +446,10 @@ public abstract class AbstractGrid extends NetworkObject {
             return;
         }
 
-        InventoryUtil.addItem(player, requestingStack);
-        if (requestingStack.getAmount() > 0) {
-            definition.getNode().getRoot().addItemStack(requestingStack);
-        }
+          InventoryUtil.addItem(player, requestingStack);
+          if (requestingStack.getAmount() > 0) {
+              definition.getNode().getRoot().addItemStack0(menu.getLocation(), requestingStack);
+          }
     }
 
     @SuppressWarnings("deprecation")
@@ -568,9 +580,9 @@ public abstract class AbstractGrid extends NetworkObject {
         @Nullable ItemStack itemStack,
         ClickAction action,
         @NotNull BlockMenu blockMenu) {
-        if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
-            root.addItemStack(itemStack);
-        }
+          if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
+              root.addItemStack0(blockMenu.getLocation(), itemStack);
+          }
     }
 
     @SuppressWarnings("deprecation")

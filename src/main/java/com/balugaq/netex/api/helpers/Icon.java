@@ -190,6 +190,9 @@ public class Icon {
     public static final ItemStack LINKER_TYPE_QUANTUM_LINK =
         Lang.getIcon("linker-type-quantum-link", Material.NETHER_STAR);
 
+    public static final ItemStack LINKER_TARGET_SWITCH =
+        Lang.getIcon("linker-target-switch", Material.TARGET);
+
     // pages are 1-based
     @SuppressWarnings("deprecation")
     @NotNull

@@ -111,6 +111,34 @@ public class ConfigManager {
         return Networks.getInstance().getConfig().getBoolean("ban-quantum-in-quantum", false);
     }
 
+    public int getChainBaseDistance() {
+        return Networks.getInstance().getConfig().getInt("chain.base-distance", 16);
+    }
+
+    public int getChainWorkIntervalSeconds() {
+        return Networks.getInstance().getConfig().getInt("chain.work-interval-seconds", 0);
+    }
+
+    public boolean isCollectEnabled() {
+        return Networks.getInstance().getConfig().getBoolean("collect-rune.enabled", true);
+    }
+
+    public int getChainDistancePerModule() {
+        return Networks.getInstance().getConfig().getInt("chain.distance-per-module", 16);
+    }
+
+    public int getChainMaxDistance() {
+        return Networks.getInstance().getConfig().getInt("chain.max-distance", 64);
+    }
+
+    public int getChainCacheTtlTicks() {
+        return Networks.getInstance().getConfig().getInt("chain.cache-ttl-ticks", 40);
+    }
+
+    public int getChainIdleTtlTicks() {
+        return Networks.getInstance().getConfig().getInt("chain.idle-ttl-ticks", 200);
+    }
+
     public boolean useBukkitItemComparison() {
         return Networks.getInstance().getConfig().getBoolean("use-bukkit-item-comparison", false);
     }
@@ -147,55 +175,63 @@ public class ConfigManager {
         return Networks.getInstance().getConfig().getBoolean("fast-interact-quantum", false);
     }
 
-    public int getAeMaxItemTypes() {
-        return getInt("ae.max-item-types", 64);
+    public int getCellnetMaxItemTypes() {
+        return getInt("cellnet.max-item-types", 64);
     }
 
-    public long getAeStorageWriteTimeout() {
-        return getLong("ae-storage.write-timeout-seconds", 10L);
+    public boolean isAssemblyBatchFetch() {
+        return getBoolean("cellnet.assembly-batch-fetch", true);
+    }
+
+    public long getCellnetStorageWriteTimeout() {
+        return getLong("cellnet-storage.write-timeout-seconds", 10L);
     }
 
     public boolean getBoolean(@NotNull String path, boolean defaultValue) {
         return Networks.getInstance().getConfig().getBoolean(path, defaultValue);
     }
 
-    public boolean getAeStorageWalMode() {
-        return getBoolean("ae-storage.wal-mode", true);
+    public boolean getCellnetStorageWalMode() {
+        return getBoolean("cellnet-storage.wal-mode", true);
     }
 
-    public int getAeStorageBusyTimeout() {
-        return getInt("ae-storage.busy-timeout", 5000);
+    public int getCellnetStorageBusyTimeout() {
+        return getInt("cellnet-storage.busy-timeout", 5000);
     }
 
-    public long getAeStorageJournalRetentionMinutes() {
-        return getLong("ae-storage.journal-retention-minutes", 30);
+    public long getCellnetStorageJournalRetentionMinutes() {
+        return getLong("cellnet-storage.journal-retention-minutes", 30);
     }
 
-    public boolean getAeStorageArchiveEnabled() {
-        return getBoolean("ae-storage.archive-enabled", true);
+    public boolean getCellnetStorageArchiveEnabled() {
+        return getBoolean("cellnet-storage.archive-enabled", true);
     }
 
-    public int getAeStorageArchiveRetentionDays() {
-        return getInt("ae-storage.archive-retention-days", 7);
+    public int getCellnetStorageArchiveRetentionDays() {
+        return getInt("cellnet-storage.archive-retention-days", 7);
     }
 
-    public int getAeStorageArchiveMaxRows() {
-        return getInt("ae-storage.archive-max-rows", 2000000);
+    public int getCellnetStorageArchiveMaxRows() {
+        return getInt("cellnet-storage.archive-max-rows", 2000000);
     }
 
-    public int getAeStorageCheckpointInterval() {
-        return getInt("ae-storage.checkpoint-interval", 60);
+    public int getCellnetStorageCheckpointInterval() {
+        return getInt("cellnet-storage.checkpoint-interval", 60);
     }
 
-    public int getAeStorageCheckpointThreshold() {
-        return getInt("ae-storage.checkpoint-threshold", 5000);
+    public int getCellnetStorageCheckpointThreshold() {
+        return getInt("cellnet-storage.checkpoint-threshold", 5000);
     }
 
-    public boolean getAeStorageBackupEnabled() {
-        return getBoolean("ae-storage.backup-enabled", true);
+    public boolean getCellnetStorageBackupEnabled() {
+        return getBoolean("cellnet-storage.backup-enabled", true);
     }
 
-    public int getAeStorageBackupIntervalHours() {
-        return getInt("ae-storage.backup-interval-hours", 24);
+    public int getCellnetStorageBackupIntervalHours() {
+        return getInt("cellnet-storage.backup-interval-hours", 24);
+    }
+
+    public int getCellnetStorageBackupKeep() {
+        return getInt("cellnet-storage.backup-keep", 10);
     }
 }

@@ -10,8 +10,11 @@ import com.balugaq.netex.utils.MapUtil;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.unusable.Blueprint;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.collect.CollectService;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter.CellQuantumConverter;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.bakedlibs.dough.collections.Pair;
+import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.NetworkRoot;
 import io.github.sefiraat.networks.network.stackcaches.BlueprintInstance;
 import io.github.sefiraat.networks.network.stackcaches.ItemRequest;
@@ -359,6 +362,11 @@ public class NetworksMain implements TabExecutor {
                     sender.sendMessage(message);
                 }
             }
+            case "celltoquantum" -> {
+                for (String message : Lang.getStringList("messages.commands.example.celltoquantum")) {
+                    sender.sendMessage(message);
+                }
+            }
             case "fillquantum" -> {
                 for (String message : Lang.getStringList("messages.commands.example.fillquantum")) {
                     sender.sendMessage(message);
@@ -433,7 +441,9 @@ public class NetworksMain implements TabExecutor {
                  "addstorageitem",
                  "reducestorageitem",
                  "setquantum",
-                 "setcontainerid" -> {
+                 "setcontainerid",
+                 "celltoquantum",
+                 "unbind" -> {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(getErrorMessage(ErrorType.MUST_BE_PLAYER));
                     return false;
@@ -535,6 +545,15 @@ public class NetworksMain implements TabExecutor {
                         player.sendMessage(e.getMessage());
                     }
 
+                    return true;
+                }
+                case "celltoquantum" -> {
+                    if (!player.hasPermission("networks.admin")
+                        && !player.hasPermission("networks.commands.celltoquantum")) {
+                        player.sendMessage(getErrorMessage(ErrorType.NO_PERMISSION));
+                        return true;
+                    }
+                    convertCellToQuantumStorage(player);
                     return true;
                 }
                 case "addstorageitem" -> {
@@ -751,6 +770,17 @@ public class NetworksMain implements TabExecutor {
                     }
                 }
 
+                case "unbind" -> {
+                    ItemStack weapon = player.getInventory().getItemInMainHand();
+                    if (CollectService.hasMark(weapon)) {
+                        CollectService.unbind(weapon);
+                        player.sendMessage(Lang.getString("messages.cellnet.collect.unbind"));
+                    } else {
+                        player.sendMessage(Lang.getString("messages.cellnet.collect.no-bind"));
+                    }
+                    return true;
+                }
+
                 default -> help(player, null);
             }
         }
@@ -784,6 +814,10 @@ public class NetworksMain implements TabExecutor {
         quantumCache.updateMetaLore(meta);
         itemStack.setItemMeta(meta);
         player.sendMessage(Lang.getString("messages.commands.updated-quantum-storage"));
+    }
+
+    public void convertCellToQuantumStorage(@NotNull Player player) {
+        CellQuantumConverter.convert(player);
     }
 
     // change "networks-changed:recipe" -> "networks:recipe"
@@ -836,6 +870,8 @@ public class NetworksMain implements TabExecutor {
             case 1 -> {
                 return List.of(
                     "addStorageItem",
+                    "celltoQuantum",
+                    "unbind",
                     "fillQuantum",
                     "fixBlueprint",
                     "getStorageItem",

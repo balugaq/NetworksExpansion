@@ -8,12 +8,12 @@ import com.balugaq.netex.api.enums.StorageType;
 import com.balugaq.netex.api.events.NetworkRootLocateStorageEvent;
 import com.balugaq.netex.api.interfaces.FeedbackSendable;
 import com.balugaq.netex.utils.BlockMenuUtil;
-import com.balugaq.netex.utils.NetworksVersionedParticle;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AEDriveStorage;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.core.drive.AENetworkCache;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveCache;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemHashMap;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.mooy1.infinityexpansion.items.storage.StorageCache;
@@ -50,10 +50,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -195,11 +197,93 @@ public class NetworkRoot extends NetworkNode {
     private @Nullable Map<Location, BarrelIdentity> mapOutputAbleBarrels = null;
     private @Nullable Map<Location, StorageUnitData> mapInputAbleCargoStorageUnits = null;
     private @Nullable Map<Location, StorageUnitData> mapOutputAbleCargoStorageUnits = null;
-    private @Nullable Set<BlockMenu> aeDriveMenus = null;
-    private @Nullable Set<BlockMenu> inputAbleAEDriveMenus = null;
-    private @Nullable Set<BlockMenu> outputAbleAEDriveMenus = null;
-    private final AENetworkCache aeNetworkCache = new AENetworkCache();
-    private Map<ItemStack, Long> allItemsView = null;
+    private @Nullable Set<BlockMenu> cellDriveMenus = null;
+    private @Nullable Set<BlockMenu> inputAbleCellDriveMenus = null;
+    private @Nullable Set<BlockMenu> outputAbleCellDriveMenus = null;
+    private @Nullable Set<BlockMenu> greedyBlockMenus = null;
+    private @Nullable Set<BlockMenu> advancedGreedyBlockMenus = null;
+    private @Nullable Set<BlockMenu> cellMenus = null;
+    private final DriveCache driveCache = new DriveCache();
+
+    /**
+     * 聚合物品快照按网络（控制器位置）静态共享：root 实例每刻由 NetworkController 重建，
+     * 实例级缓存无法跨刻复用，空闲网络（无写入）借此零重扫。失效条件：
+     * 同刻——仅显式失效（{@link #markDirty()} / {@link #refreshRootItems()}）重建，
+     * 刻内普通写沿用既有"至多 1 刻延迟"契约（写纪元不影响同刻复用）；
+     * 跨刻——期间无任何写（写纪元不变）且未超 {@link #SNAPSHOT_MAX_AGE_MS} 才复用。
+     * 时间上限兜底绕过 root 的直改存储（抽屉/单元 GUI 手改、区块加载、结构变更）——陈旧度至多 500ms。
+     */
+    private static final Map<Location, ItemSnapshot> SHARED_ITEM_SNAPSHOTS = new ConcurrentHashMap<>();
+    private static final Map<Location, AtomicLong> INVALIDATION_EPOCHS = new ConcurrentHashMap<>();
+    private static final Map<Location, AtomicLong> WRITE_EPOCHS = new ConcurrentHashMap<>();
+    private static final long SNAPSHOT_MAX_AGE_MS = 500L;
+    private static final long SNAPSHOT_IDLE_MS = 3_600_000L;
+
+    /**
+     * 不可变快照：内容与失效判定依据作为整体经 CHM 原子发布（单引用读），
+     * 拆成多个字段会让读线程看到"新纪元 + 旧数据"的组合。
+     * keyed 为内部聚合的原始视图（发布后不再变更），供 keyed 消费方零哈希查询；
+     * items 为 keyed 的 ItemStack 出口视图，仅首个消费方需要时构建并缓存（keyed-only 消费零克隆）。
+     */
+    private static final class ItemSnapshot {
+        private final @NotNull Map<ItemKey, Long> keyed;
+        private final long invalidationEpoch;
+        private final long writeEpoch;
+        private final int tick;
+        private final long publishedAtMs;
+        private volatile @Nullable Map<ItemStack, Long> exported;
+
+        private ItemSnapshot(
+                @NotNull Map<ItemKey, Long> keyed,
+                long invalidationEpoch,
+                long writeEpoch,
+                int tick,
+                long publishedAtMs) {
+            this.keyed = keyed;
+            this.invalidationEpoch = invalidationEpoch;
+            this.writeEpoch = writeEpoch;
+            this.tick = tick;
+            this.publishedAtMs = publishedAtMs;
+        }
+
+        private long invalidationEpoch() {
+            return invalidationEpoch;
+        }
+
+        private long writeEpoch() {
+            return writeEpoch;
+        }
+
+        private int tick() {
+            return tick;
+        }
+
+        private long publishedAtMs() {
+            return publishedAtMs;
+        }
+
+        private @NotNull Map<ItemKey, Long> keyed() {
+            return keyed;
+        }
+
+        private @NotNull Map<ItemStack, Long> items() {
+            Map<ItemStack, Long> items = exported;
+            if (items != null) {
+                return items;
+            }
+            synchronized (this) {
+                items = exported;
+                if (items == null) {
+                    items = new HashMap<>(keyed.size() * 2);
+                    for (Map.Entry<ItemKey, Long> entry : keyed.entrySet()) {
+                        items.put(entry.getKey().getItemStack(), entry.getValue());
+                    }
+                    exported = items;
+                }
+                return items;
+            }
+        }
+    }
 
     @Setter
     @Getter
@@ -531,48 +615,106 @@ public class NetworkRoot extends NetworkNode {
         return this.nodeLocations.size();
     }
 
+    @NotNull
+    public Set<Location> getNodeLocations() {
+        return this.nodeLocations;
+    }
+
+    /** 显式失效纪元：markDirty / refreshRootItems 递增，同刻与跨刻复用都会校验。 */
+    private void bumpInvalidationEpoch() {
+        INVALIDATION_EPOCHS.computeIfAbsent(this.nodePosition, k -> new AtomicLong()).incrementAndGet();
+    }
+
+    /** 写纪元：物品存取（addItemStack0 / getItemStack0）递增，仅影响跨刻复用。 */
+    private void bumpWriteEpoch() {
+        WRITE_EPOCHS.computeIfAbsent(this.nodePosition, k -> new AtomicLong()).incrementAndGet();
+    }
+
+    private static long currentInvalidationEpoch(@NotNull Location networkId) {
+        AtomicLong counter = INVALIDATION_EPOCHS.get(networkId);
+        return counter == null ? 0L : counter.get();
+    }
+
+    private static long currentWriteEpoch(@NotNull Location networkId) {
+        AtomicLong counter = WRITE_EPOCHS.get(networkId);
+        return counter == null ? 0L : counter.get();
+    }
+
+    /**
+     * 外部代码绕过 {@link #addItemStack0(Location, ItemStack)} / {@link #getItemStack0(Location, ItemRequest)}
+     * 直接改动网络存储内容（如机器菜单槽位、元件驱动器内部缓存）后，必须调用本方法使聚合物品缓存失效。
+     */
+    public void markDirty() {
+        bumpInvalidationEpoch();
+    }
+
     public void setOverburdened(boolean overburdened) {
-        if (overburdened && !isOverburdened) {
-            final Location loc = this.nodePosition.clone();
-            for (int x = 0; x <= 1; x++) {
-                for (int y = 0; y <= 1; y++) {
-                    for (int z = 0; z <= 1; z++) {
-                        loc.getWorld()
-                            .spawnParticle(
-                                NetworksVersionedParticle.EXPLOSION,
-                                loc.clone().add(x, y, z),
-                                0);
-                    }
-                }
-            }
-        }
         this.isOverburdened = overburdened;
     }
 
     // for display needs, don't operate items based on the return value!
     @NotNull
     public Map<ItemStack, Long> getAllNetworkItemsLongTypeView() {
-        if (allItemsView != null) {
-            return allItemsView;
-        }
-        allItemsView = getAllNetworkItemsLongType();
-        return allItemsView;
+        return getAllNetworkItemsLongType();
+    }
+
+    /**
+     * 返回网络全量物品的聚合快照。快照按网络静态共享：
+     * 同刻内——仅显式失效（{@link #refreshRootItems()} / {@link #markDirty()}）重建，
+     * 普通物品写沿用既有"至多 1 刻延迟"契约；
+     * 跨刻——期间无任何写（写纪元不变）且距发布不超过 500ms 时直接复用（空闲网络零重扫），
+     * 否则重建。绕过 root 的直改存储（GUI 手改、区块加载、结构变更）由时间上限兜底。
+     * <p>
+     * 注意：返回的是<b>共享缓存实例</b>，调用方不得修改（含 entrySet/keySet 视图）；
+     * 需要独立副本请自行 clone。
+     */
+    @NotNull
+    public Map<ItemStack, Long> getAllNetworkItemsLongType() {
+        return obtainItemSnapshot().items();
+    }
+
+    /**
+     * 聚合物品的 keyed 只读视图（{@link ItemKey} 精确身份，amount 归一为 1 的模板）：
+     * 与 {@link #getAllNetworkItemsLongType()} 同一份快照、同一套失效校验，
+     * 键的哈希在聚合时已算好——查询零重复深度哈希。返回共享实例，不得修改。
+     */
+    @NotNull
+    public Map<ItemKey, Long> getAllNetworkItemsKeyedView() {
+        return obtainItemSnapshot().keyed();
     }
 
     @NotNull
-    public Map<ItemStack, Long> getAllNetworkItemsLongType() {
-        final Map<ItemStack, Long> itemStacks = new HashMap<>();
+    private ItemSnapshot obtainItemSnapshot() {
+        final Location networkId = this.nodePosition;
+        // 读取顺序：先快照、后纪元——若两步之间发生失效递增，会判定不命中而重扫（fail-safe）
+        final ItemSnapshot snapshot = SHARED_ITEM_SNAPSHOTS.get(networkId);
+        final long invalidationEpoch = currentInvalidationEpoch(networkId);
+        final long writeEpoch = currentWriteEpoch(networkId);
+        final int currentTick = Bukkit.getCurrentTick();
+        if (snapshot != null) {
+            if (snapshot.tick == currentTick) {
+                if (snapshot.invalidationEpoch == invalidationEpoch) {
+                    return snapshot;
+                }
+            } else if (snapshot.invalidationEpoch == invalidationEpoch
+                && snapshot.writeEpoch == writeEpoch
+                && System.currentTimeMillis() - snapshot.publishedAtMs <= SNAPSHOT_MAX_AGE_MS) {
+                return snapshot;
+            }
+        }
+
+        final ItemHashMap<Long> itemStacks = new ItemHashMap<>();
 
         // Barrels
         for (BarrelIdentity barrelIdentity : getOutputAbleBarrels()) {
-            addAmount(itemStacks, barrelIdentity.getItemStack(), barrelIdentity.getAmount());
+            addKeyedAmount(itemStacks, barrelIdentity.getItemStack(), barrelIdentity.getAmount());
         }
 
         // Cargo storage units
         Map<StorageUnitData, Location> cacheMap = getOutputAbleCargoStorageUnitDatas();
         for (StorageUnitData cache : cacheMap.keySet()) {
             for (ItemContainer itemContainer : cache.getStoredItems()) {
-                addAmount(itemStacks, itemContainer.getSample(), itemContainer.getAmount());
+                addKeyedAmount(itemStacks, itemContainer.getSample(), itemContainer.getAmount());
             }
         }
 
@@ -582,8 +724,8 @@ public class NetworkRoot extends NetworkNode {
             int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
             for (int slot : slots) {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
-                final ItemStack clone = StackUtils.getAsQuantity(itemStack == null || itemStack.getType() == Material.AIR ? template : itemStack, 1);
-                addAmount(itemStacks, clone, itemStack);
+                final ItemStack identity = itemStack == null || itemStack.getType() == Material.AIR ? template : itemStack;
+                addKeyedAmount(itemStacks, identity, itemStack);
             }
         }
 
@@ -592,8 +734,8 @@ public class NetworkRoot extends NetworkNode {
             if (template == null || template.getType() == Material.AIR) continue;
             int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
             final ItemStack itemStack = blockMenu.getItemInSlot(slots[0]);
-            final ItemStack clone = StackUtils.getAsQuantity(itemStack == null || itemStack.getType() == Material.AIR ? template : itemStack, 1);
-            addAmount(itemStacks, clone, itemStack);
+            final ItemStack identity = itemStack == null || itemStack.getType() == Material.AIR ? template : itemStack;
+            addKeyedAmount(itemStacks, identity, itemStack);
         }
 
         for (BlockMenu blockMenu : getCrafterOutputs()) {
@@ -601,8 +743,7 @@ public class NetworkRoot extends NetworkNode {
             for (int slot : slots) {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack != null && itemStack.getType() != Material.AIR) {
-                    final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
-                    addAmount(itemStacks, clone, itemStack);
+                    addKeyedAmount(itemStacks, itemStack, itemStack);
                 }
             }
         }
@@ -612,22 +753,55 @@ public class NetworkRoot extends NetworkNode {
             for (int slot : CELL_AVAILABLE_SLOTS) {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack != null && itemStack.getType() != Material.AIR) {
-                    final ItemStack clone = StackUtils.getAsQuantity(itemStack, 1);
-                    addAmount(itemStacks, clone, itemStack);
+                    addKeyedAmount(itemStacks, itemStack, itemStack);
                 }
             }
         }
 
-        // AE Drives
-        Map<ItemStack, Long> aeItems = AEDrive.getStorage().getAllCellItems(aeNetworkCache, getOutputAbleAEDriveMenus());
-        for (Map.Entry<ItemStack, Long> entry : aeItems.entrySet()) {
-            ItemStack clone = entry.getKey().clone();
-            clone.setAmount(1);
-            addAmount(itemStacks, clone, entry.getValue());
+        // Cell Drives：直取 keyed 视图，零身份构造合并
+        ItemHashMap<Long> cellItems = CellDrive.getStorage().getAllCellItemsKeyed(driveCache, getOutputAbleCellDriveMenus());
+        for (Map.Entry<ItemKey, Long> entry : cellItems.keyEntrySet()) {
+            ItemKey key = entry.getKey();
+            Long current = itemStacks.getKey(key);
+            itemStacks.putKey(key, (current == null ? 0L : current) + entry.getValue());
         }
 
-        allItemsView = itemStacks;
-        return itemStacks;
+        // 发布快照：用读取开始前捕获的纪元打戳——扫描中途发生的失效递增会让本快照立即过期重扫；
+        // ItemStack 出口视图惰性构建（见 ItemSnapshot.items）
+        ItemSnapshot published = new ItemSnapshot(
+            itemStacks.keyedView(), invalidationEpoch, writeEpoch, currentTick, System.currentTimeMillis());
+        SHARED_ITEM_SNAPSHOTS.put(networkId, published);
+        evictStaleSnapshotNetworks();
+        return published;
+    }
+
+    /** 内部聚合：以精确身份（保留全部 meta，仅数量归一）为键累计数量，每条目一次深度哈希。 */
+    private static void addKeyedAmount(@NotNull ItemHashMap<Long> all, @Nullable ItemStack key, long amount) {
+        if (key == null || key.getType() == Material.AIR) return;
+        ItemKey itemKey = ItemKey.exact(key);
+        Long current = all.getKey(itemKey);
+        all.putKey(itemKey, (current == null ? 0L : current) + amount);
+    }
+
+    private static void addKeyedAmount(@NotNull ItemHashMap<Long> all, @Nullable ItemStack key, @Nullable ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return;
+        addKeyedAmount(all, key, item.getAmount());
+    }
+
+    /** 清理长期无发布的网络快照与纪元条目，防止网络拆除后残留。 */
+    private static void evictStaleSnapshotNetworks() {
+        if (SHARED_ITEM_SNAPSHOTS.size() <= 1) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        SHARED_ITEM_SNAPSHOTS.entrySet().removeIf(entry -> {
+            if (now - entry.getValue().publishedAtMs() > SNAPSHOT_IDLE_MS) {
+                INVALIDATION_EPOCHS.remove(entry.getKey());
+                WRITE_EPOCHS.remove(entry.getKey());
+                return true;
+            }
+            return false;
+        });
     }
 
     // fallback api, don't remove
@@ -753,6 +927,9 @@ public class NetworkRoot extends NetworkNode {
 
     @NotNull
     public Set<BlockMenu> getCellMenus() {
+        if (this.cellMenus != null) {
+            return this.cellMenus;
+        }
         final Set<BlockMenu> menus = new HashSet<>();
         for (Location cellLocation : this.cells) {
             BlockMenu menu = StorageCacheUtils.getMenu(cellLocation);
@@ -760,48 +937,54 @@ public class NetworkRoot extends NetworkNode {
                 menus.add(menu);
             }
         }
+        this.cellMenus = menus;
         return menus;
     }
 
     @NotNull
-    public Set<BlockMenu> getAEDriveMenus() {
-        if (this.aeDriveMenus != null) {
-            return this.aeDriveMenus;
+    public Set<BlockMenu> getCellDriveMenus() {
+        if (this.cellDriveMenus != null) {
+            return this.cellDriveMenus;
         }
         final Set<Location> monitor = new HashSet<>();
         monitor.addAll(this.inputOnlyMonitors);
         monitor.addAll(this.outputOnlyMonitors);
         monitor.addAll(this.monitors);
-        this.aeDriveMenus = collectAEDriveMenus(monitor);
-        return this.aeDriveMenus;
+        this.cellDriveMenus = collectCellDriveMenus(monitor);
+        return this.cellDriveMenus;
     }
 
     @NotNull
-    public Set<BlockMenu> getInputAbleAEDriveMenus() {
-        if (this.inputAbleAEDriveMenus != null) {
-            return this.inputAbleAEDriveMenus;
+    public Set<BlockMenu> getInputAbleCellDriveMenus() {
+        if (this.inputAbleCellDriveMenus != null) {
+            return this.inputAbleCellDriveMenus;
         }
         final Set<Location> monitor = new HashSet<>();
         monitor.addAll(this.inputOnlyMonitors);
         monitor.addAll(this.monitors);
-        this.inputAbleAEDriveMenus = collectAEDriveMenus(monitor);
-        return this.inputAbleAEDriveMenus;
+        this.inputAbleCellDriveMenus = collectCellDriveMenus(monitor);
+        return this.inputAbleCellDriveMenus;
     }
 
     @NotNull
-    public Set<BlockMenu> getOutputAbleAEDriveMenus() {
-        if (this.outputAbleAEDriveMenus != null) {
-            return this.outputAbleAEDriveMenus;
+    public Set<BlockMenu> getOutputAbleCellDriveMenus() {
+        if (this.outputAbleCellDriveMenus != null) {
+            return this.outputAbleCellDriveMenus;
         }
         final Set<Location> monitor = new HashSet<>();
         monitor.addAll(this.outputOnlyMonitors);
         monitor.addAll(this.monitors);
-        this.outputAbleAEDriveMenus = collectAEDriveMenus(monitor);
-        return this.outputAbleAEDriveMenus;
+        this.outputAbleCellDriveMenus = collectCellDriveMenus(monitor);
+        return this.outputAbleCellDriveMenus;
     }
 
     @NotNull
-    private Set<BlockMenu> collectAEDriveMenus(@NotNull Set<Location> monitors) {
+    public DriveCache getDriveCache() {
+        return this.driveCache;
+    }
+
+    @NotNull
+    private Set<BlockMenu> collectCellDriveMenus(@NotNull Set<Location> monitors) {
         final Set<BlockMenu> menus = new HashSet<>();
         final Set<Location> addedLocations = ConcurrentHashMap.newKeySet();
         for (Location monitorLocation : monitors) {
@@ -815,7 +998,7 @@ public class NetworkRoot extends NetworkNode {
             }
             addedLocations.add(testLocation);
             final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(testLocation);
-            if (slimefunItem instanceof AEDrive) {
+            if (slimefunItem instanceof CellDrive) {
                 BlockMenu menu = StorageCacheUtils.getMenu(testLocation);
                 if (menu != null) {
                     menus.add(menu);
@@ -839,6 +1022,9 @@ public class NetworkRoot extends NetworkNode {
 
     @NotNull
     public Set<BlockMenu> getGreedyBlockMenus() {
+        if (this.greedyBlockMenus != null) {
+            return this.greedyBlockMenus;
+        }
         final Set<BlockMenu> menus = new HashSet<>();
         for (Location location : this.greedyBlocks) {
             BlockMenu menu = StorageCacheUtils.getMenu(location);
@@ -846,11 +1032,15 @@ public class NetworkRoot extends NetworkNode {
                 menus.add(menu);
             }
         }
+        this.greedyBlockMenus = menus;
         return menus;
     }
 
     @NotNull
     public Set<BlockMenu> getAdvancedGreedyBlockMenus() {
+        if (this.advancedGreedyBlockMenus != null) {
+            return this.advancedGreedyBlockMenus;
+        }
         final Set<BlockMenu> menus = new HashSet<>();
         for (Location location : this.advancedGreedyBlocks) {
             BlockMenu menu = StorageCacheUtils.getMenu(location);
@@ -858,6 +1048,7 @@ public class NetworkRoot extends NetworkNode {
                 menus.add(menu);
             }
         }
+        this.advancedGreedyBlockMenus = menus;
         return menus;
     }
 
@@ -1189,8 +1380,8 @@ public class NetworkRoot extends NetworkNode {
             }
         }
 
-        // AE Drives
-        found += AEDrive.getStorage().getAmount(aeNetworkCache, getOutputAbleAEDriveMenus(), request.getItemStack());
+        // Cell Drives
+        found += CellDrive.getStorage().getAmount(driveCache, getOutputAbleCellDriveMenus(), request.getItemStack());
 
         if (found >= request.getAmount()) {
             return true;
@@ -1247,8 +1438,8 @@ public class NetworkRoot extends NetworkNode {
             }
         }
 
-        // AE Drives
-        totalAmount += AEDrive.getStorage().getAmount(aeNetworkCache, getOutputAbleAEDriveMenus(), itemStack);
+        // Cell Drives
+        totalAmount += CellDrive.getStorage().getAmount(driveCache, getOutputAbleCellDriveMenus(), itemStack);
 
         if (totalAmount > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
@@ -1326,11 +1517,11 @@ public class NetworkRoot extends NetworkNode {
             }
         }
 
-        // AE Drives
+        // Cell Drives
         for (ItemStack itemStack : itemStacks) {
-            long aeAmount = AEDrive.getStorage().getAmount(aeNetworkCache, getOutputAbleAEDriveMenus(), itemStack);
-            if (aeAmount > 0) {
-                totalAmounts.put(itemStack, totalAmounts.getOrDefault(itemStack, 0L) + aeAmount);
+            long cellAmount = CellDrive.getStorage().getAmount(driveCache, getOutputAbleCellDriveMenus(), itemStack);
+            if (cellAmount > 0) {
+                totalAmounts.put(itemStack, totalAmounts.getOrDefault(itemStack, 0L) + cellAmount);
             }
         }
 
@@ -1830,15 +2021,19 @@ public class NetworkRoot extends NetworkNode {
     }
 
     public boolean refreshRootItems() {
+        bumpInvalidationEpoch();
         this.barrels = null;
         this.cargoStorageUnitDatas = null;
         this.inputAbleBarrels = null;
         this.outputAbleBarrels = null;
         this.inputAbleCargoStorageUnitDatas = null;
         this.outputAbleCargoStorageUnitDatas = null;
-        this.aeDriveMenus = null;
-        this.inputAbleAEDriveMenus = null;
-        this.outputAbleAEDriveMenus = null;
+        this.cellDriveMenus = null;
+        this.inputAbleCellDriveMenus = null;
+        this.outputAbleCellDriveMenus = null;
+        this.greedyBlockMenus = null;
+        this.advancedGreedyBlockMenus = null;
+        this.cellMenus = null;
 
         getBarrels();
         getCargoStorageUnitDatas();
@@ -1903,10 +2098,7 @@ public class NetworkRoot extends NetworkNode {
             return null;
         }
 
-        if (!allowAccessOutput(accessor)) {
-            FeedbackSendable.sendFeedback0(accessor, FeedbackType.ROOT_LIMITING_ACCESS_OUTPUT);
-            return null;
-        }
+        bumpWriteEpoch();
 
         Map<Location, Integer> m = getPersistentAccessHistory(accessor);
         if (m != null) {
@@ -1951,7 +2143,6 @@ public class NetworkRoot extends NetworkNode {
 
                     if (request.getAmount() <= preserveAmount) {
                         // Netex - Reduce start
-                        uncontrolAccessOutput(accessor);
                         // Netex - Reduce end
                         stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
                         fetched.setAmount(fetched.getAmount() - request.getAmount());
@@ -1985,7 +2176,6 @@ public class NetworkRoot extends NetworkNode {
 
                             if (request.getAmount() <= 0) {
                                 // Netex - Reduce start
-                                uncontrolAccessOutput(accessor);
                                 // Netex - Reduce end
                                 // Netex - Record start
                                 tryRecord(accessor, request);
@@ -2044,7 +2234,6 @@ public class NetworkRoot extends NetworkNode {
 
             if (request.getAmount() <= preserveAmount) {
                 // Netex - Reduce start
-                uncontrolAccessOutput(accessor);
                 // Netex - Reduce end
                 stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
                 fetched.setAmount(fetched.getAmount() - request.getAmount());
@@ -2077,7 +2266,6 @@ public class NetworkRoot extends NetworkNode {
 
                 if (request.getAmount() <= 0) {
                     // Netex - Reduce start
-                    uncontrolAccessOutput(accessor);
                     // Netex - Reduce end
                     // Netex - Record start
                     tryRecord(accessor, request);
@@ -2088,8 +2276,8 @@ public class NetworkRoot extends NetworkNode {
             // </editor-fold>
         }
 
-        // AE Drives
-        ItemStack take = AEDrive.getStorage().takeItem(aeNetworkCache, getOutputAbleAEDriveMenus(), request);
+        // Cell Drives
+        ItemStack take = CellDrive.getStorage().takeItem(driveCache, getOutputAbleCellDriveMenus(), request);
         if (take != null) {
             if (stackToReturn == null) {
                 stackToReturn = take.clone();
@@ -2099,7 +2287,6 @@ public class NetworkRoot extends NetworkNode {
             request.receiveAmount(take.getAmount());
 
             if (request.getAmount() <= 0) {
-                uncontrolAccessOutput(accessor);
                 tryRecord(accessor, request);
                 return stackToReturn;
             }
@@ -2127,7 +2314,6 @@ public class NetworkRoot extends NetworkNode {
 
                 if (request.getAmount() <= itemStack.getAmount()) {
                     // Netex - Reduce start
-                    uncontrolAccessOutput(accessor);
                     // Netex - Reduce end
                     // We can't take more than this stack. Level to request amount, remove items and then return
                     stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
@@ -2164,7 +2350,6 @@ public class NetworkRoot extends NetworkNode {
 
                 if (request.getAmount() <= itemStack.getAmount()) {
                     // Netex - Reduce start
-                    uncontrolAccessOutput(accessor);
                     // Netex - Reduce end
                     stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
                     itemStack.setAmount(itemStack.getAmount() - request.getAmount());
@@ -2198,7 +2383,6 @@ public class NetworkRoot extends NetworkNode {
 
                 if (request.getAmount() <= itemStack.getAmount()) {
                     // Netex - Reduce start
-                    uncontrolAccessOutput(accessor);
                     // Netex - Reduce end
                     stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
                     itemStack.setAmount(itemStack.getAmount() - request.getAmount());
@@ -2235,7 +2419,6 @@ public class NetworkRoot extends NetworkNode {
 
             if (request.getAmount() <= itemStack.getAmount()) {
                 // Netex - Reduce start
-                uncontrolAccessOutput(accessor);
                 // Netex - Reduce end
                 // We can't take more than this stack. Level to request amount, remove items and then return
                 stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
@@ -2253,18 +2436,470 @@ public class NetworkRoot extends NetworkNode {
         }
 
         if (stackToReturn == null || stackToReturn.getAmount() == 0) {
-            addTransportOutputMiss(accessor);
             return null;
         }
 
         // Netex - Reduce start
-        uncontrolAccessOutput(accessor);
         // Netex - Reduce end
         // Netex - Record start
         tryRecord(accessor, request);
         // Netex - Record end
 
         return stackToReturn;
+    }
+
+    /**
+     * 批量取料：一次网络走查服务多个请求，走查家族顺序与 {@link #getItemStack0(Location, ItemRequest)} 完全一致
+     * （访问历史优先 → 桶 → 抽屉 → 元件驱动器 → 细胞 → 合成器 → 高级贪心 → 贪心），
+     * 唯一区别是每到访一个存储节点会尝试满足所有未完成请求，全部满足后立即结束走查。
+     * <p>
+     * 契约：消费各请求（{@link ItemRequest#receiveAmount(int)} 递减至 0）；返回列表与入参按位对齐，
+     * 未取到任何物品的请求对应位为 null；相同身份的重复请求不去重、按序逐条尝试；
+     * 访问历史命中/衰减与 transport-miss 簿记按请求各自对齐。
+     * 与逐请求调用 getItemStack0 的行为差异：各请求在存储节点间的消耗顺序不同（各请求取到总量不变）、
+     * recordFlow 记录顺序不同、access-limit 反馈整批至多一条。
+     */
+    @NotNull
+    public List<ItemStack> getItemStacksBatch0(@NotNull Location accessor, @NotNull List<ItemRequest> requests) {
+        final List<ItemStack> results = new ArrayList<>(requests.size());
+        final List<BatchTake> pending = new ArrayList<>(requests.size());
+        for (int i = 0; i < requests.size(); i++) {
+            results.add(null);
+            final ItemRequest request = requests.get(i);
+            if (request == null) {
+                continue;
+            }
+            if (request.getAmount() <= 0) {
+                FeedbackSendable.sendFeedback0(accessor, FeedbackType.ROOT_REQUEST_0);
+                continue;
+            }
+            pending.add(new BatchTake(request, i));
+        }
+        if (pending.isEmpty()) {
+            return results;
+        }
+
+        bumpWriteEpoch();
+
+        Map<Location, Integer> m = getPersistentAccessHistory(accessor);
+        if (m != null) {
+            for (Map.Entry<Location, Integer> entry : m.entrySet()) {
+                final Location historyLocation = entry.getKey();
+                final BarrelIdentity barrelIdentity = accessOutputAbleBarrel(historyLocation);
+                if (barrelIdentity != null) {
+                    final ItemStack barrelItem = barrelIdentity.getItemStack();
+                    if (barrelItem == null) {
+                        for (BatchTake take : pending) {
+                            take.historyMisses.add(historyLocation);
+                        }
+                        continue;
+                    }
+                    final boolean infinity = barrelIdentity instanceof InfinityBarrel;
+                    for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                        final BatchTake take = iterator.next();
+                        final ItemRequest request = take.request;
+                        if (!StackUtils.itemsMatch(request, barrelItem)) {
+                            take.historyMisses.add(historyLocation);
+                            continue;
+                        }
+
+                        // Netex - Cache start
+                        minusCacheMiss(accessor, historyLocation);
+                        take.historyFound = true;
+                        // Netex - Cache end
+
+                        final ItemStack fetched = barrelIdentity.requestItem(request);
+                        if (fetched == null
+                            || fetched.getType() == Material.AIR
+                            || (infinity && fetched.getAmount() == 1)) {
+                            continue;
+                        }
+
+                        if (take.collected == null) {
+                            take.collected = fetched.clone();
+                            take.collected.setAmount(0);
+                        }
+
+                        final int preserveAmount = infinity ? fetched.getAmount() - 1 : fetched.getAmount();
+                        if (request.getAmount() <= preserveAmount) {
+                            // Netex - Reduce start
+                            // Netex - Reduce end
+                            take.collected.setAmount(take.collected.getAmount() + request.getAmount());
+                            fetched.setAmount(fetched.getAmount() - request.getAmount());
+                            // Netex - Record start
+                            tryRecord(accessor, request);
+                            // Netex - Record end
+                            results.set(take.index, take.collected);
+                            iterator.remove();
+                        } else {
+                            take.collected.setAmount(take.collected.getAmount() + preserveAmount);
+                            request.receiveAmount(preserveAmount);
+                            fetched.setAmount(fetched.getAmount() - preserveAmount);
+                        }
+                    }
+                } else {
+                    StorageUnitData data = accessOutputAbleCargoStorageUnitData(historyLocation);
+                    if (data != null) {
+                        for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                            final BatchTake take = iterator.next();
+                            final ItemStack takeStack = data.requestItem0(accessor, take.request);
+                            if (takeStack != null) {
+                                // Netex - Cache start
+                                minusCacheMiss(accessor, historyLocation);
+                                take.historyFound = true;
+                                // Netex - Cache end
+
+                                if (take.collected == null) {
+                                    take.collected = takeStack.clone();
+                                } else {
+                                    take.collected.setAmount(take.collected.getAmount() + takeStack.getAmount());
+                                }
+                                take.request.receiveAmount(takeStack.getAmount());
+
+                                if (take.request.getAmount() <= 0) {
+                                    // Netex - Reduce start
+                                    // Netex - Reduce end
+                                    // Netex - Record start
+                                    tryRecord(accessor, take.request);
+                                    // Netex - Record end
+                                    results.set(take.index, take.collected);
+                                    iterator.remove();
+                                }
+                            } else {
+                                // Netex - Cache start
+                                take.historyMisses.add(historyLocation);
+                                // Netex - Cache end
+                            }
+                        }
+                    } else {
+                        for (BatchTake take : pending) {
+                            take.historyMisses.add(historyLocation);
+                        }
+                    }
+                }
+                if (pending.isEmpty()) {
+                    break;
+                }
+            }
+
+            // Netex - Cache start
+            for (BatchTake take : pending) {
+                if (!take.historyFound) {
+                    for (Location miss : take.historyMisses) {
+                        minusCacheMiss(accessor, miss);
+                    }
+                }
+            }
+            // Netex - Cache end
+        }
+        if (pending.isEmpty()) {
+            return results;
+        }
+
+        // Barrels first
+        for (BarrelIdentity barrelIdentity : getOutputAbleBarrels()) {
+            final ItemStack barrelItem = barrelIdentity.getItemStack();
+            if (barrelItem == null) {
+                continue;
+            }
+            final boolean infinity = barrelIdentity instanceof InfinityBarrel;
+            for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                final BatchTake take = iterator.next();
+                final ItemRequest request = take.request;
+                if (!StackUtils.itemsMatch(request, barrelItem)) {
+                    continue;
+                }
+
+                // Netex - Cache start
+                addCountObservingAccessHistory(accessor, barrelIdentity.getLocation());
+                // Netex - Cache end
+
+                final ItemStack fetched = barrelIdentity.requestItem(request);
+                if (fetched == null || fetched.getType() == Material.AIR || (infinity && fetched.getAmount() == 1)) {
+                    continue;
+                }
+
+                if (take.collected == null) {
+                    take.collected = fetched.clone();
+                    take.collected.setAmount(0);
+                }
+
+                final int preserveAmount = infinity ? fetched.getAmount() - 1 : fetched.getAmount();
+                if (request.getAmount() <= preserveAmount) {
+                    // Netex - Reduce start
+                    // Netex - Reduce end
+                    take.collected.setAmount(take.collected.getAmount() + request.getAmount());
+                    fetched.setAmount(fetched.getAmount() - request.getAmount());
+                    // Netex - Record start
+                    tryRecord(accessor, request);
+                    // Netex - Record end
+                    results.set(take.index, take.collected);
+                    iterator.remove();
+                } else {
+                    take.collected.setAmount(take.collected.getAmount() + preserveAmount);
+                    request.receiveAmount(preserveAmount);
+                    fetched.setAmount(fetched.getAmount() - preserveAmount);
+                }
+            }
+            if (pending.isEmpty()) {
+                return results;
+            }
+        }
+
+        // Units
+        for (StorageUnitData cache : getOutputAbleCargoStorageUnitDatas().keySet()) {
+            for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                final BatchTake take = iterator.next();
+                final ItemStack takeStack = cache.requestItem0(accessor, take.request);
+                if (takeStack != null) {
+                    // Netex - Cache start
+                    addCountObservingAccessHistory(accessor, cache.getLastLocation());
+                    // Netex - Cache end
+                    if (take.collected == null) {
+                        take.collected = takeStack.clone();
+                    } else {
+                        take.collected.setAmount(take.collected.getAmount() + takeStack.getAmount());
+                    }
+                    take.request.receiveAmount(takeStack.getAmount());
+
+                    if (take.request.getAmount() <= 0) {
+                        // Netex - Reduce start
+                        // Netex - Reduce end
+                        // Netex - Record start
+                        tryRecord(accessor, take.request);
+                        // Netex - Record end
+                        results.set(take.index, take.collected);
+                        iterator.remove();
+                    }
+                }
+            }
+            if (pending.isEmpty()) {
+                return results;
+            }
+        }
+
+        // Cell Drives
+        for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+            final BatchTake take = iterator.next();
+            final ItemStack takeStack =
+                CellDrive.getStorage().takeItem(driveCache, getOutputAbleCellDriveMenus(), take.request);
+            if (takeStack != null) {
+                if (take.collected == null) {
+                    take.collected = takeStack.clone();
+                } else {
+                    take.collected.setAmount(take.collected.getAmount() + takeStack.getAmount());
+                }
+                take.request.receiveAmount(takeStack.getAmount());
+
+                if (take.request.getAmount() <= 0) {
+                    tryRecord(accessor, take.request);
+                    results.set(take.index, take.collected);
+                    iterator.remove();
+                }
+            }
+        }
+        if (pending.isEmpty()) {
+            return results;
+        }
+
+        // Cells
+        for (BlockMenu blockMenu : getCellMenus()) {
+            if (!isRealCell(blockMenu)) continue;
+            for (int slot : CELL_AVAILABLE_SLOTS) {
+                final ItemStack itemStack = blockMenu.getItemInSlot(slot);
+                if (itemStack == null || itemStack.getType() == Material.AIR) {
+                    continue;
+                }
+                for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                    final BatchTake take = iterator.next();
+                    if (!StackUtils.itemsMatch(take.request, itemStack)) {
+                        continue;
+                    }
+
+                    // Mark the Cell as dirty otherwise the changes will not save on shutdown
+                    blockMenu.markDirty();
+
+                    // If the return stack is null, we need to set it up
+                    if (take.collected == null) {
+                        take.collected = itemStack.clone();
+                        take.collected.setAmount(0);
+                    }
+
+                    if (take.request.getAmount() <= itemStack.getAmount()) {
+                        // Netex - Reduce start
+                        // Netex - Reduce end
+                        // We can't take more than this stack. Level to request amount, remove items and then return
+                        take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
+                        itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                        // Netex - Record start
+                        tryRecord(accessor, take.request);
+                        // Netex - Record end
+                        results.set(take.index, take.collected);
+                        iterator.remove();
+                    } else {
+                        // We can take more than what is here, consume before trying to take more
+                        take.collected.setAmount(take.collected.getAmount() + itemStack.getAmount());
+                        take.request.receiveAmount(itemStack.getAmount());
+                        itemStack.setAmount(0);
+                    }
+                }
+            }
+            if (pending.isEmpty()) {
+                return results;
+            }
+        }
+
+        // Crafters
+        for (BlockMenu blockMenu : getCrafterOutputs()) {
+            int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
+            for (int slot : slots) {
+                final ItemStack itemStack = blockMenu.getItemInSlot(slot);
+                if (itemStack == null || itemStack.getType() == Material.AIR) {
+                    continue;
+                }
+                for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                    final BatchTake take = iterator.next();
+                    if (!StackUtils.itemsMatch(take.request, itemStack)) {
+                        continue;
+                    }
+
+                    if (take.collected == null) {
+                        take.collected = itemStack.clone();
+                        take.collected.setAmount(0);
+                    }
+
+                    if (take.request.getAmount() <= itemStack.getAmount()) {
+                        // Netex - Reduce start
+                        // Netex - Reduce end
+                        take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
+                        itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                        // Netex - Record start
+                        tryRecord(accessor, take.request);
+                        // Netex - Record end
+                        results.set(take.index, take.collected);
+                        iterator.remove();
+                    } else {
+                        take.collected.setAmount(take.collected.getAmount() + itemStack.getAmount());
+                        take.request.receiveAmount(itemStack.getAmount());
+                        itemStack.setAmount(0);
+                    }
+                }
+            }
+            if (pending.isEmpty()) {
+                return results;
+            }
+        }
+
+        for (BlockMenu blockMenu : getAdvancedGreedyBlockMenus()) {
+            int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
+            for (int slot : slots) {
+                final ItemStack itemStack = blockMenu.getItemInSlot(slot);
+                if (itemStack == null || itemStack.getType() == Material.AIR) {
+                    continue;
+                }
+                for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                    final BatchTake take = iterator.next();
+                    if (!StackUtils.itemsMatch(take.request, itemStack)) {
+                        continue;
+                    }
+
+                    if (take.collected == null) {
+                        take.collected = itemStack.clone();
+                        take.collected.setAmount(0);
+                    }
+
+                    if (take.request.getAmount() <= itemStack.getAmount()) {
+                        // Netex - Reduce start
+                        // Netex - Reduce end
+                        take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
+                        itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                        // Netex - Record start
+                        tryRecord(accessor, take.request);
+                        // Netex - Record end
+                        results.set(take.index, take.collected);
+                        iterator.remove();
+                    } else {
+                        take.collected.setAmount(take.collected.getAmount() + itemStack.getAmount());
+                        take.request.receiveAmount(itemStack.getAmount());
+                        itemStack.setAmount(0);
+                    }
+                }
+            }
+            if (pending.isEmpty()) {
+                return results;
+            }
+        }
+
+        // Greedy Blocks
+        for (BlockMenu blockMenu : getGreedyBlockMenus()) {
+            int[] slots = blockMenu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.WITHDRAW);
+            final ItemStack itemStack = blockMenu.getItemInSlot(slots[0]);
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                continue;
+            }
+            for (Iterator<BatchTake> iterator = pending.iterator(); iterator.hasNext(); ) {
+                final BatchTake take = iterator.next();
+                if (!StackUtils.itemsMatch(take.request, itemStack)) {
+                    continue;
+                }
+
+                // Mark the Cell as dirty otherwise the changes will not save on shutdown
+                blockMenu.markDirty();
+
+                // If the return stack is null, we need to set it up
+                if (take.collected == null) {
+                    take.collected = itemStack.clone();
+                    take.collected.setAmount(0);
+                }
+
+                if (take.request.getAmount() <= itemStack.getAmount()) {
+                    // Netex - Reduce start
+                    // Netex - Reduce end
+                    // We can't take more than this stack. Level to request amount, remove items and then return
+                    take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
+                    itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                    // Netex - Record start
+                    tryRecord(accessor, take.request);
+                    // Netex - Record end
+                    results.set(take.index, take.collected);
+                    iterator.remove();
+                } else {
+                    // We can take more than what is here, consume before trying to take more
+                    take.collected.setAmount(take.collected.getAmount() + itemStack.getAmount());
+                    take.request.receiveAmount(itemStack.getAmount());
+                    itemStack.setAmount(0);
+                }
+            }
+        }
+
+        for (BatchTake take : pending) {
+            if (take.collected == null || take.collected.getAmount() == 0) {
+            } else {
+                // Netex - Reduce start
+                // Netex - Reduce end
+                // Netex - Record start
+                tryRecord(accessor, take.request);
+                // Netex - Record end
+                results.set(take.index, take.collected);
+            }
+        }
+
+        return results;
+    }
+
+    /** getItemStacksBatch0 的单请求运行态：入参索引对齐、聚合结果与访问历史段簿记。 */
+    private static final class BatchTake {
+        private final ItemRequest request;
+        private final int index;
+        @Nullable
+        private ItemStack collected;
+        private boolean historyFound;
+        private final List<Location> historyMisses = new ArrayList<>();
+
+        private BatchTake(@NotNull ItemRequest request, int index) {
+            this.request = request;
+            this.index = index;
+        }
     }
 
     public void addItem(@NotNull Location accessor, @NotNull ItemStack incoming) {
@@ -2278,14 +2913,11 @@ public class NetworkRoot extends NetworkNode {
     }
 
     public void addItemStack0(@NotNull Location accessor, @NotNull ItemStack incoming) {
-        if (!allowAccessInput(accessor)) {
-            FeedbackSendable.sendFeedback0(accessor, FeedbackType.ROOT_LIMITING_ACCESS_INPUT);
-            return;
-        }
-
         if (StackUtils.isBlacklisted(incoming)) {
             return;
         }
+
+        bumpWriteEpoch();
 
         ItemStack beforeItemStack = null;
         if (recordFlow && itemFlowRecord != null) {
@@ -2315,7 +2947,6 @@ public class NetworkRoot extends NetworkNode {
                         // All distributed, can escape
                         if (incoming.getAmount() == 0) {
                             // Netex - Reduce start
-                            uncontrolAccessInput(accessor);
                             // Netex - Reduce end
                             // Netex - Record start
                             tryRecord(accessor, beforeItemStack, 0);
@@ -2347,7 +2978,6 @@ public class NetworkRoot extends NetworkNode {
 
                         if (incoming.getAmount() == 0) {
                             // Netex - Reduce start
-                            uncontrolAccessInput(accessor);
                             // Netex - Reduce end
                             // Netex - Record start
                             tryRecord(accessor, beforeItemStack, 0);
@@ -2377,7 +3007,6 @@ public class NetworkRoot extends NetworkNode {
             blockMenu.markDirty();
             BlockMenuUtil.pushItem(blockMenu, incoming, ADVANCED_GREEDY_BLOCK_AVAILABLE_SLOTS);
             // Netex - Reduce start
-            uncontrolAccessInput(accessor);
             // Netex - Reduce end
             // Netex - Record start
             tryRecord(accessor, beforeItemStack, incoming.getAmount());
@@ -2397,7 +3026,6 @@ public class NetworkRoot extends NetworkNode {
             blockMenu.markDirty();
             BlockMenuUtil.pushItem(blockMenu, incoming, GREEDY_BLOCK_AVAILABLE_SLOTS[0]);
             // Netex - Reduce start
-            uncontrolAccessInput(accessor);
             // Netex - Reduce end
             // Netex - Record start
             tryRecord(accessor, beforeItemStack, incoming.getAmount());
@@ -2419,7 +3047,6 @@ public class NetworkRoot extends NetworkNode {
                 // All distributed, can escape
                 if (incoming.getAmount() == 0) {
                     // Netex - Reduce start
-                    uncontrolAccessInput(accessor);
                     // Netex - Reduce end
                     // Netex - Record start
                     tryRecord(accessor, beforeItemStack, 0);
@@ -2440,7 +3067,6 @@ public class NetworkRoot extends NetworkNode {
             // Netex - Cache start
             if (incoming.getAmount() != before2) {
                 // Netex - Reduce start
-                uncontrolAccessInput(accessor);
                 // Netex - Reduce end
                 addCountObservingAccessHistory(accessor, cache.getLastLocation());
             }
@@ -2448,7 +3074,6 @@ public class NetworkRoot extends NetworkNode {
 
             if (incoming.getAmount() == 0) {
                 // Netex - Reduce start
-                uncontrolAccessInput(accessor);
                 // Netex - Reduce end
                 // Netex - Record start
                 tryRecord(accessor, beforeItemStack, 0);
@@ -2457,13 +3082,11 @@ public class NetworkRoot extends NetworkNode {
             }
         }
 
-        // AE Drives
-        Map<ItemStack, Long> itemsToPush = new HashMap<>();
-        itemsToPush.put(incoming.clone(), (long) incoming.getAmount());
-        AEDrive.getStorage().pushItems(aeNetworkCache, getInputAbleAEDriveMenus(), itemsToPush);
-        incoming.setAmount(itemsToPush.values().iterator().next().intValue());
+        // Cell Drives
+        long cellRemaining = CellDrive.getStorage().pushSingle(
+            driveCache, getInputAbleCellDriveMenus(), incoming, incoming.getAmount());
+        incoming.setAmount((int) Math.min(cellRemaining, Integer.MAX_VALUE));
         if (incoming.getAmount() == 0) {
-            uncontrolAccessInput(accessor);
             tryRecord(accessor, beforeItemStack, 0);
             return;
         }
@@ -2474,7 +3097,6 @@ public class NetworkRoot extends NetworkNode {
             BlockMenuUtil.pushItem(blockMenu, incoming, CELL_AVAILABLE_SLOTS);
             if (incoming.getAmount() == 0) {
                 // Netex - Reduce start
-                uncontrolAccessInput(accessor);
                 // Netex - Reduce end
                 // Netex - Record start
                 tryRecord(accessor, beforeItemStack, 0);
@@ -2486,14 +3108,237 @@ public class NetworkRoot extends NetworkNode {
         // Netex - Reduce start
         if (before == incoming.getAmount()) {
             // No item moved, limit the accessor
-            addTransportInputMiss(accessor);
         } else {
-            uncontrolAccessInput(accessor);
         }
         // Netex - Reduce end
         // Netex - Record start
         tryRecord(accessor, beforeItemStack, incoming.getAmount());
         // Netex - Record end
+    }
+
+    /**
+     * 批量入库：一批物品按原有优先级走一遍存储，每种仓库只访问一次。
+     * 未收完的物品保留剩余数量，由调用方回扣来源容器。
+     */
+    public void addItemStacks0(@NotNull Location accessor, @NotNull List<ItemStack> incomings) {
+        if (incomings.isEmpty()) {
+            return;
+        }
+
+        bumpWriteEpoch();
+
+        int size = incomings.size();
+        int[] beforeAmounts = new int[size];
+        boolean[] done = new boolean[size];
+        ItemStack[] beforeClones = recordFlow && itemFlowRecord != null ? new ItemStack[size] : null;
+        int leftover = 0;
+        for (int i = 0; i < size; i++) {
+            ItemStack incoming = incomings.get(i);
+            if (incoming.getAmount() <= 0 || StackUtils.isBlacklisted(incoming)) {
+                done[i] = true;
+                continue;
+            }
+            leftover++;
+            beforeAmounts[i] = incoming.getAmount();
+            if (beforeClones != null) {
+                beforeClones[i] = incoming.clone();
+            }
+        }
+
+        Map<Location, Integer> m = getPersistentAccessHistory(accessor);
+        if (m != null) {
+            List<Location> misses = new ArrayList<>();
+            for (Map.Entry<Location, Integer> entry : m.entrySet()) {
+                if (leftover <= 0) {
+                    break;
+                }
+                boolean found = false;
+                BarrelIdentity barrelIdentity = accessInputAbleBarrel(entry.getKey());
+                if (barrelIdentity != null) {
+                    for (int i = 0; i < size; i++) {
+                        if (done[i] || incomings.get(i).getAmount() <= 0) {
+                            continue;
+                        }
+                        if (StackUtils.itemsMatch(barrelIdentity, incomings.get(i))) {
+                            found = true;
+                            minusCacheMiss(accessor, entry.getKey());
+                            barrelIdentity.depositItemStack(incomings.get(i));
+                            if (incomings.get(i).getAmount() <= 0) {
+                                done[i] = true;
+                                leftover--;
+                            }
+                        }
+                    }
+                } else {
+                    StorageUnitData data = accessInputAbleCargoStorageUnitData(entry.getKey());
+                    if (data != null) {
+                        for (int i = 0; i < size; i++) {
+                            if (done[i] || incomings.get(i).getAmount() <= 0) {
+                                continue;
+                            }
+                            int before2 = incomings.get(i).getAmount();
+                            data.depositItemStack0(accessor, incomings.get(i), true);
+                            if (incomings.get(i).getAmount() != before2) {
+                                found = true;
+                                minusCacheMiss(accessor, entry.getKey());
+                                if (incomings.get(i).getAmount() <= 0) {
+                                    done[i] = true;
+                                    leftover--;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!found) {
+                    misses.add(entry.getKey());
+                }
+            }
+            for (Location miss : misses) {
+                addCacheMiss(accessor, miss);
+            }
+        }
+
+        if (leftover > 0) {
+            for (BlockMenu blockMenu : getAdvancedGreedyBlockMenus()) {
+                final ItemStack template = blockMenu.getItemInSlot(AdvancedGreedyBlock.TEMPLATE_SLOT);
+                if (template == null || template.getType() == Material.AIR) {
+                    continue;
+                }
+                for (int i = 0; i < size; i++) {
+                    if (done[i] || incomings.get(i).getAmount() <= 0) {
+                        continue;
+                    }
+                    if (!StackUtils.itemsMatch(incomings.get(i), template)) {
+                        continue;
+                    }
+                    done[i] = true;
+                    leftover--;
+                    blockMenu.markDirty();
+                    BlockMenuUtil.pushItem(blockMenu, incomings.get(i), ADVANCED_GREEDY_BLOCK_AVAILABLE_SLOTS);
+                }
+                if (leftover <= 0) {
+                    break;
+                }
+            }
+        }
+
+        if (leftover > 0) {
+            for (BlockMenu blockMenu : getGreedyBlockMenus()) {
+                final ItemStack template = blockMenu.getItemInSlot(NetworkGreedyBlock.TEMPLATE_SLOT);
+                if (template == null || template.getType() == Material.AIR) {
+                    continue;
+                }
+                for (int i = 0; i < size; i++) {
+                    if (done[i] || incomings.get(i).getAmount() <= 0) {
+                        continue;
+                    }
+                    if (!StackUtils.itemsMatch(incomings.get(i), template)) {
+                        continue;
+                    }
+                    done[i] = true;
+                    leftover--;
+                    blockMenu.markDirty();
+                    BlockMenuUtil.pushItem(blockMenu, incomings.get(i), GREEDY_BLOCK_AVAILABLE_SLOTS[0]);
+                }
+                if (leftover <= 0) {
+                    break;
+                }
+            }
+        }
+
+        if (leftover > 0) {
+            for (BarrelIdentity barrelIdentity : getInputAbleBarrels()) {
+                for (int i = 0; i < size; i++) {
+                    if (done[i] || incomings.get(i).getAmount() <= 0) {
+                        continue;
+                    }
+                    if (!StackUtils.itemsMatch(barrelIdentity, incomings.get(i))) {
+                        continue;
+                    }
+                    addCountObservingAccessHistory(accessor, barrelIdentity.getLocation());
+                    barrelIdentity.depositItemStack(incomings.get(i));
+                    if (incomings.get(i).getAmount() <= 0) {
+                        done[i] = true;
+                        leftover--;
+                    }
+                }
+                if (leftover <= 0) {
+                    break;
+                }
+            }
+        }
+
+        if (leftover > 0) {
+            for (StorageUnitData cache : getInputAbleCargoStorageUnitDatas().keySet()) {
+                for (int i = 0; i < size; i++) {
+                    if (done[i] || incomings.get(i).getAmount() <= 0) {
+                        continue;
+                    }
+                    int before2 = incomings.get(i).getAmount();
+                    cache.depositItemStack0(accessor, incomings.get(i), true);
+                    if (incomings.get(i).getAmount() != before2) {
+                        addCountObservingAccessHistory(accessor, cache.getLastLocation());
+                        if (incomings.get(i).getAmount() <= 0) {
+                            done[i] = true;
+                            leftover--;
+                        }
+                    }
+                }
+                if (leftover <= 0) {
+                    break;
+                }
+            }
+        }
+
+        if (leftover > 0) {
+            List<ItemStack> cellBatch = new ArrayList<>(leftover);
+            for (int i = 0; i < size; i++) {
+                if (!done[i] && incomings.get(i).getAmount() > 0) {
+                    cellBatch.add(incomings.get(i));
+                }
+            }
+            CellDrive.getStorage().pushMany(driveCache, getInputAbleCellDriveMenus(), cellBatch);
+            for (int i = 0; i < size; i++) {
+                if (!done[i] && incomings.get(i).getAmount() == 0) {
+                    done[i] = true;
+                    leftover--;
+                }
+            }
+        }
+
+        if (leftover > 0) {
+            for (BlockMenu blockMenu : getCellMenus()) {
+                if (!isRealCell(blockMenu)) {
+                    continue;
+                }
+                boolean pushed = false;
+                for (int i = 0; i < size; i++) {
+                    if (done[i] || incomings.get(i).getAmount() <= 0) {
+                        continue;
+                    }
+                    if (!pushed) {
+                        blockMenu.markDirty();
+                        pushed = true;
+                    }
+                    BlockMenuUtil.pushItem(blockMenu, incomings.get(i), CELL_AVAILABLE_SLOTS);
+                    if (incomings.get(i).getAmount() == 0) {
+                        done[i] = true;
+                        leftover--;
+                    }
+                }
+                if (leftover <= 0) {
+                    break;
+                }
+            }
+        }
+
+        if (beforeClones != null) {
+            for (int i = 0; i < size; i++) {
+                if (beforeClones[i] != null) {
+                    tryRecord(accessor, beforeClones[i], incomings.get(i).getAmount());
+                }
+            }
+        }
     }
 
     public Map<Location, BarrelIdentity> getMapInputAbleBarrels() {
@@ -2545,6 +3390,7 @@ public class NetworkRoot extends NetworkNode {
 
         return this.mapOutputAbleCargoStorageUnits;
     }
+
 
     public boolean allowAccessInput(@NotNull Location accessor) {
         Long lastTime = controlledAccessInputHistory.get(accessor);

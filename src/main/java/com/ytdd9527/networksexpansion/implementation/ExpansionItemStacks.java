@@ -62,6 +62,32 @@ public class ExpansionItemStacks {
         Lang.getItem("NTW_EXPANSION_LINE_TRANSFER_PLUS_GRABBER", Material.WAXED_COPPER_BLOCK), Theme.MACHINE);
     public static final SlimefunItemStack LINE_TRANSFER_PLUS =
         Theme.random(Lang.getItem("NTW_EXPANSION_LINE_TRANSFER_PLUS", Material.STICKY_PISTON), Theme.MACHINE);
+
+    public static final SlimefunItemStack CHAIN_GRABBER =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_GRABBER", Material.HAY_BLOCK), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_PUSHER =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_PUSHER", Material.OBSERVER), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_TRANSCEIVER =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_TRANSCEIVER", Material.PISTON), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_RANGE =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_RANGE", Material.SPYGLASS), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_CAPACITY =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_CAPACITY", Material.BUNDLE), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_MODE =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_MODE", Material.REPEATER), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_VANILLA =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_VANILLA", Material.CHEST_MINECART), Theme.MACHINE);
+    public static final SlimefunItemStack RUNE_COLLECT =
+        Theme.random(Lang.getItem("NTW_EXPANSION_RUNE_COLLECT", Material.FIREWORK_STAR), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_MULTI_DIRECTION =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_MULTI_DIRECTION", Material.LEAD), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_BINDING =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_BINDING", Material.NAME_TAG), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_CONFIGURATOR =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_CONFIGURATOR", Material.CLOCK), Theme.TOOL);
+    public static final SlimefunItemStack CHAIN_BRUSH =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_BRUSH", Material.FEATHER), Theme.TOOL);
+
     public static final SlimefunItemStack LINE_TRANSFER_VANILLA_PUSHER =
         Theme.random(Lang.getItem("NTW_EXPANSION_LINE_TRANSFER_VANILLA_PUSHER", Material.OBSERVER), Theme.MACHINE);
     public static final SlimefunItemStack LINE_TRANSFER_VANILLA_GRABBER = Theme.random(
@@ -514,30 +540,34 @@ public class ExpansionItemStacks {
     public static final SlimefunItemStack LINKER_GRID = Theme.themedSlimefunItemStack(
         Lang.getItem("NTW_EXPANSION_LINKER_GRID", Material.JUKEBOX), Theme.MACHINE);
 
-    // AE Drive and Storage Cells
-    public static final SlimefunItemStack AE_DRIVE = Theme.themedSlimefunItemStack(
-        Lang.getItem("NTW_EXPANSION_AE_DRIVE", Material.CHISELED_BOOKSHELF), Theme.MACHINE);
-    public static final SlimefunItemStack AE_CELL_CLEANER = Theme.themedSlimefunItemStack(
-        Lang.getItem("NTW_EXPANSION_AE_CELL_CLEANER", Material.CARTOGRAPHY_TABLE), Theme.MACHINE);
-    public static final SlimefunItemStack AE_CELL_CONVERTER = Theme.random(
-        Lang.getItem("NTW_EXPANSION_AE_CELL_CONVERTER", Material.CHISELED_QUARTZ_BLOCK), Theme.MACHINE);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L1 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L1", Material.MUSIC_DISC_11);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L2 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L2", Material.MUSIC_DISC_13);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L3 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L3", Material.MUSIC_DISC_CAT);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L4 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L4", Material.MUSIC_DISC_BLOCKS);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L5 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L5", Material.MUSIC_DISC_CHIRP);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L6 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L6", Material.MUSIC_DISC_FAR);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L7 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L7", Material.MUSIC_DISC_MALL);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L8 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L8", Material.MUSIC_DISC_MELLOHI);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L9 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L9", Material.MUSIC_DISC_STAL);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L10 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L10", Material.MUSIC_DISC_STRAD);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L11 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L11", Material.MUSIC_DISC_WARD);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L12 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L12", Material.MUSIC_DISC_OTHERSIDE);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L13 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L13", Material.MUSIC_DISC_PIGSTEP);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L14 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L14", Material.MUSIC_DISC_5);
-    public static final SlimefunItemStack AE_STORAGE_CELL_L15 = themedCell("NTW_EXPANSION_AE_STORAGE_CELL_L15", Material.MUSIC_DISC_RELIC);
-    public static final SlimefunItemStack AE_STORAGE_CELL_UNLIMITED = Theme.themedSlimefunItemStack(
-        Lang.getItem("NTW_EXPANSION_AE_STORAGE_CELL_UNLIMITED", enchanted(Material.MUSIC_DISC_OTHERSIDE)), Theme.MACHINE);
+    // Cellnet Drives and Storage Cells
+    public static final SlimefunItemStack CELL_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CELL_DRIVE", Material.CHISELED_BOOKSHELF), Theme.MACHINE);
+    public static final SlimefunItemStack CELL_CLEANER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CELL_CLEANER", Material.CARTOGRAPHY_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack CELL_CONVERTER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CELL_CONVERTER", Material.SMITHING_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack VOID_CELL = themedCell("NTW_EXPANSION_VOID_CELL", Material.MUSIC_DISC_WAIT);
+    public static final SlimefunItemStack ASSEMBLY_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_DRIVE", Material.BEACON), Theme.MACHINE);
+    public static final SlimefunItemStack ENDER_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ENDER_DRIVE", Material.ENDER_CHEST), Theme.MACHINE);
+    public static final SlimefunItemStack ASSEMBLY_CARD = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_CARD", Material.PAPER), Theme.TOOL);
+    public static final SlimefunItemStack ASSEMBLY_WORKSHOP = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_WORKSHOP", Material.SMITHING_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack CONTAINER_FILLER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CONTAINER_FILLER", Material.FLETCHING_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack CHANNEL_CONFIGURATOR = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CHANNEL_CONFIGURATOR", Material.ENDER_EYE), Theme.TOOL);
+    public static final SlimefunItemStack OVERCLOCK_CORE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_OVERCLOCK_CORE", Material.NETHER_STAR), Theme.TOOL);
+    public static final SlimefunItemStack SMART_CORE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_SMART_CORE", Material.ECHO_SHARD), Theme.TOOL);
+    public static final SlimefunItemStack ASSEMBLY_MONITOR = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_MONITOR", Material.TARGET), Theme.MACHINE);
+    public static final SlimefunItemStack DRIVE_MONITOR = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_DRIVE_MONITOR", Material.OBSERVER), Theme.MACHINE);
 
 
     private static @NotNull SlimefunItemStack themedCell(@NotNull String key, @NotNull Material disc) {

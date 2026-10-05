@@ -58,6 +58,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings({"deprecation", "DuplicatedCode"})
 public class NetworkQuantumStorage extends SpecialSlimefunItem implements DistinctiveItem {
@@ -97,7 +98,7 @@ public class NetworkQuantumStorage extends SpecialSlimefunItem implements Distin
     private static final int[] OUTPUT_SLOTS = new int[]{6, 8};
     private static final int[] BACKGROUND_SLOTS = new int[]{9, 10, 11, 12, 14, 15, 16, 17};
 
-    private static final Map<Location, QuantumCache> CACHES = new HashMap<>();
+    private static final Map<Location, QuantumCache> CACHES = new ConcurrentHashMap<>();
 
     static {
         final ItemMeta itemMeta = Icon.QUANTUM_STORAGE_NO_ITEM.getItemMeta();

@@ -6,6 +6,5 @@ public enum BarrelType {
     FLUFFY,
     TSINGSHAN_TECHNOLOGY,
     SIMPLE_STORAGE,
-    SLIME_AE_PLUGIN,
     UNKNOWN
 }

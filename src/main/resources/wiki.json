@@ -32,5 +32,8 @@
   "NTW_PROBE": "tools/network-probe",
   "NTW_CRAYON": "tools/network-crayon",
   "NTW_CONFIGURATOR": "tools/network-configurator",
-  "NTW_WIRELESS_CONFIGURATOR": "tools/network-configurator"
+  "NTW_WIRELESS_CONFIGURATOR": "tools/network-configurator",
+  "NTW_EXPANSION_ASSEMBLY_DRIVE": "extension/assembly-drive",
+  "NTW_EXPANSION_VOID_CELL": "extension/void-cell",
+  "NTW_EXPANSION_ENDER_DRIVE": "extension/ender-drive"
 }

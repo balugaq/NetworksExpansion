@@ -1,6 +1,7 @@
 package com.ytdd9527.networksexpansion.implementation;
 
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -45,6 +46,7 @@ import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_STORAGE_13;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_QUANTUM_WORKBENCH;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_RECIPE_ENCODER;
+import com.ytdd9527.networksexpansion.implementation.ExpansionItemStacks;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_VACUUM;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_VANILLA_GRABBER;
 import static io.github.sefiraat.networks.slimefun.NetworkSlimefunItems.NETWORK_VANILLA_PUSHER;
@@ -68,6 +70,8 @@ public class ExpansionRecipes {
         null, null, null,
         null, null, null
     };
+
+    public static final ItemStack[] RUNE_COLLECT = NULL;
 
     // Workbench
     public static final ItemStack[] NETWORKS_EXPANSION_WORKBENCH = new ItemStack[]{
@@ -999,119 +1003,172 @@ public class ExpansionRecipes {
         SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.STATUS_VIEWER, SYNTHETIC_EMERALD_SHARD.getItem()
     };
 
-    // AE Drive recipe
-    public static final ItemStack[] AE_DRIVE = new ItemStack[]{
+    // Cell Drive recipe
+    public static final ItemStack[] CELL_DRIVE = new ItemStack[]{
         NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem(),
-        NETWORK_BRIDGE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L3, NETWORK_BRIDGE.getItem(),
+        NETWORK_BRIDGE.getItem(), CellTier.T3.stack(), NETWORK_BRIDGE.getItem(),
         NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem(), NETWORK_CAPACITOR_2.getItem()
     };
 
-    public static final ItemStack[] AE_CELL_CLEANER = new ItemStack[]{
-        OPTIC_GLASS.getItem(), ExpansionItemStacks.AE_DRIVE, OPTIC_GLASS.getItem(),
-        NETWORK_BRIDGE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L2, NETWORK_BRIDGE.getItem(),
+    public static final ItemStack[] CELL_CLEANER = new ItemStack[]{
+        OPTIC_GLASS.getItem(), ExpansionItemStacks.CELL_DRIVE, OPTIC_GLASS.getItem(),
+        NETWORK_BRIDGE.getItem(), CellTier.T2.stack(), NETWORK_BRIDGE.getItem(),
         OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
     };
 
-    public static final ItemStack[] AE_CELL_CONVERTER = new ItemStack[]{
-        OPTIC_GLASS.getItem(), ExpansionItemStacks.AE_CELL_CLEANER, OPTIC_GLASS.getItem(),
+    public static final ItemStack[] CELL_CONVERTER = new ItemStack[]{
+        OPTIC_GLASS.getItem(), ExpansionItemStacks.CELL_CLEANER, OPTIC_GLASS.getItem(),
         NETWORK_BRIDGE.getItem(), NETWORK_QUANTUM_STORAGE_0.getItem(), NETWORK_BRIDGE.getItem(),
         OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
     };  // 元件转量子储存：工作台换个芯，中间放个量子储存当核心
 
-    // AE Storage Cell recipes (progression)
-    public static final ItemStack[] AE_STORAGE_CELL_L1 = new ItemStack[]{
-        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(),
-        OPTIC_GLASS.getItem(), NETWORK_CELL.getItem(), OPTIC_GLASS.getItem(),
-        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
+    // ---- 元件网络三件套（装配驱动器 / 虚空元件 / 末影驱动器） ----
+
+    public static final ItemStack ENDER_PEARL = new ItemStack(org.bukkit.Material.ENDER_PEARL);
+    public static final ItemStack WITHER_ROSE = new ItemStack(org.bukkit.Material.WITHER_ROSE);
+
+    /** 装配驱动器 = 蓝图 + 元件驱动器 + 桥梁。 */
+    public static final ItemStack[] ASSEMBLY_DRIVE = new ItemStack[]{
+        ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT, ExpansionItemStacks.NETWORK_BRIDGE_ORDINAL, ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT,
+        OPTIC_GLASS.getItem(), ExpansionItemStacks.CELL_DRIVE, OPTIC_GLASS.getItem(),
+        ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT, ExpansionItemStacks.NETWORK_BRIDGE_ORDINAL, ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L2 = new ItemStack[]{
-        OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem(),
-        OPTIC_CABLE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L1, OPTIC_CABLE.getItem(),
-        OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem(), OPTIC_CABLE.getItem()
+    /** 虚空元件 = 枯萎玫瑰 + 基础存储元件。 */
+    public static final ItemStack[] VOID_CELL = new ItemStack[]{
+        null, WITHER_ROSE, null,
+        WITHER_ROSE, CellTier.T1.stack(), WITHER_ROSE,
+        null, WITHER_ROSE, null
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L3 = new ItemStack[]{
-        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem(),
-        OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L2, OPTIC_STAR.getItem(),
-        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem()
+    public static final ItemStack[] ENDER_DRIVE = new ItemStack[]{
+        OPTIC_GLASS.getItem(), ENDER_PEARL, OPTIC_GLASS.getItem(),
+        ENDER_PEARL, ExpansionItemStacks.CELL_DRIVE, ENDER_PEARL,
+        OPTIC_GLASS.getItem(), ENDER_PEARL, OPTIC_GLASS.getItem()
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L4 = new ItemStack[]{
-        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem(),
-        OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L3, OPTIC_STAR.getItem(),
-        OPTIC_STAR.getItem(), OPTIC_STAR.getItem(), OPTIC_STAR.getItem()
+    /** 装配卡 = 纸 + 墨囊 + 末影珍珠。 */
+    public static final ItemStack PAPER_STACK = new ItemStack(org.bukkit.Material.PAPER);
+    public static final ItemStack INK_SAC = new ItemStack(org.bukkit.Material.INK_SAC);
+
+    public static final ItemStack[] ASSEMBLY_CARD = new ItemStack[]{
+        PAPER_STACK, PAPER_STACK, PAPER_STACK,
+        INK_SAC, ENDER_PEARL, INK_SAC,
+        PAPER_STACK, PAPER_STACK, PAPER_STACK
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L5 = new ItemStack[]{
-        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(),
-        RADIOACTIVE_OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L4, RADIOACTIVE_OPTIC_STAR.getItem(),
-        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem()
+    /** 装配工坊 = 装配卡 ×4 + 网络编码器。 */
+    public static final ItemStack[] ASSEMBLY_WORKSHOP = new ItemStack[]{
+        null, ExpansionItemStacks.ASSEMBLY_CARD, null,
+        ExpansionItemStacks.ASSEMBLY_CARD, NETWORK_RECIPE_ENCODER.getItem(), ExpansionItemStacks.ASSEMBLY_CARD,
+        null, ExpansionItemStacks.ASSEMBLY_CARD, null
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L6 = new ItemStack[]{
-        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(),
-        RADIOACTIVE_OPTIC_STAR.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L5, RADIOACTIVE_OPTIC_STAR.getItem(),
-        RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(), RADIOACTIVE_OPTIC_STAR.getItem()
+    /** 自动灌装机 = 装配卡 ×4 + 重生锚。 */
+    public static final ItemStack[] CONTAINER_FILLER = new ItemStack[]{
+        null, ExpansionItemStacks.ASSEMBLY_CARD, null,
+        ExpansionItemStacks.ASSEMBLY_CARD, new ItemStack(Material.RESPAWN_ANCHOR), ExpansionItemStacks.ASSEMBLY_CARD,
+        null, ExpansionItemStacks.ASSEMBLY_CARD, null
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L7 = new ItemStack[]{
-        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(),
-        SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L6, SYNTHETIC_EMERALD_SHARD.getItem(),
-        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem()
+    /** 频道配置器 = 末影珍珠 + 纸。 */
+    public static final ItemStack[] CHANNEL_CONFIGURATOR = new ItemStack[]{
+        null, null, null,
+        null, PAPER_STACK, null,
+        null, ENDER_PEARL, null
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L8 = new ItemStack[]{
-        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(),
-        SYNTHETIC_EMERALD_SHARD.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L7, SYNTHETIC_EMERALD_SHARD.getItem(),
-        SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem(), SYNTHETIC_EMERALD_SHARD.getItem()
+    /** 装配超频核心 = 红石 + 金锭 + 末影珍珠。 */
+    public static final ItemStack[] OVERCLOCK_CORE = new ItemStack[]{
+        null, new ItemStack(org.bukkit.Material.REDSTONE), null,
+        new ItemStack(org.bukkit.Material.REDSTONE), new ItemStack(org.bukkit.Material.GOLD_INGOT), new ItemStack(org.bukkit.Material.REDSTONE),
+        null, ENDER_PEARL, null
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L9 = new ItemStack[]{
-        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(),
-        SIMPLE_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L8, SIMPLE_NANOBOTS.getItem(),
-        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem()
+    /** 装配智能核心 = 回响碎片 + 金锭 + 末影珍珠。 */
+    public static final ItemStack[] SMART_CORE = new ItemStack[]{
+        null, new ItemStack(org.bukkit.Material.ECHO_SHARD), null,
+        new ItemStack(org.bukkit.Material.ECHO_SHARD), new ItemStack(org.bukkit.Material.GOLD_INGOT), new ItemStack(org.bukkit.Material.ECHO_SHARD),
+        null, ENDER_PEARL, null
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L10 = new ItemStack[]{
-        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(),
-        SIMPLE_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L9, SIMPLE_NANOBOTS.getItem(),
-        SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem(), SIMPLE_NANOBOTS.getItem()
+    /** 装配监控器 = 铁框 + 望远镜 + 红石。 */
+    public static final ItemStack[] ASSEMBLY_MONITOR = new ItemStack[]{
+        new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.SPYGLASS), new ItemStack(org.bukkit.Material.IRON_INGOT),
+        new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.REDSTONE), new ItemStack(org.bukkit.Material.IRON_INGOT),
+        new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.IRON_INGOT)
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L11 = new ItemStack[]{
-        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(),
-        ADVANCED_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L10, ADVANCED_NANOBOTS.getItem(),
-        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem()
+    /** 元件驱动器管理器 = 铁框 + 末影之眼 + 红石。 */
+    public static final ItemStack[] DRIVE_MONITOR = new ItemStack[]{
+        new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.ENDER_EYE), new ItemStack(org.bukkit.Material.IRON_INGOT),
+        new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.REDSTONE), new ItemStack(org.bukkit.Material.IRON_INGOT),
+        new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.IRON_INGOT), new ItemStack(org.bukkit.Material.IRON_INGOT)
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L12 = new ItemStack[]{
-        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(),
-        ADVANCED_NANOBOTS.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L11, ADVANCED_NANOBOTS.getItem(),
-        ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem(), ADVANCED_NANOBOTS.getItem()
+    public static final ItemStack[] CHAIN_GRABBER = new ItemStack[]{
+        NETWORK_GRABBER.getItem(), OPTIC_CABLE.getItem(), NETWORK_GRABBER.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        NETWORK_GRABBER.getItem(), OPTIC_CABLE.getItem(), NETWORK_GRABBER.getItem()
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L13 = new ItemStack[]{
-        SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem(),
-        SHRINKING_BASE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L12, SHRINKING_BASE.getItem(),
-        SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem(), SHRINKING_BASE.getItem()
+    public static final ItemStack[] CHAIN_PUSHER = new ItemStack[]{
+        NETWORK_PUSHER.getItem(), OPTIC_CABLE.getItem(), NETWORK_PUSHER.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        NETWORK_PUSHER.getItem(), OPTIC_CABLE.getItem(), NETWORK_PUSHER.getItem()
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L14 = new ItemStack[]{
-        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(),
-        INTERDIMENSIONAL_PRESENCE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L13, INTERDIMENSIONAL_PRESENCE.getItem(),
-        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem()
+    public static final ItemStack[] CHAIN_TRANSCEIVER = new ItemStack[]{
+        NETWORK_GRABBER.getItem(), OPTIC_CABLE.getItem(), NETWORK_PUSHER.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        NETWORK_PUSHER.getItem(), OPTIC_CABLE.getItem(), NETWORK_GRABBER.getItem()
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_L15 = new ItemStack[]{
-        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(),
-        INTERDIMENSIONAL_PRESENCE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L14, INTERDIMENSIONAL_PRESENCE.getItem(),
-        INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), INTERDIMENSIONAL_PRESENCE.getItem()
+    public static final ItemStack[] CHAIN_MODULE_RANGE = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_MONITOR.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem()
     };
 
-    public static final ItemStack[] AE_STORAGE_CELL_UNLIMITED = new ItemStack[]{
-        RADIOACTIVE_OPTIC_STAR.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), RADIOACTIVE_OPTIC_STAR.getItem(),
-        INTERDIMENSIONAL_PRESENCE.getItem(), ExpansionItemStacks.AE_STORAGE_CELL_L15, INTERDIMENSIONAL_PRESENCE.getItem(),
-        RADIOACTIVE_OPTIC_STAR.getItem(), INTERDIMENSIONAL_PRESENCE.getItem(), RADIOACTIVE_OPTIC_STAR.getItem()
+    public static final ItemStack[] CHAIN_MODULE_CAPACITY = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_MORE_PUSHER.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] CHAIN_MODULE_MODE = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_CONFIGURATOR.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] CHAIN_MODULE_VANILLA = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_VANILLA_GRABBER.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] CHAIN_MODULE_MULTI_DIRECTION = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_WIRELESS_TRANSMITTER.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] CHAIN_MODULE_BINDING = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_IMPORT.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] CHAIN_CONFIGURATOR = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_CABLE.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_CABLE.getItem(), NETWORK_WIRELESS_CONFIGURATOR.getItem(), OPTIC_CABLE.getItem(),
+        OPTIC_GLASS.getItem(), ExpansionItemStacks.CHAIN_MODULE_BINDING, OPTIC_GLASS.getItem()
+    };
+
+    public static final ItemStack[] CHAIN_BRUSH = new ItemStack[]{
+        null, OPTIC_CABLE.getItem(), null,
+        null, NETWORK_WIRELESS_CONFIGURATOR.getItem(), null,
+        null, ExpansionItemStacks.CHAIN_MODULE_BINDING, null
     };
 }

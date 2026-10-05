@@ -514,7 +514,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
         ClickAction action,
         BlockMenu blockMenu) {
         if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
-            root.addItemStack(itemStack);
+            root.addItemStack0(blockMenu.getLocation(), itemStack);
         }
     }
 

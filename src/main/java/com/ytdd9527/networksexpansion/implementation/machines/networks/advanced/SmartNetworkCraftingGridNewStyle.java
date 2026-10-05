@@ -110,7 +110,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                     if (stack == null || stack.getType() == Material.AIR || stack.getAmount() <= 0) break label;
 
                     // 1. try store back into networks
-                    root.addItemStack(stack);
+                    root.addItemStack0(menu.getLocation(), stack);
                     if (stack.getAmount() == 0) break label;
 
                     // 2. try store into output slots
@@ -263,7 +263,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                             if (stack == null || stack.getType() == Material.AIR || stack.getAmount() <= 0) break label;
 
                             // 1. try store back into networks
-                            root.addItemStack(stack);
+                            root.addItemStack0(menu.getLocation(), stack);
                             if (stack.getAmount() == 0) break label;
 
                             // 2. try store into output slots
@@ -284,7 +284,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                             if (stack == null || stack.getType() == Material.AIR || stack.getAmount() <= 0) break label;
 
                             // 1. try store back into networks
-                            root.addItemStack(stack);
+                            root.addItemStack0(menu.getLocation(), stack);
                         }
                     }
 
@@ -411,7 +411,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                     // return items
                     for (ItemStack i2 : got) {
                         // 1. try store back into networks
-                        root.addItemStack(crafted);
+                        root.addItemStack0(menu.getLocation(), i2);
                     }
                     return;
                 } else {
@@ -438,7 +438,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                     if (c2.getAmount() == 0) break label;
 
                     // 2. try store back into networks
-                    root.addItemStack(c2);
+                    root.addItemStack0(menu.getLocation(), c2);
                     if (c2.getAmount() == 0) break label;
 
                     // 3. try store into ingredients slots

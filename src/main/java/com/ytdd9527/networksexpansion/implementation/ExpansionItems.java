@@ -42,9 +42,22 @@ import com.ytdd9527.networksexpansion.implementation.machines.manual.FacingPrese
 import com.ytdd9527.networksexpansion.implementation.machines.manual.ItemDifferenter;
 import com.ytdd9527.networksexpansion.implementation.machines.manual.StorageCardConverter;
 import com.ytdd9527.networksexpansion.implementation.machines.manual.StorageUnitUpgradeTable;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AECellCleaner;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AECellConverter;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.collect.CollectRune;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainBrush;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainConfigurator;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainTransceiver;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainGrabber;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainModuleItem;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainPusher;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyWorkshop;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.filler.ContainerFiller;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.EnderDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter.CellCleaner;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter.CellConverter;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyMonitor;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveMonitor;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedExport;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedImport;
@@ -64,7 +77,11 @@ import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SmartPusher;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SuperTrash;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SwitchingMonitor;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.item.AEStorageCell;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.VoidCell;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyCard;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.ender.ChannelConfigurator;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.core.SmartCore;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.core.OverclockCore;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import com.ytdd9527.networksexpansion.implementation.machines.viewer.ItemFlowViewer;
 import com.ytdd9527.networksexpansion.implementation.tools.CargoNodeQuickTool;
@@ -737,6 +754,78 @@ public class ExpansionItems {
         ExpansionItemStacks.LINE_TRANSFER_VANILLA_GRABBER,
         ExpansionWorkbench.TYPE,
         ExpansionRecipes.LINE_TRANSFER_VANILLA_GRABBER);
+
+    public static final ChainGrabber CHAIN_GRABBER = new ChainGrabber(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_GRABBER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_GRABBER);
+
+    public static final ChainPusher CHAIN_PUSHER = new ChainPusher(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_PUSHER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_PUSHER);
+
+    public static final ChainTransceiver CHAIN_TRANSCEIVER = new ChainTransceiver(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_TRANSCEIVER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_TRANSCEIVER);
+
+    public static final ChainModuleItem CHAIN_MODULE_RANGE = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_RANGE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_RANGE);
+
+    public static final ChainModuleItem CHAIN_MODULE_CAPACITY = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_CAPACITY,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_CAPACITY);
+
+    public static final ChainModuleItem CHAIN_MODULE_MODE = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_MODE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_MODE);
+
+    public static final ChainModuleItem CHAIN_MODULE_VANILLA = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_VANILLA,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_VANILLA);
+
+    public static final ChainModuleItem CHAIN_MODULE_MULTI_DIRECTION = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_MULTI_DIRECTION,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_MULTI_DIRECTION);
+
+    public static final ChainModuleItem CHAIN_MODULE_BINDING = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_BINDING,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_BINDING);
+
+    public static final ChainConfigurator CHAIN_CONFIGURATOR = new ChainConfigurator(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_CONFIGURATOR,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_CONFIGURATOR);
+
+    public static final ChainBrush CHAIN_BRUSH = new ChainBrush(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_BRUSH,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_BRUSH);
+
+    public static final CollectRune RUNE_COLLECT = new CollectRune(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.RUNE_COLLECT,
+        RecipeType.NULL,
+        ExpansionRecipes.RUNE_COLLECT);
 
     public static final AdvancedLineTransferPusher ADVANCED_LINE_TRANSFER_PUSHER = new AdvancedLineTransferPusher(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
@@ -1486,138 +1575,91 @@ public class ExpansionItems {
         ExpansionRecipes.SUPER_TRASH
     );
 
-    // AE Drive
-    public static final AEDrive AE_DRIVE = new AEDrive(
+    // Cellnet Drive
+    public static final CellDrive CELL_DRIVE = new CellDrive(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_DRIVE,
+        ExpansionItemStacks.CELL_DRIVE,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_DRIVE);
+        ExpansionRecipes.CELL_DRIVE);
 
-    // AE Cell Cleaner
-    public static final AECellCleaner AE_CELL_CLEANER = new AECellCleaner(
+    // Cell Cleaner
+    public static final CellCleaner CELL_CLEANER = new CellCleaner(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_CELL_CLEANER,
+        ExpansionItemStacks.CELL_CLEANER,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_CELL_CLEANER);
+        ExpansionRecipes.CELL_CLEANER);
 
-    // AE Cell Converter
-    public static final AECellConverter AE_CELL_CONVERTER = new AECellConverter(
+    // Cell Converter
+    public static final CellConverter CELL_CONVERTER = new CellConverter(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_CELL_CONVERTER,
+        ExpansionItemStacks.CELL_CONVERTER,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_CELL_CONVERTER);
+        ExpansionRecipes.CELL_CONVERTER);
 
-    // AE Storage Cells (non-placeable items)
-    public static final AEStorageCell AE_STORAGE_CELL_L1 = new AEStorageCell(
+    public static final AssemblyDrive ASSEMBLY_DRIVE = new AssemblyDrive(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L1,
+        ExpansionItemStacks.ASSEMBLY_DRIVE,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L1,
-        64L);
+        ExpansionRecipes.ASSEMBLY_DRIVE);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L2 = new AEStorageCell(
+    public static final VoidCell VOID_CELL = new VoidCell(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L2,
+        ExpansionItemStacks.VOID_CELL,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L2,
-        256L);
+        ExpansionRecipes.VOID_CELL);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L3 = new AEStorageCell(
+    public static final EnderDrive ENDER_DRIVE = new EnderDrive(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L3,
+        ExpansionItemStacks.ENDER_DRIVE,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L3,
-        1024L);
+        ExpansionRecipes.ENDER_DRIVE);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L4 = new AEStorageCell(
+    public static final AssemblyCard ASSEMBLY_CARD = new AssemblyCard(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L4,
+        ExpansionItemStacks.ASSEMBLY_CARD,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L4,
-        4096L);
+        ExpansionRecipes.ASSEMBLY_CARD);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L5 = new AEStorageCell(
+    public static final AssemblyWorkshop ASSEMBLY_WORKSHOP = new AssemblyWorkshop(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L5,
+        ExpansionItemStacks.ASSEMBLY_WORKSHOP,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L5,
-        32768L);
+        ExpansionRecipes.ASSEMBLY_WORKSHOP);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L6 = new AEStorageCell(
+    public static final ContainerFiller CONTAINER_FILLER = new ContainerFiller(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L6,
+        ExpansionItemStacks.CONTAINER_FILLER,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L6,
-        262144L);
+        ExpansionRecipes.CONTAINER_FILLER);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L7 = new AEStorageCell(
+    public static final ChannelConfigurator CHANNEL_CONFIGURATOR = new ChannelConfigurator(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L7,
+        ExpansionItemStacks.CHANNEL_CONFIGURATOR,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L7,
-        2097152L);
+        ExpansionRecipes.CHANNEL_CONFIGURATOR);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L8 = new AEStorageCell(
+    public static final OverclockCore OVERCLOCK_CORE = new OverclockCore(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L8,
+        ExpansionItemStacks.OVERCLOCK_CORE,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L8,
-        16777216L);
+        ExpansionRecipes.OVERCLOCK_CORE);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L9 = new AEStorageCell(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L9,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L9,
-        134217728L);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L10 = new AEStorageCell(
+    public static final SmartCore SMART_CORE = new SmartCore(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L10,
+        ExpansionItemStacks.SMART_CORE,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L10,
-        1073741824L);
+        ExpansionRecipes.SMART_CORE);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L11 = new AEStorageCell(
+    public static final AssemblyMonitor ASSEMBLY_MONITOR = new AssemblyMonitor(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L11,
+        ExpansionItemStacks.ASSEMBLY_MONITOR,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L11,
-        2147483647L);
+        ExpansionRecipes.ASSEMBLY_MONITOR);
 
-    public static final AEStorageCell AE_STORAGE_CELL_L12 = new AEStorageCell(
+    public static final DriveMonitor DRIVE_MONITOR = new DriveMonitor(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L12,
+        ExpansionItemStacks.DRIVE_MONITOR,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L12,
-        34359738352L);
-
-    public static final AEStorageCell AE_STORAGE_CELL_L13 = new AEStorageCell(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L13,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L13,
-        549755813888L);
-
-    public static final AEStorageCell AE_STORAGE_CELL_L14 = new AEStorageCell(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L14,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L14,
-        8796093022208L);
-
-    public static final AEStorageCell AE_STORAGE_CELL_L15 = new AEStorageCell(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_L15,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_L15,
-        140737488355328L);
-
-    // 无限元件：单格容量 Long.MAX_VALUE + 无限单元(种类)，免升级
-    public static final AEStorageCell AE_STORAGE_CELL_UNLIMITED = new AEStorageCell(
-        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
-        ExpansionItemStacks.AE_STORAGE_CELL_UNLIMITED,
-        ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AE_STORAGE_CELL_UNLIMITED,
-        Long.MAX_VALUE);
+        ExpansionRecipes.DRIVE_MONITOR);
 }

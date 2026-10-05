@@ -10,8 +10,8 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.managers.ConfigManager;
 import com.ytdd9527.networksexpansion.core.services.LocalizationService;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.blockentity.AEDrive;
-import com.ytdd9527.networksexpansion.implementation.machines.ae.core.persistence.AEStorageDatabase;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.storage.CellStorageDatabase;
 import com.ytdd9527.networksexpansion.setup.SetupUtil;
 import com.ytdd9527.networksexpansion.utils.databases.DataSource;
 import com.ytdd9527.networksexpansion.utils.databases.DataStorage;
@@ -72,7 +72,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     private static BukkitRunnable aeAutoSaveThread;
 
     @Getter
-    private static AEStorageDatabase aeStorageDatabase;
+    private static CellStorageDatabase cellStorageDatabase;
 
     private static MinecraftVersion minecraftVersion = MinecraftVersion.UNKNOWN;
     private final @NotNull String username;
@@ -176,22 +176,22 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         long period = 20L * seconds;
         autoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
 
-        // AE 驱动器元件数据自动保存
+        // 元件驱动器元件数据自动保存
         aeAutoSaveThread = new BukkitRunnable() {
             @Override
             public void run() {
-                AEDrive.saveAllDriveCells();
+                CellDrive.saveAllDriveCells();
             }
         };
         aeAutoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
 
-        getLogger().info(getLocalizationService().getString("messages.startup.initializing-ae-database"));
+        getLogger().info(getLocalizationService().getString("messages.startup.initializing-cell-database"));
         try {
-            aeStorageDatabase = new AEStorageDatabase();
-            aeStorageDatabase.init();
+            cellStorageDatabase = new CellStorageDatabase();
+            cellStorageDatabase.init();
         } catch (Exception e) {
-            aeStorageDatabase = null;
-            getLogger().warning(getLocalizationService().getString("messages.startup.failed-to-init-ae-database"));
+            cellStorageDatabase = null;
+            getLogger().warning(getLocalizationService().getString("messages.startup.failed-to-init-cell-database"));
             Debug.trace(e);
         }
 
@@ -273,9 +273,9 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
             aeAutoSaveThread.cancel();
         }
         DataStorage.saveAmountChange();
-        AEDrive.saveAllDriveCells();
-        if (aeStorageDatabase != null) {
-            aeStorageDatabase.shutdown();
+        CellDrive.saveAllDriveCells();
+        if (cellStorageDatabase != null) {
+            cellStorageDatabase.shutdown();
         }
         if (queryQueue != null) {
             while (!queryQueue.isAllDone()) {

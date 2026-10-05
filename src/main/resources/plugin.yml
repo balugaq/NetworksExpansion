@@ -58,8 +58,8 @@ permissions:
   networks.commands.setcontainerid:
     description: Allows you to use the /networks setcontainerid command
     default: op
-  networks.commands.aetoquantum:
-    description: Allows you to use the /networks aetoquantum command
+  networks.commands.celltoquantum:
+    description: Allows you to use the /networks celltoquantum command
     default: op
   networks.commands.updateitem:
     description: Allows you to use the /networks updateitem command

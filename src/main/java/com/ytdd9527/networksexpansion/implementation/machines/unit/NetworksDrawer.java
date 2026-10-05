@@ -6,6 +6,7 @@ import com.balugaq.netex.api.enums.QuickTransferMode;
 import com.balugaq.netex.api.enums.StorageUnitType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.interfaces.ModellableItem;
+import com.balugaq.netex.integrations.logitech.LinkBindingStore;
 import com.balugaq.netex.utils.InventoryUtil;
 import com.balugaq.netex.utils.Lang;
 import com.jeff_media.morepersistentdatatypes.DataType;
@@ -120,6 +121,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
             public void newInstance(@NotNull BlockMenu menu, @NotNull Block b) {
                 Location l = b.getLocation();
                 requestData(l, getContainerId(l));
+                LinkBindingStore.replayDrawer(l);
                 // Restore mode
                 SlimefunBlockData blockData = StorageCacheUtils.getBlock(l);
                 String lock = null;
@@ -578,7 +580,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                                 return;
                             }
 
-                            final int left = (int) quantumAmount - canAdd;
+                            final long left = quantumAmount - canAdd;
                             if (left > 0) {
                                 quantumCache.setAmount(left);
                                 DataTypeMethods.setCustom(

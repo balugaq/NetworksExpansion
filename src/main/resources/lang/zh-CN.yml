@@ -136,22 +136,22 @@ messages:
     cannot-update-cargo-storage-unit: "<error>暂不支持更新网络抽屉"
     updated-item: "<success>已更新物品"
     updated-item-in-quantum-storage: "<success>已更新存储内的物品!"
-    wait-for-data: "<green>已请求数据，请稍候..."
+    wait-for-data: "<success>已请求数据，请稍候..."
     set-container-id: "&a已设置位于为 %s 的网络抽屉的容器ID为 %s."
     invalid-slot-index: "<error>槽位号必须在 0-%s 之间!"
     empty-slot: "<error>该槽位没有物品!"
     selected-area-outline-hide-request: "&a已请求隐藏选中区域的轮廓."
     selected-area-outline-show-request: "&a已请求显示选中区域的轮廓."
     clear-selected-pos: "&a已清除选择的位置."
-    aetoquantum:
-      need-cell: "<error>你必须手持 AE 存储元件"
+    celltoquantum:
+      need-cell: "<error>你必须手持存储元件"
       empty: "<warning>该元件为空"
       converted: "<success>已将元件内容转换为对应等级的量子存储"
       none-converted: "<warning>元件中没有可转换的物品"
     help:
       - "&6网络命令帮助:"
       - "&6/networks help - 显示此帮助信息."
-      - "&6/networks aetoquantum - 将手中 AE 存储元件内容转换为对应等级的量子存储."
+      - "&6/networks celltoquantum - 将手中存储元件内容转换为对应等级的量子存储."
       - "&6/networks fillquantum <amount> - 填充手持量子存储物品的存储量."
       - "&6/networks fixblueprint <keyInMeta> - 修复手持合成蓝图."
       - "&6/networks addstorageitem <amount> - 使看向的网络抽屉中添加物品."
@@ -165,9 +165,9 @@ messages:
       help:
         - "&6/networks help - 显示此帮助信息."
         - "&6ex: /networks help"
-      aetoquantum:
-        - "&6/networks aetoquantum - 将手中 AE 存储元件内容转换为对应等级的量子存储."
-        - "&6ex: /networks aetoquantum"
+      celltoquantum:
+        - "&6/networks celltoquantum - 将手中存储元件内容转换为对应等级的量子存储."
+        - "&6ex: /networks celltoquantum"
       fillquantum:
         - "&6/networks fillQuantum <amount> - 设置手持量子存储的存储量."
         - "&6ex: /networks fillQuantum 1000"
@@ -213,7 +213,6 @@ messages:
         pressure_chamber: "压力机"
         quantum_workbench: "网络量子工作台"
         smeltery: "冶炼炉"
-        ae: "AE"
     quantum_cache:
       empty: "空"
       stored_item: "<click_info>物品: %s"
@@ -284,6 +283,11 @@ messages:
         - "<click_info>左键点击: <passive>高亮机器"
       linker-grid-click-behavior:
         - '<click_info>左键点击: <passive>获取存储的超链接/量子纠缠奇点'
+      linker-target-current: "<gold>绑定目标: <white>{0}"
+      linker-target-auto: "自动 (量子储存 → 元件 → 抽屉)"
+      linker-target-quantum_storage: "仅量子储存"
+      linker-target-cell: "仅元件"
+      linker-target-drawer: "仅网络抽屉"
     comprehensive:
       auto_set_face: "自动设置朝向"
   completed-operation:
@@ -518,8 +522,8 @@ messages:
     failed-to-connect-database: "数据库文件连接失败!"
     creating-query-queue: "正在创建队列..."
     creating-auto-save-thread: "正在创建自动保存线程..."
-    initializing-ae-database: "正在初始化 AE 存储数据库..."
-    failed-to-init-ae-database: "AE 存储数据库初始化失败!"
+    initializing-cell-database: "正在初始化元件存储数据库..."
+    failed-to-init-cell-database: "元件存储数据库初始化失败!"
     registering-items: "正在注册物品..."
     registering-listeners: "正在注册监听器..."
     registering-commands: "正在注册命令..."
@@ -567,7 +571,17 @@ messages:
           - "这种植物成熟后,"
           - "收获时将获得人造绿宝石碎片."
   save-all: "正在保存网络拓展数据."
-  ae:
+  cellnet:
+    search:
+      title: "<gold>搜索"
+      current: "<passive>当前过滤 · <aqua>{0}"
+      none: "<passive>未设置搜索词"
+      hint: "<click_info>左键<passive> 输入关键词 · <click_info>右键<passive> 清除 · 支持拼音"
+      chat_hint: "<passive>请在聊天框输入搜索关键词 · 留空清除 · 支持拼音首字母"
+      set: "<success>搜索关键词 · <aqua>{0}"
+      cleared: "<success>已清除搜索关键词"
+      invalid: "<error>搜索词过长"
+      empty: "<error>没有匹配的物品"
     cell:
       button:
         whitelist: "<warning>白名单"
@@ -576,9 +590,6 @@ messages:
         whitelist_enabled: "<passive>  状态 · <success>● 已启用"
         whitelist_disabled: "<passive>  状态 · <passive>○ 已禁用"
         open_whitelist: "<passive>  点击管理白名单"
-        toggle_on: "<success>● 白名单已启用"
-        toggle_off: "<passive>○ 白名单已禁用"
-        toggle_hint: "<passive>  点击切换"
         setting_slot: "<passive>白名单物品"
         setting_slot_hint: "<passive>  手持物品点击此处添加"
         remove_item: "<error>  点击移除此物品"
@@ -593,17 +604,21 @@ messages:
         no_upgrade_material: "<error>  无可用的升级材料"
         raw_capacity: "<error>  每单元容量: {0}"
         item_count: "<passive>  数量 · <white>{0}"
+        reserved_on_lore: "<success>🔒 已保留单元 · <click_info>Shift+左键<passive> 取消"
+        reserved_off_lore: "<passive>Shift+左键 <white>保留该单元"
+        void_excess_on_lore: "<error>🔥 满载清空已开启 · <click_info>Shift+右键<passive> 关闭"
+        void_excess_off_lore: "<passive>Shift+右键 <white>满载清空该单元"
         rename: "<gold>命名"
         rename_current: "<passive>  当前名称 · <white>{0}"
         rename_default: "未命名"
         rename_hint: "<passive>  点击在聊天栏输入新名称"
       menu:
-        title_view: "预览"
-        title_whitelist: "存储元件 · 白名单"
+        title_view: "<gold>预览"
+        title_whitelist: "<gold>存储元件 · 白名单"
         opened_by_another: "<error>该元件正被其他玩家查看，请稍后再试"
-        prev_page: "<white>上一页"
+        prev_page: "<aqua>上一页"
         first_page: "<passive>已是第一页"
-        next_page: "<white>下一页"
+        next_page: "<aqua>下一页"
         last_page: "<passive>已是最后一页"
       lore:
         capacity_line: "<passive>  单格容量 · <white>{0}"
@@ -628,41 +643,154 @@ messages:
       rename_failed: "<error>重命名失败，请确保元件在你的背包中"
       rename_success: "<success>元件已重命名为: {0}"
       wrong_server: "<error>该元件属于其它服务器，无法使用"
-      whitelist_not_allowed: "<error>潜影盒与存储元件不能加入白名单"
+      whitelist_not_allowed: "<error>已使用的元件与装有物品的容器不能加入白名单"
+      reserved_on: "<success>已为该物品保留单元：数量归零后该单元仍被占用，其它物品无法挤占"
+      reserved_off: "<passive>已取消该物品的单元保留"
+      void_excess_on: "<success>已对该单元开启满载清空：该类型已满时多余的将被销毁"
+      void_excess_off: "<passive>已对该单元关闭满载清空"
+    line:
+      mode-locked: "<error>需要插入模式模块才能切换传输模式"
+      mode-name: "<gold>传输模式"
+      mode-hint: "<passive>左键下一个 · 右键上一个"
+      mode-row-current: "<success>● {0}"
+      mode-row-other: "<passive>○ {0}"
+      modes.NONE: "无限制模式"
+      modes.NULL_ONLY: "仅空模式"
+      modes.NONNULL_ONLY: "仅非空模式"
+      modes.FIRST_ONLY: "仅首位模式"
+      modes.LAST_ONLY: "仅末位模式"
+      modes.FIRST_STOP: "首位阻断模式"
+      modes.LAZY: "懒惰模式"
+      modes.VOID: "清空模式"
+      modes.SPECIFIED_QUANTITY: "指定数量模式"
+      modes.P2P: "强对称模式"
+      distance-set: "<success>距离已设为 {0} 格 (上限 {1} 格)"
+      distance-locked: "<passive>距离保持 {0} 格 (上限 {1} 格，插入距离模块可提升)"
+      distance-name: "<gold>传输距离 · <white>{0} 格 <passive>/ 上限 {1} 格"
+      distance-lore:
+        - "<passive>机器沿所选方向最远工作到第几格容器"
+        - "<click_info>手持任意物品点击<passive> · 物品数量即格数（不消耗）"
+        - "<passive>装入链式距离模块可提升上限"
+      direction-name: "<gold>方向 · <white>{0}"
+      direction-north: "北"
+      direction-south: "南"
+      direction-west: "西"
+      direction-east: "东"
+      direction-up: "上"
+      direction-down: "下"
+      template-locked-name: "<error>推送物品槽"
+      template-locked-lore: "<passive>要推送的物品放这里 · 扩容模块解锁"
+      module-not-module: "<error>只能放入模块物品"
+      module-capacity-unsupported: "<error>抓取器没有模板槽，不需要扩容模块"
+      module-binding-unsupported: "<error>抓取器没有推送侧，不需要绑定模块"
+      module-slot-name: "<passive>模块槽"
+      module-slot-lore: "<passive>放入模块"
+      direction-no-permission: "<error>无权打开该目标方块"
+      direction-no-target: "<error>该方向没有可打开的容器"
+      binding-entry-name: "<gold>分工供应"
+      binding-entry-lore: "<passive>给线上每个容器单独指定要供应的物品"
+      binding-locked-name: "<passive>分工供应"
+      binding-locked-lore: "<passive>装入链式绑定模块解锁"
+      binding-module-required: "<error>请先装入链式绑定模块"
+      binding-grabber-unsupported: "<error>抓取器没有推送侧，无法使用分工供应"
+      binding-title-directions: "分工供应 · 选择方向"
+      binding-title-targets: "分工供应 · {0}"
+      binding-title-edit: "分工供应 · {0} 距离 {1}"
+      binding-info-name: "<aqua>该格供应清单"
+      binding-info-lore: "<passive>清单 <aqua>{0}<passive> / <aqua>{1} 种"
+      binding-direction-name: "<aqua>方向 · <white>{0}"
+      binding-direction-lore: "<passive>线上容器 <aqua>{0}<passive> 个 · 已设清单 <aqua>{1}<passive> 处"
+      binding-direction-closed: "<error>该方向未开启"
+      binding-mode-name: "<aqua>该方向传输模式"
+      binding-mode-follow: "跟随整机"
+      binding-mode-hint: "<passive>左键下一档 · 右键上一档 · 不设则跟随整机"
+      binding-target-name: "<aqua>{0} · <white>距离 {1}"
+      binding-target-position: "<aqua>第 <white>{0}<aqua> 格 · <white>{1}"
+      binding-list-item: "<passive>· "
+      binding-edit-hint-add: "<gold>[左键]<aqua> 录入物品（不消耗）"
+      binding-edit-hint-remove: "<gold>[右键]<aqua> 移除物品"
+      binding-status-ok: "<success>供应正常"
+      binding-status-starving: "<warning>断货跳轮 · 静候补货"
+      binding-status-empty: "<passive>空清单 · 暂停供应"
+      binding-status-distance: "<warning>超出传输距离 · 提升后生效"
+      binding-status-unreachable: "<passive>休眠 · 线路截断"
+      binding-status-shared: "<passive>未设清单 · 沿用整机模板"
+      binding-and-more: "<passive>…等 {0} 种"
+      binding-hint-edit: "<gold>[左键]<aqua> 编辑清单"
+      binding-hint-open: "<gold>[右键]<aqua> 打开容器"
+      binding-hint-unbind: "<gold>[Shift+左键]<aqua> 清除该格清单"
+      binding-hint-cycle-mode: "<gold>[Shift+右键]<aqua> 切换传输模式"
+      binding-mode-line: "<passive>模式 · <aqua>{0}"
+      binding-duplicate: "<error>清单中已有该物品"
+      binding-full: "<error>清单已满（最多 9 种）"
+      binding-unbind-item-removed: "<success>已从清单移除该物品"
+      binding-save-rejected: "<error>保存失败：数据过大或序列化异常"
+      binding-machine-gone: "<error>机器已不存在"
+      binding-target-gone: "<error>该距离位目标已不在线上"
+      configurator-title-select: "链式配置器 · 选择方向"
+      configurator-info-lore: "<passive>选方向 = 复制该方向全部绑定配置"
+      configurator-dir-count: "<passive>已绑定 <aqua>{0} 条"
+      configurator-dir-mode: "<passive>模式覆盖 · <white>{0}"
+      configurator-dir-hint: "<gold>[左键]<aqua> 复制方向"
+      configurator-lore-face: "<passive>已存方向 · <aqua>{0}"
+      configurator-lore-count: "<passive>绑定 · <aqua>{0} 条"
+      configurator-lore-follow: "<passive>模式覆盖 · 跟随整机"
+      configurator-lore-hint-copy: "<gold>[左键]<aqua> 复制方向配置"
+      configurator-lore-hint-apply: "<gold>[右键]<aqua> 应用到机器"
+      configurator-lore-hint-clear: "<gold>[Shift+空挥]<aqua> 清空已存配置"
+      configurator-lore-mode: "<passive>模式覆盖 · <aqua>{0}"
+      brush-no-line: "<error>这台机器不在任何绑定线上"
+      brush-summary-label: "<passive>━━ <aqua>清单<passive> ━━"
+      brush-summary-empty: "<passive>未设清单"
+      brush-summary-bullet: "<passive>· "
+      brush-drag-title: "清单笔 · 批量写入 · {0} 向"
+      brush-drag-hint-add: "<gold>[左键]<aqua> 手持物品写入该格"
+      brush-drag-hint-clear: "<gold>[Shift+左键]<aqua> 清除该格清单"
+      brush-drag-hint-edit: "<gold>[右键]<aqua> 精细编辑"
+      brush-dir-hint-drag: "<gold>[右键]<aqua> 批量写入整方向"
+    collect:
+      bind: "<success>已绑定网络：{0}"
+      unbind: "<success>已解绑"
+      no-bind: "<warning>手里这个还没绑定网络"
+      mode-inventory: "<success>收纳方式：先进背包，装不下再进网络"
+      mode-direct: "<success>收纳方式：掉落直接进网络"
+      no-permission: "<error>这个网络不归你管"
+      apply-success: "<success>成了，击杀挖矿的掉落会收进绑定的网络"
+      mark-lore: "§5网络收纳"
     drive:
-      slot_marker: "元件槽位"
-      slot_marker_lore: "<passive>  手持元件 · 点击放入"
-      display_name: "<passive>AE 驱动器"
-      item_count: "<passive>  数量 · <white>{0}"
-      cell_count: "<passive>  元件 · <white>{0}<passive> / <white>{1}"
-      total_items: "<passive>  物品 · <white>{0}"
-      item_types: "<passive>  种类 · <white>{0}"
-      more_items: "<passive>  ··· 还有更多"
-      item_entry: "<white>  {0}<passive> · <white>{1}"
-      access_hint: "<passive>  点击浏览全部库存"
+      slot_marker: "<gold>元件槽位"
+      slot_marker_lore: "<passive>手持元件 · <click_info>点击<passive>放入"
+      display_name: "<gold>元件驱动器"
+      item_count: "<passive>数量 <aqua>{0}"
+      cell_count: "<passive>元件 <aqua>{0}<passive> / <aqua>{1}"
+      link_support: "<gold>纠缠链接 · <success>可用"
+      total_items: "<passive>物品 <aqua>{0}"
+      item_types: "<passive>种类 <aqua>{0}"
+      more_items: "<passive>··· 还有更多"
+      item_entry: "<aqua>{0}<passive> × <aqua>{1}"
+      access_hint: "<click_info>点击<passive>浏览全部库存"
       browse: "<passive>浏览库存"
-      prev_page: "<white>◀ 上一页"
+      prev_page: "<aqua>◀ 上一页"
       first_page: "<passive>◀ 已是第一页"
-      next_page: "<white>下一页 ▶"
+      next_page: "<aqua>下一页 ▶"
       last_page: "<passive>已是最后一页 ▶"
       back: "<passive>返回"
-      preview_title: "库存预览"
-      saving: "正在保存驱动器元件数据..."
-      saved: "保存成功"
-      cell_uuid_duplicate: "<error>无法放入：该元件UUID已存在于当前驱动器"
+      preview_title: "<gold>库存预览"
+      saving: "已提交驱动器元件数据保存..."
+      cell_uuid_duplicate: "<error>无法放入：该元件 UUID 已存在于当前驱动器"
       whitelist_button: "<gold>权限 · 白名单"
-      whitelist_owner: "<passive>  所有者 · <white>{0}"
-      whitelist_count: "<passive>  白名单 · <white>{0}<passive> 人"
-      whitelist_no_owner: "<error>  该驱动器暂无所有者"
-      whitelist_open_hint: "<passive>  点击管理白名单玩家"
-      whitelist_title: "AE 驱动器 · 白名单"
+      whitelist_owner: "<passive>所有者 <aqua>{0}"
+      whitelist_count: "<passive>白名单 <aqua>{0}<passive> 人"
+      whitelist_no_owner: "<error>该驱动器暂无所有者"
+      whitelist_open_hint: "<click_info>点击管理白名单玩家"
+      whitelist_title: "<gold>元件驱动器 · 白名单"
       whitelist_owner_head: "<gold>所有者 · {0}"
-      whitelist_owner_head_lore: "<passive>  放置此驱动器的玩家"
+      whitelist_owner_head_lore: "<passive>放置此驱动器的玩家"
       whitelist_add: "<success>添加玩家"
-      whitelist_add_lore: "<passive>  点击后在聊天栏输入玩家名"
-      whitelist_remove_hint: "<error>  点击移除此玩家"
+      whitelist_add_lore: "<click_info>点击后在聊天栏输入玩家名"
+      whitelist_remove_hint: "<error>点击移除此玩家"
       whitelist_not_owner: "<error>你不是该驱动器的所有者"
-      whitelist_enter_name: "<success>请在聊天栏输入要添加的玩家名："
+      whitelist_enter_name: "<success>请在聊天栏输入要添加的玩家名"
       whitelist_player_not_found: "<error>找不到该玩家"
       whitelist_name_invalid: "<error>玩家名无效，只能包含字母、数字、下划线"
       whitelist_name_too_long: "<error>玩家名过长（最多 16 个字符）"
@@ -674,50 +802,38 @@ messages:
       whitelist_add_timeout: "<warning>输入超时，已取消添加白名单"
       break_not_allowed: "<error>你没有权限破坏这个驱动器"
     cleaner:
-      title: "<passive>元件清理台"
-      cell_slot: "<passive>元件放置槽"
-      cell_slot_lore: "<passive>  手持元件点击放入"
-      cell_name: "<passive>  元件 · <white>{0}"
-      item_types: "<passive>  物品种类 · <white>{0}"
-      item_count: "<passive>  数量 · <white>{0}"
-      delete_hint: "<passive>  Shift+点击删除此物品"
-      no_cell: "<passive>  未放入元件"
+      cell_name: "<passive>元件 <aqua>{0}"
+      item_types: "<passive>物品种类 <aqua>{0}"
+      item_count: "<passive>数量 <aqua>{0}"
+      delete_hint: "<click_info>Shift+点击删除此物品"
+      no_cell: "<passive>未放入元件"
       info_title: "<passive>元件清理台"
-      prev_page: "<passive>◀ 上一页"
+      prev_page: "<aqua>◀ 上一页"
       first_page: "<passive>◀ 已是第一页"
-      next_page: "<passive>下一页 ▶"
+      next_page: "<aqua>下一页 ▶"
       last_page: "<passive>已是最后一页 ▶"
-      close: "<passive>关闭"
-      display_placeholder: "<passive>  空槽位"
     converter:
-      title: "<passive>元件量子转换机"
-      cell_slot: "<passive>元件放置槽"
-      cell_slot_lore: "<passive>  手持元件点击放入"
-      item_count: "<passive>  数量 · <white>{0}"
-      transfer_hint: "<passive>  点击转移"
+      item_count: "<passive>数量 <aqua>{0}"
+      transfer_hint: "<click_info>点击转移"
       output_full: "<passive>输出槽已满，取走后再转"
       no_matching_storage: "<passive>该元件容量没有对应量子储存等级"
-      mode_transfer: "<passive>元件 → 量子储存"
-      mode_import: "<passive>量子储存 → 元件"
-      mode_hint: "<passive>  点击切换模式"
       no_quantum_storage: "<passive>请先放入同级量子储存"
       tier_mismatch: "<passive>量子储存等级与元件不符"
       units_full: "<error>元件种类已满，先清理一部分"
       whitelist_rejected: "<error>该物品不在白名单中"
       item_capacity_full: "<error>该物品已达单格容量上限"
       info_title: "<passive>元件信息"
-      cell_name: "<passive>  元件 · <white>{0}"
-      item_types: "<passive>  物品种类 · <white>{0}"
-      no_cell: "<passive>  未放入元件"
-      output_count: "<passive>  输出占用 · <white>{0}<passive>/{1}"
-      prev_page: "<white>◀ 上一页"
+      cell_name: "<passive>元件 <aqua>{0}"
+      item_types: "<passive>物品种类 <aqua>{0}"
+      no_cell: "<passive>未放入元件"
+      output_count: "<passive>输出占用 <aqua>{0}<passive>/{1}"
+      prev_page: "<aqua>◀ 上一页"
       first_page: "<passive>◀ 已是第一页"
-      next_page: "<white>下一页 ▶"
+      next_page: "<aqua>下一页 ▶"
       last_page: "<passive>已是最后一页 ▶"
-      close: "<error>关闭"
     persistence:
-      db_initialized: "AE 存储数据库初始化完成"
-      db_closed: "AE 存储数据库已关闭"
+      db_initialized: "网络元件存储数据库初始化完成"
+      db_closed: "网络元件存储数据库已关闭"
       backup_failed: "备份失败: {0}"
       backup_file_missing: "数据库文件不存在: {0}"
       backup_copy_failed: "复制数据库文件失败: {0}"
@@ -728,7 +844,7 @@ messages:
       cell_load_items_failed: "读取元件物品失败: {0}"
       cell_serialize_whitelist_failed: "序列化白名单失败: {0}"
       cell_deserialize_whitelist_failed: "反序列化白名单失败: {0}"
-      schema_init_failed: "AE schema 初始化失败: {0}"
+      schema_init_failed: "元件存储 schema 初始化失败: {0}"
       schema_mark_version_failed: "标记 schema 版本失败: {0}"
       template_insert_failed: "INSERT 物品模板失败: {0}"
       template_query_failed: "查询物品模板失败: {0}"
@@ -746,33 +862,400 @@ messages:
       checkpoint_query_max_id_failed: "查询 max journal_id 失败: {0}"
       checkpoint_archive_failed: "归档/清理失败: {0}"
       replay_lock_timeout: "Replay 获取锁超时"
+    input:
+      previous_cancelled: "<passive>已取消上一个待输入项"
+      channel_hint: "<click_info>输入态已激活：按 T 打开聊天框输入频道名回车（≤{0}字符）；输入 - 解绑"
+      channel_invalid: "<error>频道名无效：需非空且不超过 {0} 个字符"
+      target_hint: "<click_info>输入合成计划数量 · <passive>0 为持续合成"
+      keep_hint: "<click_info>输入保持数量 · <passive>0 为不补货"
+      target_invalid: "<error>请输入有效整数 · <passive>0 为持续合成"
+    assembly:
+      switch_on: "<success>装配器已启动"
+      switch_off: "<success>装配器已停止"
+      clear_slots_empty: "<error>配方槽内没有装配卡，无需清空"
+      slots_cleared: "<success>配方槽已清空，物品已退还"
+      blueprint_invalid: "<error>这不是有效的装配卡"
+      target_set: "<success>合成计划 <aqua>{0}<passive> · 0 为持续合成"
+      target_slot_lost: "<error>目标槽位已不存在"
+      status_name: "<gold>装配中心"
+      status_phase: "<passive>{0}"
+      phase_active: "<success>运行中"
+      phase_no_network: "<passive>未接入网络"
+      task_row_title: "<gold>产线"
+      task_gear: "<passive>速度 <aqua>{0}  {1}"
+      gear_on: "▮"
+      gear_off: "<passive>▯"
+      gear_stop: "<error>停"
+      gear_level: "<aqua>×{0}"
+      gear_max: "<gold>∞"
+      task_gear_max_note: "<passive>满负荷挡 · 一轮拉满，超出部分下秒继续"
+      task_continuous: "<passive>当前模式 · <success>持续合成"
+      task_plan: "<passive>当前模式 · <gold>合成计划 <aqua>剩余 {0}"
+      task_plan_unset: "<passive>当前模式 · <gold>合成计划<passive> · <error>未设置计划"
+      task_plan_done: "<passive>当前模式 · <gold>合成计划<passive> · <error>没有合成任务"
+      task_replenish: "<passive>当前模式 · <gold>补货<passive> · 保持 <aqua>{0}"
+      task_replenish_unset: "<passive>当前模式 · <gold>补货<passive> · <error>未设置数量"
+      task_hint: "<click_info>左键<passive> 升挡 · <click_info>右键<passive> 降挡 · <click_info>Shift+左键<passive> 切模式 · <click_info>Shift+右键<passive> 设数量"
+      task_replenish_stock: "<passive>库存 <aqua>{0}<passive> / <aqua>{1}<passive> · {2}"
+      task_replenish_ok: "<success>已满足"
+      task_replenish_doing: "<gold>补货中"
+      plan_on: "<success>已切换到合成计划<passive> · <click_info>Shift+右键<passive> 设置计划"
+      replenish_on: "<success>已切换到补货模式<passive> · <click_info>Shift+右键<passive> 设置计划"
+      continuous_on: "<success>已切换到持续合成"
+      keep_set: "<success>补货 · 保持 <aqua>{0}"
+      task_blocked: "<error>仓满停机"
+      task_available: "<passive>可合成 <aqua>{0}"
+      task_available_infinite: "<passive>可合成 <aqua>∞"
+      upgrade_invalid: "<error>只能放入超频核心"
+      smart_invalid: "<error>只能放入智能核心"
+      smart_slot_no_core: "<error>请先放入智能核心，再持配置器点击绑定"
+    workshop:
+      no_network: "<error>装配工坊未接入网络"
+      no_power: "<error>网络电力不足（需要 2000J）"
+      no_card: "<error>卡槽没有空白装配卡，网络中也没有可用的空白卡"
+      invalid_recipe: "<error>无法识别为真实配方"
+      material_short: "<error>材料数量不足，请补齐后再编码"
+      output_full: "<error>产物槽已满"
+      clear_no_recipe: "<error>卡槽中没有已编码的装配卡"
+      clear_ok: "<success>配方已清理，材料已退回材料槽"
+    storage_assembler:
+      status_name: "<gold>自动灌装机"
+      phase_run: "<success>● 运行中"
+      phase_paused: "<passive>‖ 已暂停"
+      phase_no_template: "<warning>▲ 待料 · 装货清单未设置"
+      phase_no_container: "<warning>▲ 待料 · 容器区为空"
+      phase_no_material: "<warning>▲ 待料 · 网络缺少清单物品"
+      phase_full: "<error>■ 输出区已满"
+      phase_no_network: "<error>■ 未接入网络"
+      phase_loading: "<warning>▲ 等待 · 抽屉数据加载中"
+      templates_line: "<passive>装货清单 <aqua>{0}<passive> 种"
+      storage_line: "<passive>容器区 <aqua>{0}<passive>/{1} · 灌装 <aqua>{2}<passive> · 输出 <aqua>{3}<passive>/{4}"
+      filled_line: "<passive>上轮灌入 <aqua>{0}"
+      hint_line: "<click_info>清单区<passive> 放入要灌装的物品 · <click_info>容器区<passive> 放入储存 · <gold>有多少灌多少"
+      state_empty: "空"
+      filling_line: "<gold>灌装中 · <white>{0}<white> 个容器"
+      paused: "<success>已暂停"
+      resumed: "<success>已继续"
+      container_rejected: "<error>只支持潜影盒 / 存储元件 / 量子存储 / 已绑定的抽屉"
+      container_oversize: "<error>容器 NBT 过大，禁止放入"
+      drawer_unbound: "<error>抽屉未绑定数据 · 先放置并破坏一次"
+      drawer_placed: "<error>抽屉数据正被别处的方块占用"
+      void_cell_rejected: "<error>虚空元件无法灌装"
+      break_not_allowed: "<error>你没有权限破坏这台自动灌装机"
+      pending_corrupted: "自动灌装机 pending 数据损坏，已清除并重新开始灌装: {0}"
+      buffer_corrupted: "自动灌装机 buffer 数据损坏，已清除: {0}"
+    void:
+      title: "<gold>虚空元件 · 过滤器"
+      not_void_cell: "<error>这不是虚空元件"
+      cell_lore:
+        - "<passive>销毁命中的物品，为网络溢流兜底"
+        - "<click_info>右键<passive> 设置过滤器"
+        - "<error>不可放入末影驱动器"
+      saved: "<success>过滤器已保存"
+      extra_whitelist: "<passive>白名单 · 命中才吞"
+      editing_by_other: "<error>该元件正在被其他玩家编辑"
+      save_target_missing: "<error>找不到原元件，本次修改未保存"
+      filter_rejected: "<error>虚空元件与黑名单物品不能作过滤器"
+      lore_filter_empty: "<passive>过滤器 · 未设置（右键编辑）"
+      lore_filter_header: "<passive>过滤器 · <aqua>{0}<passive> 类"
+      lore_filter_entry: "<passive>· <aqua>{0}"
+    ender:
+      sneak_hint: "<passive>潜行 + 单击中央槽位绑定频道"
+      bind_failed: "<error>频道绑定失败，请重试"
+      display_name: "<gold>末影驱动器 · <aqua>{0}"
+      channel_none: "<passive>未绑定"
+      channel_bound: "<success>已绑定频道 <aqua>{0}"
+      channel_unbound: "<passive>已解绑"
+      unbind_nothing: "<passive>该驱动器未绑定任何频道"
+      unbind_not_owner: "<error>你不是这台驱动器的主人，无权解绑"
+      display_shared: "<success>共享中 · 同频元件互通"
+      display_independent: "<passive>独立 · 未加入频道"
+      display_members: "<passive>频道成员 <aqua>{0}<passive> 个元件"
+      display_sneak_hint: "<click_info>点中央槽位解绑 · 绑定用配置器"
+      void_rejected: "<error>虚空元件不能放入末影驱动器"
+      table_create_failed: "末影频道数据库建表失败"
+      write_failed: "末影频道数据写入失败: {0}"
+      read_failed: "末影频道数据读取失败: {0}"
+    configurator:
+      not_ender_drive: "<error>这个方块不是末影驱动器"
+      not_owner: "<error>你不是这台驱动器的主人"
+      copied: "<success>已复制频道 <aqua>{0}"
+      drive_no_channel: "<error>该驱动器还没有频道，直接右键生成"
+      bound: "<success>已绑定频道 <aqua>{0}"
+      bound_new: "<success>已生成频道 <aqua>{0}<success> 并绑定"
+      cleared: "<passive>配置器已清空"
+    monitor:
+      title: "<gold>装配监控器"
+      drive_name: "<gold>装配驱动器 <aqua>({0}, {1}, {2})"
+      drive_status_on: "<success>运行中"
+      drive_status_off: "<passive>已停机"
+      core_overclock: "<gold>超频✓"
+      core_smart: "<aqua>智能✓"
+      core_none: "<error>无核心"
+      drive_lines: "<passive>活跃产线 <aqua>{0}<passive>/9"
+      drive_blocked: "<error>仓满停机 <aqua>{0}"
+      drive_hint: "<click_info>左键<passive> 查看产线 · <click_info>右键<passive> 打开驱动器"
+      refresh_name: "<gold>刷新"
+      prev_page: "<aqua>◀ 上一页"
+      first_page: "<passive>◀ 已是第一页"
+      next_page: "<aqua>下一页 ▶"
+      last_page: "<passive>已是最后一页 ▶"
+      back: "<passive>返回"
+      detail_open: "<gold>打开驱动器界面"
+      name_button: "<gold>命名产线"
+      name_current: "<passive>当前名称 · <aqua>{0}"
+      name_none: "<error>未命名"
+      name_action_gear: "<click_info>左键<passive> 命名"
+      name_action_clear: "<click_info>右键<passive> 清除命名"
+      name_hint: "<click_info>输入名称 · <passive>最长 16 字符 · 输入 - 清除"
+      name_set: "<success>已命名为 <aqua>{0}"
+      name_invalid: "<error>名称为空或超过 16 字符"
+      name_cleared: "<success>已清除装配驱动器命名"
+      name_duplicate: "<error>命名 <aqua>{0}<error> 已被其他装配驱动器使用"
+      search_name: "<gold>搜索产线 / 驱动器"
+      search_none: "<passive>未设置搜索词"
+      search_current: "<passive>当前过滤 · <aqua>{0}"
+      search_hint_button: "<click_info>左键<passive>输入关键词 · <click_info>右键<passive>清除 · 支持拼音"
+      search_hint: "<passive>请在聊天框输入搜索关键词 · 留空清除 · 支持拼音首字母"
+      search_set: "<success>搜索关键词 · <aqua>{0}"
+      search_cleared: "<success>已清除搜索关键词"
+      search_invalid: "<error>搜索词过长"
+      search_empty: "<error>没有匹配的产线"
+      drive_not_loaded: "<error>该驱动器未加载，先手动打开一次"
+      line_mode_continuous: "<success>持续合成"
+      line_mode_plan: "<gold>合成计划 · 剩余 <aqua>{0}"
+      line_mode_plan_unset: "<error>合成计划 · 未设置计划"
+      line_mode_plan_done: "<gold>合成计划 · 没有任务"
+      line_mode_replenish: "<gold>补货 · 保持 <aqua>{0}"
+      line_mode_replenish_unset: "<error>补货 · 未设置数量"
+      view_all: "<gold>视图 · 全部产线"
+      view_lines: "<gold>视图 · 按驱动器"
+      all_none: "<error>没有已命名的装配驱动器"
+      line_belongs: "<passive>属于 <gold>{0}"
+      line_gear: "<passive>速度 {0}"
+      line_gear_stop: "<passive>速度 · <error>停"
+      line_blocked: "<error>仓满停机"
+      line_hint_gear: "<click_info>左键<passive> 升挡 · <click_info>右键<passive> 降挡"
+      line_hint_mode: "<click_info>Shift+左键<passive> 切模式 · <click_info>Shift+右键<passive> 设置数量"
+      no_permission: "<error>你没有权限管理这台驱动器"
+    manager:
+      title: "<gold>驱动器监视器"
+      drive_name: "<gold>元件驱动器 <aqua>({0}, {1}, {2})"
+      type_standard: "<machine>标准"
+      type_ender: "<tool>末影"
+      cells: "<passive>元件 <aqua>{0}<passive>/9"
+      stored: "<passive>存储物品 <aqua>{0}"
+      drive_hint: "<click_info>左键<passive> 打开 · <click_info>右键<passive> 箭头指引"
+      drive_hint_name: "<click_info>Shift+左键<passive> 命名 · <click_info>Shift+右键<passive> 清除命名"
+      empty: "<error>网络中没有元件驱动器"
+      search_name: "<gold>搜索驱动器"
+      search_none: "<passive>未设置搜索词"
+      search_current: "<passive>当前过滤 · <aqua>{0}"
+      search_hint_button: "<click_info>左键<passive>输入关键词 · <click_info>右键<passive>清除 · 支持拼音"
+      search_set: "<success>搜索关键词 · <aqua>{0}"
+      search_cleared: "<success>已清除搜索关键词"
+      search_empty: "<error>没有匹配的驱动器"
+      name_cleared: "<success>已清除驱动器命名"
+      name_set: "<success>已命名为 <aqua>{0}"
+      guide_started: "<success>指引已开启 · 跟随地面箭头寻找驱动器"
+      guide_arrived: "<success>已到达驱动器"
+      guide_replaced: "<passive>已切换指引目标"
+      guide_distance: "<gold>元件驱动器<white> · 距离 <aqua>{0}<white> 格{1}"
+      guide_up: "<gold> · 目标更高"
+      guide_down: "<gold> · 目标更低"
+    assemblycard:
+      title: "<gold>装配卡 · 配方编辑"
+      not_card: "<error>手里已经不是装配卡了"
+      save_ok: "<success>配方已保存"
+      save_failed_output: "<error>产物槽为空"
+      save_failed_inputs: "<error>请先在 3×3 格子摆放材料"
+      save_failed_blacklist: "<error>输入或产物包含不允许的物品"
+      save_failed_same: "<error>产物不能与材料相同"
+      save_failed_overflow: "<error>材料超出上限：最多 {0} 种 / {1} 个"
+      save_failed_not_real: "<error>摆法对不上任何配方，无法保存"
+      save_failed_disabled: "<error>该配方产物已禁用"
+      save_failed_moved: "<error>编辑期间手里的卡被挪动，本次保存作废"
+      clear_done: "<passive>卡片已重置为空白，可重新配置配方"
+      clear_failed_moved: "<error>编辑期间手里的卡被挪动，本次重置作废"
+      lore_output: "<passive>产物"
+      lore_inputs: "<passive>材料（每轮消耗）"
+      lore_entry: "<aqua>{0}<passive> × <aqua>{1}"
 icons:
-  ae-back-button:
-    name: "&c返回"
-  ae-drive-whitelist-add:
-    name: "&a添加玩家"
+  cellnet-back-button:
+    name: "<gold>返回"
+  cellnet-search-empty:
+    name: "<error>没有匹配的物品"
     lore:
-      - "&7  &r点击后在聊天栏输入玩家名"
-  ae-drive-browse:
-    name: "&r浏览库存"
+      - "<passive>右键搜索按钮可清除过滤"
+  cellnet-assemblycard-save:
+    name: "<gold>保存配方"
     lore:
-      - "&7  &r点击浏览全部库存"
-  ae-cleaner-cell-slot:
-    name: "&a元件放置槽"
+      - "<passive>摆法对不上配方则<error>无法保存"
+      - "<passive>槽内材料会归还"
+  cellnet-assemblycard-clear:
+    name: "<gold>重置卡片"
     lore:
-      - "&7  &r手持元件点击放入"
-  ae-cleaner-close:
-    name: "&c关闭"
-  ae-display-placeholder:
+      - "<passive>槽内材料会归还"
+      - "<passive>卡片清空，可重新配置配方"
+  cellnet-assemblycard-arrow:
+    name: "<gold>→ 产物预览"
+  cellnet-assemblycard-hint:
+    name: "<gold>使用说明"
+    lore:
+      - "<click_info>点击或拖拽<passive>，把材料摆进 3×3 格子"
+      - "<passive>摆好后<click_info>点保存<passive>，自动识别产物"
+      - "<passive>已录配方会回填，微调后重新保存"
+  cellnet-assembly-slot-marker:
+    name: "<gold>产线槽"
+    lore:
+      - "<passive>放入装配卡"
+      - "<click_info>空手点击<passive>取回"
+  cellnet-assembly-upgrade-slot:
+    name: "<gold>升级槽"
+    lore:
+      - "<passive>放入超频核心"
+      - "<passive>解锁满负荷挡 <gold>∞"
+  cellnet-assembly-smart-slot:
+    name: "<gold>智能槽"
+    lore:
+      - "<passive>放入智能核心"
+      - "<passive>持<click_info>频道配置器<passive>点击绑定频道"
+  cellnet-assembly-switch-on:
+    name: "<success>装配 · 运行中"
+    lore:
+      - "<click_info>点击<passive>切换整机状态"
+  cellnet-assembly-switch-off:
+    name: "<passive>装配 · 已停止"
+    lore:
+      - "<click_info>点击<passive>切换整机状态"
+  cellnet-assembly-task-empty:
+    name: "<passive>空产线 · 放入装配卡"
+  cellnet-void-info:
+    name: "<gold>虚空过滤器"
+    lore:
+      - "<passive>下方 <aqua>9<passive> 格放过滤器，像箱子一样操作"
+      - "<passive>改动即时保存"
+      - "<passive>命中即<gold>销毁"
+  cellnet-void-close:
+    name: "<error>关闭"
+    lore:
+      - "<passive>改动已即时保存"
+      - "<passive>按 <click_info>E<passive> 关闭同样生效"
+  cellnet-drive-whitelist-add:
+    name: "<success>添加玩家"
+    lore:
+      - "<click_info>点击<passive>后在聊天栏输入玩家名"
+  cellnet-drive-browse:
+    name: "<gold>浏览库存"
+    lore:
+      - "<passive>查看网络全部库存"
+  cellnet-template-slot-marker:
+    name: "<aqua>模板槽"
+    lore:
+      - "<passive>放入想让机器灌装的物品"
+      - "<passive>可放多种 · 按从左到右顺序灌装"
+  cellnet-assembler-status:
+    name: "<gold>运行状态"
+    lore:
+      - "<passive>实时显示当前状态与灌装进度"
+  cellnet-assembler-pause:
+    name: "<gold>暂停"
+    lore:
+      - "<passive>暂停取料与灌装 · 进度保留"
+  cellnet-assembler-resume:
+    name: "<success>继续"
+    lore:
+      - "<passive>恢复自动灌装 · 接续暂停前的进度"
+  cellnet-assembler-box-off:
+    name: "<passive>潜影盒均分 · 关"
+    lore:
+      - "<passive>只对潜影盒生效"
+      - "<click_info>点击开启<passive> · 多种模板轮流占用盒内格子"
+  cellnet-assembler-box-on:
+    name: "<success>潜影盒均分 · 开"
+    lore:
+      - "<passive>只对潜影盒生效"
+      - "<click_info>点击关闭<passive> · 恢复按顺序装满格子"
+  cellnet-assembly-drive-clear-slots:
+    name: "<error>清空配方槽"
+    lore:
+      - "<passive>点击退还全部配方槽内的物品"
+  cellnet-workshop-encode:
+    name: "<gold>编码配方"
+    lore:
+      - "<passive>左键编码一次 · Shift 至多 64 次"
+  cellnet-workshop-clear:
+    name: "<error>清理配方"
+    lore:
+      - "<passive>放入已编码卡后点击：材料退回材料槽，卡恢复如新"
+  cellnet-converter-mode-export:
+    name: "<passive>元件 → 量子储存"
+    lore:
+      - "<click_info>点击切换模式"
+  cellnet-converter-mode-import:
+    name: "<passive>量子储存 → 元件"
+    lore:
+      - "<click_info>点击切换模式"
+  cellnet-cell-toggle-on:
+    name: "<success>● 白名单已启用"
+    lore:
+      - "<passive>点击切换"
+  cellnet-cell-toggle-off:
+    name: "<passive>○ 白名单已禁用"
+    lore:
+      - "<passive>点击切换"
+  cellnet-cell-upgrade-max:
+    name: "<gold>无需升级"
+  cellnet-page-arrow:
+    name: "<passive>翻页"
+  cellnet-search-icon:
+    name: "<gold>搜索库存"
+  cellnet-preview-fill:
+    name: "<passive>预览区"
+  cellnet-line-module-slot:
+    name: "<passive>模块槽"
+  cellnet-line-template-locked:
+    name: "<error>推送物品槽"
+  cellnet-line-distance:
+    name: "<gold>传输距离"
+  cellnet-line-mode-on:
+    name: "<gold>传输模式"
+  cellnet-line-mode-off:
+    name: "<passive>传输模式"
+  cellnet-line-direction-on:
+    name: "<success>方向"
+  cellnet-line-direction-off:
+    name: "<aqua>方向"
+  cellnet-line-direction-fallback:
+    name: "<gold>方向"
+  cellnet-chain-binding-entry:
+    name: "<gold>绑定供应"
+  cellnet-chain-binding-entry-locked:
+    name: "<passive>绑定供应"
+  cellnet-chain-binding-info:
+    name: "<gold>绑定管理"
+  cellnet-chain-binding-mode-on:
+    name: "<gold>方向模式覆盖"
+  cellnet-cleaner-cell-slot:
+    name: "<success>元件放置槽"
+    lore:
+      - "<passive>手持元件<click_info>点击<passive>放入"
+  cellnet-cleaner-close:
+    name: "<error>关闭"
+  cellnet-display-placeholder:
     name: " "
-  ae-converter-border:
+  cellnet-converter-border:
     name: " "
-  ae-converter-separator:
-    name: " "
-  ae-setting-slot:
-    name: "&a白名单物品"
+  cellnet-converter-cell-slot:
+    name: "<success>元件放置槽"
     lore:
-      - "&7手持物品点击此处添加"
+      - "<passive>手持元件<click_info>点击<passive>放入"
+  cellnet-converter-close:
+    name: "<error>关闭"
+  cellnet-setting-slot:
+    name: "<success>白名单物品"
+    lore:
+      - "<passive>手持物品<click_info>点击<passive>此处添加"
   keybind-settings:
     name: "&6按键控制设置"
   light-gray-background:
@@ -1317,6 +1800,11 @@ icons:
     name: "&6链接使用: &d量子纠缠奇点"
     lore:
       - "&a点击将链接使用改为&d超链接"
+  linker-target-switch:
+    name: "&6绑定目标"
+    lore:
+      - "&a点击切换要绑定的存储类型"
+      - "&7仅量子纠缠模式生效"
   recipe-types:
     expansion_workbench_3x3:
       name: "网络拓展工作台"
@@ -1702,6 +2190,104 @@ items:
       - "&c不可调整运输数量"
       - "&e与乱序技艺的链式传输器不同的是，此机器&c只有连续抓取的功能"
       - "&c而不是连续转移物品！"
+
+  NTW_EXPANSION_CHAIN_GRABBER:
+    name: "链式抓取器"
+    lore:
+      - "<passive>沿设定方向把容器物品抓进网络"
+      - ""
+      - "<click_info>手持物品点距离槽<passive> 数量即距离"
+      - "<passive>插入<gold>链式模块<passive>扩展能力"
+
+  NTW_EXPANSION_CHAIN_PUSHER:
+    name: "链式推送器"
+    lore:
+      - "<passive>把模板物品沿设定方向推进线路容器"
+      - ""
+      - "<click_info>模板槽<passive> 放入要推送的物品"
+      - "<passive>插入<gold>链式模块<passive>扩展能力"
+
+  NTW_EXPANSION_CHAIN_TRANSCEIVER:
+    name: "链式收发器"
+    lore:
+      - "<passive>同一条线路，先推模板物品再抓回目标物品"
+      - ""
+      - "<click_info>模板槽<passive> 放入要推送的物品"
+      - "<passive>插入<gold>链式模块<passive>扩展能力"
+
+  NTW_EXPANSION_CHAIN_MODULE_RANGE:
+    name: "链式距离模块"
+    lore:
+      - "<passive>提升链式机器的传输距离"
+      - ""
+      - "<passive>每片 <aqua>+16 格<passive>，最多叠 3 片"
+      - "<click_info>放入模块槽<passive> 即生效"
+
+  NTW_EXPANSION_CHAIN_MODULE_CAPACITY:
+    name: "链式扩容模块"
+    lore:
+      - "<passive>给推送器 / 收发器增加模板槽"
+      - ""
+      - "<passive>每片 <aqua>+3 格<passive>，最多叠 2 片"
+      - "<error>抓取器没有模板槽，放入无效"
+
+  NTW_EXPANSION_CHAIN_MODULE_MODE:
+    name: "链式模式模块"
+    lore:
+      - "<passive>解锁传输模式切换"
+      - ""
+      - "<click_info>放入模块槽<passive> 即生效"
+      - "<click_info>点模式槽<passive> 左右键切换"
+
+  NTW_EXPANSION_CHAIN_MODULE_VANILLA:
+    name: "链式原版容器模块"
+    lore:
+      - "<passive>让链式机器识别原版容器"
+      - ""
+      - "<click_info>放入模块槽<passive> 即生效"
+
+  NTW_EXPANSION_CHAIN_MODULE_MULTI_DIRECTION:
+    name: "链式多方向模块"
+    lore:
+      - "<passive>让链式机器同时朝多个方向传输"
+      - ""
+      - "<click_info>点方向槽<passive> 添加或移除方向"
+
+  NTW_EXPANSION_CHAIN_MODULE_BINDING:
+    name: "链式绑定模块"
+    lore:
+      - "<passive>装入推送器 / 收发器，解锁<gold>分工供应<passive>功能"
+      - "<passive>给线上每个容器单独指定要供应的物品"
+      - ""
+      - "<click_info>放入模块槽<passive> 即生效 · 拔出后数据保留"
+  NTW_EXPANSION_CHAIN_CONFIGURATOR:
+    name: "链式配置器"
+    lore:
+      - "<passive>整线复刻 · 一键迁移"
+      - ""
+      - "<gold>[左键]<aqua> 源机器 · 复制方向配置"
+      - "<gold>[右键]<aqua> 目标机器 · 逐距离写入"
+      - "<gold>[Shift+空挥]<aqua> 清空已存配置"
+      - "<passive>应用时潜行 · 只写清单不写模式"
+
+  NTW_EXPANSION_CHAIN_BRUSH:
+    name: "链式清单笔"
+    lore:
+      - "<passive>点到即改 · 隔空定喂"
+      - ""
+      - "<gold>[右键]<aqua> 线上机器 · 直达清单编辑"
+      - "<gold>[Shift+右键]<aqua> 线上机器 · 清空该位清单"
+      - "<gold>[右键]<aqua> 推送器 · 打开方向页"
+      - "<passive>方向页内右键方向 · 批量写入整方向"
+
+  NTW_EXPANSION_RUNE_COLLECT:
+    name: "网络符文"
+    lore:
+      - "<passive>丢在剑、镐、斧、锄、铲旁边合成"
+      - "<success>用它打怪挖矿，掉落直接进绑定的网络"
+      - ""
+      - "<click_info>潜行+右键控制器<passive> 绑定网络"
+      - "<click_info>潜行+右键空气<passive> 切换模式"
 
   NTW_EXPANSION_ADVANCED_LINE_TRANSFER_PUSHER:
     name: "高级链式传输 [推送]"
@@ -4032,119 +4618,134 @@ items:
     lore:
       - ""
 
-  NTW_EXPANSION_AE_DRIVE:
-    name: "AE驱动器"
+  NTW_EXPANSION_CELL_DRIVE:
+    name: "元件驱动器"
     lore:
-      - "<PASSIVE>为存储元件提供接入插槽"
-      - "<PASSIVE>放入元件后即可读写网络库存"
+      - "<passive>插入存储元件，元件里的物品即网络库存"
+      - ""
+      - "<click_info>右键<passive> 打开驱动器"
+      - "<click_info>空手右键元件槽<passive> 查看元件内容"
 
-  NTW_EXPANSION_AE_CELL_CLEANER:
-    name: "AE元件清理台"
+  NTW_EXPANSION_CELL_CLEANER:
+    name: "元件清理台"
     lore:
-      - "<PASSIVE>整理元件内不需要的物品"
-      - "<PASSIVE>放入元件，点击物品删除"
+      - "<passive>批量删除元件里不要的物品"
+      - ""
+      - "<click_info>放入元件<passive> · <click_info>Shift+点击物品<passive> 删除"
+      - "<error>该种物品全部删除，无法撤销"
 
-  NTW_EXPANSION_AE_CELL_CONVERTER:
-    name: "AE元件量子转换机"
+  NTW_EXPANSION_CELL_CONVERTER:
+    name: "元件转运机"
     lore:
-      - "<PASSIVE>元件与量子储存互转"
-      - "<PASSIVE>放入元件，点击物品转换"
+      - "<passive>在存储元件与量子储存之间转运物品"
+      - ""
+      - "<click_info>点击物品<passive> 转出为量子储存"
+      - "<click_info>切换模式<passive> 反向转回元件"
+      - "<success>转入同档空量子储存，元件可存种类 +1"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L1:
-    name: "AE存储元件 <MACHINE>(64)"
+  NTW_EXPANSION_CELL:
+    name: "存储元件 {0}"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>每种物品占一格 · 每格上限 <aqua>{0}"
+      - ""
+      - "<click_info>右键<passive> 查看内容 · 升级格数"
+      - "<passive>放入<gold>元件驱动器<passive>接入网络"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L2:
-    name: "AE存储元件 <MACHINE>(256)"
+  NTW_EXPANSION_CELL_INFINITY:
+    name: "无限元件 ∞"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>每格数量无限 · 格数无限 · 无需升级"
+      - ""
+      - "<click_info>右键<passive> 查看内容"
+      - "<passive>放入<gold>元件驱动器<passive>接入网络"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L3:
-    name: "AE存储元件 <MACHINE>(1K)"
+  NTW_EXPANSION_ASSEMBLY_DRIVE:
+    name: "装配驱动器"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>插入装配卡自动生产 · 装满即停"
+      - ""
+      - "<click_info>左键/右键<passive> 升降挡"
+      - "<click_info>Shift+左键<passive> 切模式 · <click_info>Shift+右键<passive> 定计划"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L4:
-    name: "AE存储元件 <MACHINE>(4K)"
+  NTW_EXPANSION_VOID_CELL:
+    name: "虚空元件"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>销毁命中的物品，为网络溢流兜底"
+      - ""
+      - "<click_info>右键<passive> 设置过滤器"
+      - "<error>不可放入末影驱动器"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L5:
-    name: "AE存储元件 <MACHINE>(32K)"
+  NTW_EXPANSION_ENDER_DRIVE:
+    name: "末影驱动器"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>同频道的末影驱动器共享元件"
+      - ""
+      - "<click_info>右键<passive> 绑定频道 · <click_info>潜行+右键<passive> 复制"
+      - "<click_info>点中央槽<passive> 解绑"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L6:
-    name: "AE存储元件 <MACHINE>(262K)"
+  NTW_EXPANSION_ASSEMBLY_CARD:
+    name: "装配卡"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>记录一条配方，插入装配驱动器即产"
+      - ""
+      - "<click_info>在装配工坊<passive> 写入配方"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L7:
-    name: "AE存储元件 <MACHINE>(2M)"
+  NTW_EXPANSION_ASSEMBLY_WORKSHOP:
+    name: "装配工坊"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>消耗材料，把配方写进装配卡"
+      - ""
+      - "<click_info>左键<passive> 写入一次 · <click_info>Shift+左键<passive> 连续写入"
+      - "<click_info>放入已写入的卡<passive> 清理还原材料"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L8:
-    name: "AE存储元件 <MACHINE>(16M)"
+  NTW_EXPANSION_CONTAINER_FILLER:
+    name: "自动灌装机"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>把网络物品灌进储存容器，灌满自动产出"
+      - "<passive>支持 <aqua>潜影盒 <passive>/ <aqua>存储元件 <passive>/ <aqua>量子储存 <passive>/ <aqua>网络抽屉"
+      - ""
+      - "<click_info>清单区<passive> 放要灌的物品 · <click_info>容器区<passive> 放容器"
+      - "<passive>网络不足时按现有量产出，不空等"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L9:
-    name: "AE存储元件 <MACHINE>(134M)"
+  NTW_EXPANSION_CHANNEL_CONFIGURATOR:
+    name: "频道配置器"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>给末影驱动器配置频道"
+      - ""
+      - "<click_info>右键<passive> 绑定，无频道时自动创建"
+      - "<click_info>潜行+右键<passive> 复制 / 清空频道"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L10:
-    name: "AE存储元件 <MACHINE>(1B)"
+  NTW_EXPANSION_OVERCLOCK_CORE:
+    name: "超频核心"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>给装配驱动器解锁满负荷挡"
+      - ""
+      - "<click_info>放入升级槽<passive> 即生效"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L11:
-    name: "AE存储元件 <MACHINE>(2.1B)"
+  NTW_EXPANSION_SMART_CORE:
+    name: "智能核心"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>补货判定计入绑定频道的库存"
+      - ""
+      - "<click_info>放入智能槽<passive> 即生效"
+      - "<click_info>持频道配置器点智能槽<passive> 绑定频道"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L12:
-    name: "AE存储元件 <MACHINE>(34.4B)"
+  NTW_EXPANSION_ASSEMBLY_MONITOR:
+    name: "装配监控器"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
+      - "<passive>总览网络里全部装配驱动器"
+      - ""
+      - "<click_info>点击<passive> 远程暂停 / 恢复"
+      - "<passive>支持命名与搜索"
 
-  NTW_EXPANSION_AE_STORAGE_CELL_L13:
-    name: "AE存储元件 <MACHINE>(549.8B)"
+  NTW_EXPANSION_DRIVE_MONITOR:
+    name: "驱动器监视器"
     lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_L14:
-    name: "AE存储元件 <MACHINE>(8.8T)"
-    lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_L15:
-    name: "AE存储元件 <MACHINE>(140.7T)"
-    lore:
-      - "<PASSIVE>网络内的分格存储单元"
-      - "<PASSIVE>放入驱动器使用"
-
-  NTW_EXPANSION_AE_STORAGE_CELL_UNLIMITED:
-    name: "AE无限元件 <MACHINE>(∞)"
-    lore:
-      - "<PASSIVE>单格与种类均无限"
-      - "<PASSIVE>无需升级，直接可用"
+      - "<passive>总览同网络全部元件驱动器"
+      - ""
+      - "<click_info>左键<passive> 远程打开 · <click_info>右键<passive> 箭头引路"
+      - "<click_info>Shift+左键<passive> 命名 · <click_info>Shift+右键<passive> 清除"
+      - "<passive>支持按名称 / 坐标搜索"
 
 displays:
   quantum_storage:
@@ -4176,7 +4777,7 @@ groups:
       sub_menu_advanced_storage: "<color_random_string>货运与存储 - 高级存储"
       sub_menu_networks_drawers: "<color_random_string>货运与存储 - 网络抽屉"
       sub_menu_cargo: "<color_random_string>货运与存储 - 货运"
-      sub_menu_ae: "<color_random_string>货运与存储 - AE 储存"
+      sub_menu_cellnet: "<color_random_string>货运与存储 - 元件储存"
       main_menu_functional_machine: "<color_random_string>功能机器"
       sub_menu_core_machine: "<color_random_string>功能机器 - 核心机器"
       sub_menu_advanced_networks: "<color_random_string>功能机器 - 更高级的网络机器"

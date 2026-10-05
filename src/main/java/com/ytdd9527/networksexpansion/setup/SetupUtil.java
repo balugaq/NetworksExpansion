@@ -1,11 +1,17 @@
 package com.ytdd9527.networksexpansion.setup;
 
+import com.balugaq.netex.integrations.logitech.LinkBindingStore;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItemsMenus;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.slimefun.NetworkSlimefunItems;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import net.guizhanss.slimefun4.utils.WikiUtils;
 import org.bukkit.Bukkit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SetupUtil {
 
@@ -147,26 +153,40 @@ public class SetupUtil {
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE.registerThis(),
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE_WITHHOLDING.registerThis());
 
-        ExpansionItemsMenus.SUB_MENU_AE.addTo(
-            ExpansionItems.AE_DRIVE.registerThis(),
-            ExpansionItems.AE_CELL_CLEANER.registerThis(),
-            ExpansionItems.AE_CELL_CONVERTER.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L1.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L2.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L3.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L4.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L5.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L6.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L7.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L8.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L9.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L10.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L11.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L12.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L13.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L14.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_L15.registerThis(),
-            ExpansionItems.AE_STORAGE_CELL_UNLIMITED.registerThis());
+        ExpansionItemsMenus.SUB_MENU_CELLNET.addTo(
+            ExpansionItems.CHAIN_GRABBER.registerThis(),
+            ExpansionItems.CHAIN_PUSHER.registerThis(),
+            ExpansionItems.CHAIN_TRANSCEIVER.registerThis(),
+            ExpansionItems.CHAIN_MODULE_RANGE.registerThis(),
+            ExpansionItems.CHAIN_MODULE_CAPACITY.registerThis(),
+            ExpansionItems.CHAIN_MODULE_MODE.registerThis(),
+            ExpansionItems.CHAIN_MODULE_VANILLA.registerThis(),
+            ExpansionItems.CHAIN_MODULE_MULTI_DIRECTION.registerThis(),
+            ExpansionItems.CHAIN_MODULE_BINDING.registerThis(),
+            ExpansionItems.RUNE_COLLECT.registerThis());
+
+        List<SlimefunItem> cellnetItems = new ArrayList<>();
+        cellnetItems.add(ExpansionItems.CELL_DRIVE.registerThis());
+        cellnetItems.add(ExpansionItems.CELL_CLEANER.registerThis());
+        cellnetItems.add(ExpansionItems.CELL_CONVERTER.registerThis());
+        for (CellTier tier : CellTier.values()) {
+            cellnetItems.add(tier.register(ExpansionItemsMenus.MENU_CARGO_SYSTEM));
+        }
+        cellnetItems.add(CellTier.Unlimited.register(ExpansionItemsMenus.MENU_CARGO_SYSTEM));
+        cellnetItems.add(ExpansionItems.ASSEMBLY_DRIVE.registerThis());
+        cellnetItems.add(ExpansionItems.VOID_CELL.registerThis());
+        cellnetItems.add(ExpansionItems.ENDER_DRIVE.registerThis());
+        cellnetItems.add(ExpansionItems.ASSEMBLY_CARD.registerThis());
+        cellnetItems.add(ExpansionItems.ASSEMBLY_WORKSHOP.registerThis());
+        cellnetItems.add(ExpansionItems.CONTAINER_FILLER.registerThis());
+        cellnetItems.add(ExpansionItems.CHANNEL_CONFIGURATOR.registerThis());
+        cellnetItems.add(ExpansionItems.CHAIN_CONFIGURATOR.registerThis());
+        cellnetItems.add(ExpansionItems.CHAIN_BRUSH.registerThis());
+        cellnetItems.add(ExpansionItems.OVERCLOCK_CORE.registerThis());
+        cellnetItems.add(ExpansionItems.SMART_CORE.registerThis());
+        cellnetItems.add(ExpansionItems.ASSEMBLY_MONITOR.registerThis());
+        cellnetItems.add(ExpansionItems.DRIVE_MONITOR.registerThis());
+        ExpansionItemsMenus.SUB_MENU_CELLNET.addTo(cellnetItems);
 
         ExpansionItemsMenus.SUB_MENU_BRIDGE.addTo(
             ExpansionItems.NETWORK_BRIDGE_ORDINAL.registerThis(),
@@ -299,12 +319,12 @@ public class SetupUtil {
             ExpansionItemsMenus.SUB_MENU_ADVANCED_STORAGE,
             ExpansionItemsMenus.SUB_MENU_NETWORKS_DRAWERS,
             ExpansionItemsMenus.SUB_MENU_CARGO,
-            ExpansionItemsMenus.SUB_MENU_AE);
+            ExpansionItemsMenus.SUB_MENU_CELLNET);
         ExpansionItemsMenus.MAIN_MENU_CARGO_SYSTEM.addFrom(
             ExpansionItemsMenus.SUB_MENU_ADVANCED_STORAGE,
             ExpansionItemsMenus.SUB_MENU_NETWORKS_DRAWERS,
             ExpansionItemsMenus.SUB_MENU_CARGO,
-            ExpansionItemsMenus.SUB_MENU_AE);
+            ExpansionItemsMenus.SUB_MENU_CELLNET);
 
         ExpansionItemsMenus.MAIN_ITEM_GROUP.addTo(
             ExpansionItemsMenus.MAIN_MENU_FUNCTIONAL_MACHINE,
@@ -342,6 +362,7 @@ public class SetupUtil {
         setupItem();
         setupWiki();
         setupIntegration();
+        Bukkit.getScheduler().runTaskLater(Networks.getInstance(), LinkBindingStore::replayAll, 100L);
 
         // wait for logitech integration
         Bukkit.getScheduler().runTaskLaterAsynchronously(Networks.getInstance(), SetupUtil::setupMenu, 2L);
