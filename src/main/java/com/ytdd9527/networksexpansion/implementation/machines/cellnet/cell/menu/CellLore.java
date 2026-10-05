@@ -2,9 +2,11 @@ package com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.menu
 
 import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import net.md_5.bungee.api.ChatColor;
@@ -16,9 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellUi;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+
 public final class CellLore {
 
     private static final String LORE_NOT_CONFIGURED = Lang.getString(CellnetText.CELL_LORE_NOT_CONFIGURED);
@@ -75,8 +75,8 @@ public final class CellLore {
 
         newLore.add(Lang.getString(CellnetText.CELL_LORE_CAPACITY_LINE, unlimited ? "∞" : NumberFormat.formatCellShort(perTypeLimit)));
 
-        ChatColor fillColor = CellUi.barColor(filled, slots);
-        String bar = CellUi.barBody(CellUi.barFill(filled, slots), fillColor);
+        ChatColor fillColor = CellUI.barColor(filled, slots);
+        String bar = CellUI.barBody(CellUI.barFill(filled, slots), fillColor);
         newLore.add(Lang.getString(CellnetText.CELL_LORE_UNITS_LINE,
             fillColor.toString() + NumberFormat.formatCellNumber(filled),
             unlimited ? "∞" : NumberFormat.formatCellNumber(slots), bar));

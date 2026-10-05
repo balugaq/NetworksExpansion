@@ -9,14 +9,13 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.Driv
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.EnderDrive;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.ender.ChannelConfigurator;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NetworkUtil;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUi;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUI;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.utils.Keys;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.PersistentDataAPI;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
@@ -27,7 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
@@ -185,7 +183,7 @@ final class AssemblyMenu {
             if (slotCore) {
                 ItemStackUtil.giveOrDropItem(player, current);
             }
-            CellSlotUi.placeOneFromCursor(player, menu, slot, cursor);
+            CellSlotUI.placeOneFromCursor(player, menu, slot, cursor);
         } else if (cursor == null || cursor.getType().isAir()) {
             if (slotCore) {
                 menu.replaceExistingItem(slot, marker);
@@ -276,14 +274,14 @@ final class AssemblyMenu {
             } else {
                 menu.replaceExistingItem(slot, null);
             }
-            ItemStack placed = CellSlotUi.placeOneFromCursor(player, menu, slot, cursor);
-            AssemblyRound.updateStockFlag(state, CellSlotUi.indexOf(AssemblyDrive.RECIPE_SLOTS, slot), placed);
+            ItemStack placed = CellSlotUI.placeOneFromCursor(player, menu, slot, cursor);
+            AssemblyRound.updateStockFlag(state, CellSlotUI.indexOf(AssemblyDrive.RECIPE_SLOTS, slot), placed);
             return;
         }
         if (slotHasCard) {
             menu.replaceExistingItem(slot, buildSlotMarker());
             player.setItemOnCursor(slotItem);
-            AssemblyRound.updateStockFlag(state, CellSlotUi.indexOf(AssemblyDrive.RECIPE_SLOTS, slot), null);
+            AssemblyRound.updateStockFlag(state, CellSlotUI.indexOf(AssemblyDrive.RECIPE_SLOTS, slot), null);
         }
     }
 

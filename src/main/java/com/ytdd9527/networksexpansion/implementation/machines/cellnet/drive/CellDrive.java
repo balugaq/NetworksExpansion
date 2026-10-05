@@ -9,20 +9,17 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.SpecialSlimefunItem;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellHandle;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellUniqueness;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveCellSlots;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveOwnership;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveStorage;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.menu.DriveWhitelistMenu;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUi;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellMenuCommon;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemHashMap;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.menu.DriveWhitelistMenu;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.MenuShells;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellMenuCommon;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.MenuShells;
 import io.github.sefiraat.networks.Networks;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -36,14 +33,11 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -60,8 +54,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+
 public class CellDrive extends SpecialSlimefunItem {
 
     public static final int[] CELL_SLOTS = new int[]{10, 11, 12, 19, 20, 21, 28, 29, 30};
@@ -246,7 +239,7 @@ public class CellDrive extends SpecialSlimefunItem {
         for (int slot : PREVIEW_BACKGROUND_SLOTS) {
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
-        menu.addItem(PREVIEW_BACK, BrowseUi.backButton(), (p, s, i, a) -> {
+        menu.addItem(PREVIEW_BACK, BrowseUI.backButton(), (p, s, i, a) -> {
             BlockMenu dm = StorageCacheUtils.getMenu(location);
             if (dm != null) {
                 dm.open(p);
@@ -268,24 +261,24 @@ public class CellDrive extends SpecialSlimefunItem {
             driveState.search);
 
         int page = driveState.page;
-        int totalPages = BrowseUi.totalPages(itemList.size());
+        int totalPages = BrowseUI.totalPages(itemList.size());
         if (page >= totalPages) {
             page = totalPages - 1;
             driveState.page = page;
         }
 
-        int start = page * BrowseUi.PAGE_SIZE;
-        int end = Math.min(start + BrowseUi.PAGE_SIZE, itemList.size());
+        int start = page * BrowseUI.PAGE_SIZE;
+        int end = Math.min(start + BrowseUI.PAGE_SIZE, itemList.size());
 
         Map<Integer, ItemKey> slotKeys = new ConcurrentHashMap<>();
         for (int i = 0; i < end - start; i++) {
-            slotKeys.put(BrowseUi.LIST_SLOTS[i], new ItemKey(itemList.get(start + i).getKey()));
+            slotKeys.put(BrowseUI.LIST_SLOTS[i], new ItemKey(itemList.get(start + i).getKey()));
         }
         PREVIEW_KEYS.put(menu, slotKeys);
-        BrowseUi.renderEntries(menu, itemList, start, end,
+        BrowseUI.renderEntries(menu, itemList, start, end,
             entry -> CellMenuCommon.browseEntry(cells, entry.getKey(), entry.getValue()),
             (p, s, it, a) -> handleEntryToggle(p, s, a, driveMenu, menu, location));
-        BrowseUi.wirePager(menu, page, totalPages, target -> {
+        BrowseUI.wirePager(menu, page, totalPages, target -> {
             driveState.page = target;
             renderBrowser(menu, location);
         });
@@ -321,8 +314,8 @@ public class CellDrive extends SpecialSlimefunItem {
 
     private static void wireBrowserSearch(@NotNull ChestMenu menu, @NotNull Location location) {
         DriveState driveState = state(location);
-        menu.replaceExistingItem(BrowseUi.SEARCH, ItemSearch.searchIcon(driveState.search));
-        menu.addMenuClickHandler(BrowseUi.SEARCH, (player, s, i, a) -> {
+        menu.replaceExistingItem(BrowseUI.SEARCH, ItemSearch.searchIcon(driveState.search));
+        menu.addMenuClickHandler(BrowseUI.SEARCH, (player, s, i, a) -> {
             if (a.isRightClicked()) {
                 driveState.search = null;
                 driveState.page = 0;

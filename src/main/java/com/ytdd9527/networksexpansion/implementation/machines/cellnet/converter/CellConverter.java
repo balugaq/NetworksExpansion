@@ -10,9 +10,11 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledge
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUi;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.MenuShells;
+import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.stackcaches.QuantumCache;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
 import io.github.sefiraat.networks.utils.Keys;
@@ -29,6 +31,7 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -47,9 +50,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
-import io.github.sefiraat.networks.Networks;
-import org.bukkit.Bukkit;
 public class CellConverter extends CellBrowserBase {
 
     public static final int MODE_SLOT = 48;
@@ -132,7 +132,7 @@ public class CellConverter extends CellBrowserBase {
 
     @Override
     public void onCellInserted(@NotNull BlockMenu menu, @NotNull ItemStack cellItem, @NotNull Player player) {
-        if (!CellSlotUi.prepareInsertedCell(player, cellItem)) {
+        if (!CellSlotUI.prepareInsertedCell(player, cellItem)) {
             return;
         }
         pageCache.put(menu.getLocation(), 0);
@@ -141,7 +141,7 @@ public class CellConverter extends CellBrowserBase {
 
     @Override
     public @Nullable ItemStack onCellEjected(@NotNull BlockMenu menu, int slot) {
-        return CellSlotUi.ejectCell(menu, slot,
+        return CellSlotUI.ejectCell(menu, slot,
             this::createCellSlotMarker, DISPLAY_SLOTS, pageCache, () -> refresh(menu));
     }
 
@@ -159,7 +159,7 @@ public class CellConverter extends CellBrowserBase {
 
         if (cellItem == null || !StorageCell.isStorageCell(cellItem)) {
             menu.replaceExistingItem(CELL_SLOT, createCellSlotMarker());
-            CellSlotUi.clearDisplay(menu, DISPLAY_SLOTS);
+            CellSlotUI.clearDisplay(menu, DISPLAY_SLOTS);
             menu.replaceExistingItem(INFO, buildInfoItem(null, 0, 0));
             menu.replaceExistingItem(PREV, pageButton(false, false));
             menu.replaceExistingItem(NEXT, pageButton(false, true));
@@ -182,7 +182,7 @@ public class CellConverter extends CellBrowserBase {
         menu.replaceExistingItem(NEXT, pageButton(
             pageCache.getOrDefault(menu.getLocation(), 0) < maxPages(menu) - 1, true));
         menu.replaceExistingItem(INFO, buildInfoItem(cellItem, cache.getStoredItems().size(),
-            CellSlotUi.countOccupied(menu, OUTPUT_SLOTS)));
+            CellSlotUI.countOccupied(menu, OUTPUT_SLOTS)));
         wireSearchButton(menu);
     }
 
@@ -563,7 +563,7 @@ public class CellConverter extends CellBrowserBase {
             int slot = DISPLAY_SLOTS[i];
             if (i < end - start) {
                 CellLedger.CellEntry entry = entries.get(start + i);
-                menu.replaceExistingItem(slot, CellSlotUi.displayItem(
+                menu.replaceExistingItem(slot, CellSlotUI.displayItem(
                     entry.sample, entry.amount,
                     CellnetText.CONVERTER_ITEM_COUNT, CellnetText.CONVERTER_TRANSFER_HINT));
             } else {
@@ -583,7 +583,7 @@ public class CellConverter extends CellBrowserBase {
                 ItemStack qsItem = menu.getItemInSlot(qsSlots.get(index));
                 QuantumCache qc = qsItem == null ? null : Keys.getQuantumCache(qsItem.getItemMeta());
                 if (qc != null && qc.getItemStack() != null && qc.getAmountLong() > 0) {
-                    menu.replaceExistingItem(DISPLAY_SLOTS[i], CellSlotUi.displayItem(
+                    menu.replaceExistingItem(DISPLAY_SLOTS[i], CellSlotUI.displayItem(
                         qc.getItemStack(), qc.getAmountLong(),
                         CellnetText.CONVERTER_ITEM_COUNT, CellnetText.CONVERTER_TRANSFER_HINT));
                     continue;

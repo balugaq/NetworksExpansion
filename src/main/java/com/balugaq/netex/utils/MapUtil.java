@@ -12,6 +12,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,16 +20,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @UtilityClass
+@NullMarked
 public class MapUtil {
     public static final Map<String, MapView> MAP_VIEWS = new HashMap<>();
 
-    public static @NotNull Pair<ItemStack, MapView> getImageItem(@NotNull String imagePath) {
+    public static Pair<ItemStack, MapView> getImageItem(String imagePath) {
         ItemStack map = new ItemStack(Material.FILLED_MAP);
         MapView view = apply(map, imagePath);
         return new Pair<>(map, view);
     }
 
-    public static @Nullable MapView apply(@NotNull ItemStack map, @NotNull String imagePath) {
+    public static @Nullable MapView apply(ItemStack map, String imagePath) {
         if (map.getItemMeta() instanceof MapMeta meta) {
             if (MAP_VIEWS.containsKey(imagePath)) {
                 MapView view = MAP_VIEWS.get(imagePath);
@@ -39,18 +41,18 @@ public class MapUtil {
 
             MapView view;
             if (!meta.hasMapView()) {
-                view = Bukkit.createMap(Bukkit.getWorlds().get(0));
+                view = Bukkit.createMap(Bukkit.getWorlds().getFirst());
             } else {
                 view = meta.getMapView();
                 if (view == null) {
-                    view = Bukkit.createMap(Bukkit.getWorlds().get(0));
+                    view = Bukkit.createMap(Bukkit.getWorlds().getFirst());
                 }
             }
 
             BufferedImage finalImage = resizeImage(ImageUtil.getImage(imagePath), 128, 128);
             view.addRenderer(new MapRenderer() {
                 @Override
-                public void render(@NotNull MapView mapView, @NotNull MapCanvas mapCanvas, @NotNull Player player) {
+                public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
                     mapCanvas.drawImage(0, 0, finalImage);
                 }
             });
@@ -67,7 +69,7 @@ public class MapUtil {
         return null;
     }
 
-    public static @NotNull BufferedImage resizeImage(BufferedImage original, int targetWidth, int targetHeight) {
+    public static BufferedImage resizeImage(BufferedImage original, int targetWidth, int targetHeight) {
         BufferedImage resized = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = resized.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);

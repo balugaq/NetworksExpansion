@@ -2,15 +2,16 @@ package com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly;
 
 import com.balugaq.netex.utils.Lang;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NetworkUtil;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUi;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveOwnership;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUi;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NetworkUtil;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.NetworkRoot;
 import io.github.sefiraat.networks.network.NodeType;
@@ -42,7 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntFunction;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+
 public class AssemblyMonitor extends NetworkObject {
 
     private static final int PAGE_SIZE = 45;
@@ -259,7 +260,7 @@ public class AssemblyMonitor extends NetworkObject {
                 player.sendMessage(Lang.getString(CellnetText.MONITOR_NAME_HINT));
                 return;
             }
-            int line = CellSlotUi.indexOf(LINE_SLOTS, pos);
+            int line = CellSlotUI.indexOf(LINE_SLOTS, pos);
             if (line >= 0) {
                 List<AssemblyMonitorBridge.MonitorLine> lines = AssemblyMonitorBridge.readLines(session.detail);
                 if (line < lines.size()) {
@@ -317,11 +318,11 @@ public class AssemblyMonitor extends NetworkObject {
 
         menu.replaceExistingItem(VIEW_SLOT, simpleIcon(Material.COMPASS,
             Lang.getString(CellnetText.MONITOR_VIEW_ALL)));
-        menu.replaceExistingItem(PREV_SLOT, BrowseUi.pageButton(
+        menu.replaceExistingItem(PREV_SLOT, BrowseUI.pageButton(
             Lang.getString(session.page > 0 ? CellnetText.MONITOR_PREV_PAGE : CellnetText.MONITOR_FIRST_PAGE)));
         menu.replaceExistingItem(REFRESH_BACK_SLOT, simpleIcon(Material.SUNFLOWER,
             Lang.getString(CellnetText.MONITOR_REFRESH_NAME)));
-        menu.replaceExistingItem(NEXT_SLOT, BrowseUi.pageButton(
+        menu.replaceExistingItem(NEXT_SLOT, BrowseUI.pageButton(
             Lang.getString(session.page < pages - 1 ? CellnetText.MONITOR_NEXT_PAGE : CellnetText.MONITOR_LAST_PAGE)));
         menu.replaceExistingItem(SEARCH_SLOT, searchIcon(session.search));
 
@@ -340,11 +341,11 @@ public class AssemblyMonitor extends NetworkObject {
 
         menu.replaceExistingItem(VIEW_SLOT, simpleIcon(Material.WRITABLE_BOOK,
             Lang.getString(CellnetText.MONITOR_VIEW_LINES)));
-        menu.replaceExistingItem(PREV_SLOT, BrowseUi.pageButton(
+        menu.replaceExistingItem(PREV_SLOT, BrowseUI.pageButton(
             Lang.getString(session.page > 0 ? CellnetText.MONITOR_PREV_PAGE : CellnetText.MONITOR_FIRST_PAGE)));
         menu.replaceExistingItem(REFRESH_BACK_SLOT, simpleIcon(Material.SUNFLOWER,
             Lang.getString(CellnetText.MONITOR_REFRESH_NAME)));
-        menu.replaceExistingItem(NEXT_SLOT, BrowseUi.pageButton(
+        menu.replaceExistingItem(NEXT_SLOT, BrowseUI.pageButton(
             Lang.getString(session.page < pages - 1 ? CellnetText.MONITOR_NEXT_PAGE : CellnetText.MONITOR_LAST_PAGE)));
         menu.replaceExistingItem(SEARCH_SLOT, searchIcon(session.search));
 
@@ -396,7 +397,7 @@ public class AssemblyMonitor extends NetworkObject {
         });
         menu.replaceExistingItem(DETAIL_OPEN, header);
         menu.replaceExistingItem(DETAIL_NAME, buildNameButton(overview.name()));
-        menu.replaceExistingItem(REFRESH_BACK_SLOT, BrowseUi.pageButton(Lang.getString(CellnetText.MONITOR_BACK)));
+        menu.replaceExistingItem(REFRESH_BACK_SLOT, BrowseUI.pageButton(Lang.getString(CellnetText.MONITOR_BACK)));
 
         List<AssemblyMonitorBridge.MonitorLine> lines = overview.lines();
         for (int i = 0; i < LINE_SLOTS.length; i++) {

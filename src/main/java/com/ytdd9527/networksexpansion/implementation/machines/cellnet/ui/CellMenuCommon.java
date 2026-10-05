@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
 
 public final class CellMenuCommon {
 
@@ -167,7 +166,7 @@ public final class CellMenuCommon {
     public static ItemStack browseEntry(@Nullable List<CellHandle> cells, @NotNull ItemStack sample, long amount) {
         CellHandle owner = findCellHolding(cells, new ItemKey(sample));
         CellLedger ledger = owner == null ? null : CellLedger.getActiveCaches().get(owner.getUuid());
-        return ledger != null ? CellUi.displayItem(ledger, sample, amount) : CellUi.browseEntry(sample, amount);
+        return ledger != null ? CellUI.displayItem(ledger, sample, amount) : CellUI.browseEntry(sample, amount);
     }
 
     private static void persistEntryFlags(

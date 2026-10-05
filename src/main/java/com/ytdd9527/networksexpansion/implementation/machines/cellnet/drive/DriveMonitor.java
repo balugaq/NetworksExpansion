@@ -4,14 +4,15 @@ import com.balugaq.netex.utils.Lang;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.api.DriveType;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellHandle;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.Limits;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NetworkUtil;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUi;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellHandle;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.NetworkRoot;
 import io.github.sefiraat.networks.network.NodeType;
@@ -43,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntFunction;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+
 public class DriveMonitor extends NetworkObject {
 
     private static final String NAME_KEY = "drive_name";
@@ -301,11 +302,11 @@ public class DriveMonitor extends NetworkObject {
         session.page = Math.min(session.page, pages - 1);
         session.page = Math.max(session.page, 0);
 
-        menu.replaceExistingItem(PREV_SLOT, BrowseUi.pageButton(
+        menu.replaceExistingItem(PREV_SLOT, BrowseUI.pageButton(
             Lang.getString(session.page > 0 ? CellnetText.MONITOR_PREV_PAGE : CellnetText.MONITOR_FIRST_PAGE)));
         menu.replaceExistingItem(REFRESH_SLOT, simpleIcon(Material.SUNFLOWER,
             Lang.getString(CellnetText.MONITOR_REFRESH_NAME)));
-        menu.replaceExistingItem(NEXT_SLOT, BrowseUi.pageButton(
+        menu.replaceExistingItem(NEXT_SLOT, BrowseUI.pageButton(
             Lang.getString(session.page < pages - 1 ? CellnetText.MONITOR_NEXT_PAGE : CellnetText.MONITOR_LAST_PAGE)));
         menu.replaceExistingItem(SEARCH_SLOT, searchIcon(session.search));
         for (int slot = 45; slot < 54; slot++) {

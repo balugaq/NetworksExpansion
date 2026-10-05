@@ -433,7 +433,7 @@ public class LinkerGrid extends NetworkObject {
                 }
             }
             if (location == null && (target == LinkerTarget.AUTO || target == LinkerTarget.DRAWER)) {
-                for (var c : root.getDrawerData().keySet()) {
+                for (var c : root.getDrawerData().values()) {
                     for (var ic : c.getStoredItemsDirectly()) {
                         if (StackUtils.itemsMatch(ic, itemStack)) {
                             location = c.getLastLocation();
@@ -453,7 +453,7 @@ public class LinkerGrid extends NetworkObject {
                 return b.getLocation();
             }
         }
-        for (var c : root.getDrawerData().keySet()) {
+        for (var c : root.getDrawerData().values()) {
             for (var ic : c.getStoredItemsDirectly()) {
                 if (StackUtils.itemsMatch(ic, itemStack)) {
                     return c.getLastLocation();

@@ -116,7 +116,7 @@ public class ItemHashMap<V> implements Map<ItemStack, V> {
         return null;
     }
 
-    public @Nullable  removeKey(ItemKey key) {
+    public @Nullable V removeKey(ItemKey key) {
         return map.remove(key);
     }
 

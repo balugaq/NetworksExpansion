@@ -10,7 +10,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.Driv
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.Limits;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NetworkUtil;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUi;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUI;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import io.github.sefiraat.networks.utils.Keys;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -309,7 +309,7 @@ public final class AssemblyMonitorBridge {
             }
         }
         if (state != null) {
-            AssemblyRound.updateStockFlag(state, CellSlotUi.indexOf(AssemblyDrive.RECIPE_SLOTS, slot), blueprint);
+            AssemblyRound.updateStockFlag(state, CellSlotUI.indexOf(AssemblyDrive.RECIPE_SLOTS, slot), blueprint);
         }
         menu.replaceExistingItem(slot, blueprint);
         for (var human : menu.getInventory().getViewers()) {

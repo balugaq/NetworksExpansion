@@ -1,8 +1,9 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui;
 
 import com.balugaq.netex.utils.Lang;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
 
-public final class BrowseUi {
+public final class BrowseUI {
 
     public interface EntryClick {
         void onClick(@NotNull Player player, int slot, @NotNull ItemStack item, @NotNull ClickAction action);
@@ -32,7 +31,7 @@ public final class BrowseUi {
     public static final int SEARCH = 51;
     public static final int PAGE_SIZE = LIST_SLOTS.length;
 
-    private BrowseUi() {
+    private BrowseUI() {
     }
 
     public static int totalPages(int entryCount) {

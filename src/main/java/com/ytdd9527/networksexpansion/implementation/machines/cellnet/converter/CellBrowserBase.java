@@ -1,14 +1,15 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter;
 
 import com.balugaq.netex.utils.Lang;
+import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.SpecialSlimefunItem;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.StorageCell;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUi;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
-import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -25,8 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 
 public abstract class CellBrowserBase extends SpecialSlimefunItem {
 
@@ -90,7 +89,7 @@ public abstract class CellBrowserBase extends SpecialSlimefunItem {
     }
 
     protected int normalizePage(@NotNull BlockMenu menu, int total) {
-        return CellSlotUi.normalizedPage(pageCache, menu.getLocation(), total, itemsPerPage());
+        return CellSlotUI.normalizedPage(pageCache, menu.getLocation(), total, itemsPerPage());
     }
 
     protected int maxPages(@NotNull BlockMenu menu) {
@@ -107,7 +106,7 @@ public abstract class CellBrowserBase extends SpecialSlimefunItem {
     @NotNull
     protected ItemStack pageButton(boolean enabled, boolean next) {
         String p = langPrefix();
-        return CellSlotUi.pageButton(enabled, next,
+        return CellSlotUI.pageButton(enabled, next,
             p + ".prev_page", p + ".first_page",
             p + ".next_page", p + ".last_page");
     }
@@ -156,7 +155,7 @@ public abstract class CellBrowserBase extends SpecialSlimefunItem {
             if (!shouldHandleCellSlotClick(action)) {
                 return true;
             }
-            return CellSlotUi.handleCellSlotClick(menu, slot, item, player,
+            return CellSlotUI.handleCellSlotClick(menu, slot, item, player,
                 this::isCellSlotMarker,
                 (m, placed) -> onCellInserted(m, placed, player),
                 this::onCellEjected);
@@ -173,7 +172,7 @@ public abstract class CellBrowserBase extends SpecialSlimefunItem {
 
         setupMachineHandlers(menu);
 
-        CellSlotUi.wirePageButtons(menu, PREV, NEXT, pageCache, this::maxPages, this::refresh);
+        CellSlotUI.wirePageButtons(menu, PREV, NEXT, pageCache, this::maxPages, this::refresh);
         menu.addMenuClickHandler(INFO, (player, slot, item, action) -> false);
     }
 
@@ -183,6 +182,6 @@ public abstract class CellBrowserBase extends SpecialSlimefunItem {
 
     protected int displayIndex(@NotNull BlockMenu menu, int displaySlot) {
         int page = pageCache.getOrDefault(menu.getLocation(), 0);
-        return CellSlotUi.pageIndex(displaySlots(), displaySlot, page, itemsPerPage());
+        return CellSlotUI.pageIndex(displaySlots(), displaySlot, page, itemsPerPage());
     }
 }

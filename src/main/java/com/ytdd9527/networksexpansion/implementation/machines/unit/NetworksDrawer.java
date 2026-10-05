@@ -447,18 +447,18 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                             itemRequest.setAmount(take.getMaxStackSize() * 36);
                         }
 
-                        final ItemStack requestedItemStack = data.requestItem0(l, itemRequest, false);
-                        if (requestedItemStack != null) {
+                        final ItemStack requested = data.requestItem0(l, itemRequest, false);
+                        if (requested != null) {
                             do {
                                 int max =
-                                    Math.min(requestedItemStack.getAmount(), requestedItemStack.getMaxStackSize());
-                                final ItemStack clone = StackUtils.getAsQuantity(requestedItemStack, max);
-                                requestedItemStack.setAmount(requestedItemStack.getAmount() - max);
+                                    Math.min(requested.getAmount(), requested.getMaxStackSize());
+                                final ItemStack clone = StackUtils.getAsQuantity(requested, max);
+                                requested.setAmount(requested.getAmount() - max);
                                 InventoryUtil.addItem(player, clone);
                                 if (clone.getAmount() > 0) {
                                     data.depositItemStack0(l, clone, false);
                                 }
-                            } while (requestedItemStack.getAmount() > 0);
+                            } while (requested.getAmount() > 0);
                         }
                     } else {
                         for (ItemStack each : player.getInventory().getStorageContents()) {

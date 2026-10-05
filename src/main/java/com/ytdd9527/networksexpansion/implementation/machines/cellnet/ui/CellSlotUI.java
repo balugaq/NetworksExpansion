@@ -4,7 +4,6 @@ import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.StorageCell;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
 import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -24,11 +23,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
 
-public final class CellSlotUi {
+public final class CellSlotUI {
 
-    private CellSlotUi() {
+    private CellSlotUI() {
     }
 
     public static boolean handleCellSlotClick(

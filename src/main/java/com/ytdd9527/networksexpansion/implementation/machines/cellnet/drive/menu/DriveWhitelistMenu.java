@@ -5,8 +5,9 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveOwnership;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.WhitelistStore;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUi;
 import io.github.sefiraat.networks.Networks;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+
 public final class DriveWhitelistMenu {
 
     public static final int MAX_WHITELIST_SIZE = 14;
@@ -79,7 +80,7 @@ public final class DriveWhitelistMenu {
             return false;
         });
 
-        menu.addItem(WHITELIST_BACK_BUTTON_SLOT, BrowseUi.backButton(), (p, s, i, a) -> {
+        menu.addItem(WHITELIST_BACK_BUTTON_SLOT, BrowseUI.backButton(), (p, s, i, a) -> {
             driveMenu.open(p);
             return false;
         });

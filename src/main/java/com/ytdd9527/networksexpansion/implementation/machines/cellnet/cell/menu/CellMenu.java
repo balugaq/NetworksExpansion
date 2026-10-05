@@ -2,17 +2,19 @@ package com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.menu
 
 import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUi;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.StorageCell;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.rule.CellAcceptRules;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.StorageCell;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.rule.CellAcceptRules;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.menu.CellLore;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemSearch;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellMenuCommon;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import io.github.sefiraat.networks.network.stackcaches.QuantumCache;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
 import io.github.sefiraat.networks.utils.Keys;
@@ -22,7 +24,6 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,10 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellMenuCommon;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellUi;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
+
 public final class CellMenu {
 
     public static final int[] MAIN_BACKGROUND = new int[]{1, 2, 3, 4, 5, 6, 7, 46, 47, 48, 49, 50};
@@ -141,18 +139,18 @@ public final class CellMenu {
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
 
-        menu.addItem(WHITELIST_BUTTON, CellUi.whitelistButton(cache), (p, s, i, a) -> {
+        menu.addItem(WHITELIST_BUTTON, CellUI.whitelistButton(cache), (p, s, i, a) -> {
             openWhitelist(p, uuid);
             return false;
         });
 
-        menu.addItem(UPGRADE, CellUi.upgradeButton(cache), (p, s, i, a) -> {
+        menu.addItem(UPGRADE, CellUI.upgradeButton(cache), (p, s, i, a) -> {
             handleUpgradeClick(menu, p, uuid);
-            menu.replaceExistingItem(WHITELIST_BUTTON, CellUi.whitelistButton(cache));
+            menu.replaceExistingItem(WHITELIST_BUTTON, CellUI.whitelistButton(cache));
             return false;
         });
 
-        menu.addItem(RENAME, CellUi.renameButton(cache), (p, s, i, a) -> {
+        menu.addItem(RENAME, CellUI.renameButton(cache), (p, s, i, a) -> {
             p.closeInventory();
             RENAMING.put(p.getUniqueId(), uuid);
             p.sendMessage(Lang.getString(CellnetText.CELL_RENAME_PROMPT));
@@ -182,10 +180,10 @@ public final class CellMenu {
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
 
-        menu.addItem(WHITELIST_TOGGLE, CellUi.toggleButton(cache), (p, s, i, a) -> {
+        menu.addItem(WHITELIST_TOGGLE, CellUI.toggleButton(cache), (p, s, i, a) -> {
             boolean enabled = !cache.isWhitelistEnabled();
             applyWhitelist(p, uuid, enabled, cache.getWhitelist());
-            menu.replaceExistingItem(WHITELIST_TOGGLE, CellUi.toggleButton(cache));
+            menu.replaceExistingItem(WHITELIST_TOGGLE, CellUI.toggleButton(cache));
             renderWhitelist(menu, uuid);
             return false;
         });
@@ -229,7 +227,7 @@ public final class CellMenu {
         if (search != null) {
             items = filterEntries(items, search);
         }
-        int totalPages = BrowseUi.totalPages(items.size());
+        int totalPages = BrowseUI.totalPages(items.size());
         int page = Math.min(getItemPage(uuid), totalPages - 1);
         setItemPage(uuid, page);
 
@@ -304,7 +302,7 @@ public final class CellMenu {
             if (i < end - start) {
                 Map.Entry<ItemStack, Long> entry = items.get(start + i);
                 slotKeys.put(slot, new ItemKey(entry.getKey()));
-                menu.replaceExistingItem(slot, CellUi.displayItem(cache, entry.getKey(), entry.getValue()));
+                menu.replaceExistingItem(slot, CellUI.displayItem(cache, entry.getKey(), entry.getValue()));
             } else {
                 slotKeys.remove(slot);
                 menu.replaceExistingItem(slot, Icons.PREVIEW_FILL);
@@ -323,7 +321,7 @@ public final class CellMenu {
     }
 
     private static void wirePageButtons(@NotNull ChestMenu menu, @NotNull UUID uuid, int page, int totalPages) {
-        BrowseUi.wirePager(menu, page, totalPages, target -> {
+        BrowseUI.wirePager(menu, page, totalPages, target -> {
             setItemPage(uuid, target);
             renderItems(menu, uuid);
         });
@@ -362,7 +360,7 @@ public final class CellMenu {
 
         long newCurrent = applyUpgrade(cache, cell, maxUnits);
         CellMenuCommon.writeBackLocated(player, cell);
-        menu.replaceExistingItem(UPGRADE, CellUi.upgradeButton(cache));
+        menu.replaceExistingItem(UPGRADE, CellUI.upgradeButton(cache));
         player.sendMessage(Lang.getString(CellnetText.CELL_UPGRADE_SUCCESS, NumberFormat.formatNumber(newCurrent), NumberFormat.formatNumber(maxUnits)));
     }
 
@@ -416,12 +414,12 @@ public final class CellMenu {
         for (int i = 0; i < LIST_SLOTS.length; i++) {
             int slot = LIST_SLOTS[i];
             if (i < whitelist.size()) {
-                menu.replaceExistingItem(slot, CellUi.whitelistSlotItem(whitelist.get(i)));
+                menu.replaceExistingItem(slot, CellUI.whitelistSlotItem(whitelist.get(i)));
             } else {
-                menu.replaceExistingItem(slot, CellUi.settingSlotItem());
+                menu.replaceExistingItem(slot, CellUI.settingSlotItem());
             }
         }
-        menu.replaceExistingItem(WHITELIST_TOGGLE, CellUi.toggleButton(cache));
+        menu.replaceExistingItem(WHITELIST_TOGGLE, CellUI.toggleButton(cache));
         menu.replaceExistingItem(WHITELIST_BACK, Icons.BACK);
     }
 

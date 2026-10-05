@@ -5,7 +5,7 @@ import com.balugaq.netex.utils.Lang;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.rule.CellAcceptRules;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUi;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.BrowseUI;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import io.github.sefiraat.networks.slimefun.network.NetworkDirectional;
@@ -87,7 +87,7 @@ public final class ChainBindingMenu {
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
         menu.addItem(INFO_SLOT, infoIcon(), (p, s, i, a) -> false);
-        menu.addItem(BACK_SLOT, BrowseUi.backButton(), (p, s, i, a) -> {
+        menu.addItem(BACK_SLOT, BrowseUI.backButton(), (p, s, i, a) -> {
             BlockMenu machineMenu = StorageCacheUtils.getMenu(machine);
             if (machineMenu != null) {
                 machineMenu.open(p);
@@ -210,13 +210,13 @@ public final class ChainBindingMenu {
         menu.setPlayerInventoryClickable(false);
         menu.setEmptySlotsClickable(false);
         for (int slot = 0; slot < 54; slot++) {
-            if (slot == BrowseUi.PREV || slot == BrowseUi.NEXT || slot == INFO_SLOT
-                || slot == BACK_SLOT || in(BrowseUi.LIST_SLOTS, slot)) {
+            if (slot == BrowseUI.PREV || slot == BrowseUI.NEXT || slot == INFO_SLOT
+                || slot == BACK_SLOT || in(BrowseUI.LIST_SLOTS, slot)) {
                 continue;
             }
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
-        menu.addItem(BACK_SLOT, BrowseUi.backButton(), (p, s, i, a) -> {
+        menu.addItem(BACK_SLOT, BrowseUI.backButton(), (p, s, i, a) -> {
             openDirections(p, machine);
             return false;
         });
@@ -244,13 +244,13 @@ public final class ChainBindingMenu {
         menu.replaceExistingItem(INFO_SLOT, info);
         menu.addMenuClickHandler(INFO_SLOT, (p, s, i, a) -> false);
 
-        int totalPages = BrowseUi.totalPages(Math.max(1, total));
+        int totalPages = BrowseUI.totalPages(Math.max(1, total));
         if (session.page >= totalPages) {
             session.page = totalPages - 1;
         }
-        int start = session.page * BrowseUi.PAGE_SIZE;
-        for (int i = 0; i < BrowseUi.LIST_SLOTS.length; i++) {
-            int slot = BrowseUi.LIST_SLOTS[i];
+        int start = session.page * BrowseUI.PAGE_SIZE;
+        for (int i = 0; i < BrowseUI.LIST_SLOTS.length; i++) {
+            int slot = BrowseUI.LIST_SLOTS[i];
             int distance = start + i + 1;
             if (distance > total) {
                 menu.replaceExistingItem(slot, total == 0 && i == 0 ? Icons.SEARCH_EMPTY : Icons.PREVIEW_FILL);
@@ -266,7 +266,7 @@ public final class ChainBindingMenu {
                 return false;
             });
         }
-        BrowseUi.wirePager(menu, session.page, totalPages, page -> {
+        BrowseUI.wirePager(menu, session.page, totalPages, page -> {
             session.page = page;
             renderTargets(menu, session);
         });
@@ -448,7 +448,7 @@ public final class ChainBindingMenu {
             }
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
-        menu.addItem(EDIT_BACK_SLOT, BrowseUi.backButton(), (p, s, i, a) -> {
+        menu.addItem(EDIT_BACK_SLOT, BrowseUI.backButton(), (p, s, i, a) -> {
             openTargets(p, machine, face);
             return false;
         });
@@ -611,13 +611,13 @@ public final class ChainBindingMenu {
         menu.setPlayerInventoryClickable(true);
         menu.setEmptySlotsClickable(false);
         for (int slot = 0; slot < 54; slot++) {
-            if (slot == BrowseUi.PREV || slot == BrowseUi.NEXT || slot == INFO_SLOT
-                || slot == BACK_SLOT || in(BrowseUi.LIST_SLOTS, slot)) {
+            if (slot == BrowseUI.PREV || slot == BrowseUI.NEXT || slot == INFO_SLOT
+                || slot == BACK_SLOT || in(BrowseUI.LIST_SLOTS, slot)) {
                 continue;
             }
             menu.addItem(slot, ChestMenuUtils.getBackground(), (p, s, i, a) -> false);
         }
-        menu.addItem(BACK_SLOT, BrowseUi.backButton(), (p, s, i, a) -> {
+        menu.addItem(BACK_SLOT, BrowseUI.backButton(), (p, s, i, a) -> {
             openDirections(p, machine);
             return false;
         });
@@ -647,13 +647,13 @@ public final class ChainBindingMenu {
         menu.replaceExistingItem(INFO_SLOT, info);
         menu.addMenuClickHandler(INFO_SLOT, (p, s, i, a) -> false);
 
-        int totalPages = BrowseUi.totalPages(Math.max(1, total));
+        int totalPages = BrowseUI.totalPages(Math.max(1, total));
         if (session.page >= totalPages) {
             session.page = totalPages - 1;
         }
-        int start = session.page * BrowseUi.PAGE_SIZE;
-        for (int i = 0; i < BrowseUi.LIST_SLOTS.length; i++) {
-            int slot = BrowseUi.LIST_SLOTS[i];
+        int start = session.page * BrowseUI.PAGE_SIZE;
+        for (int i = 0; i < BrowseUI.LIST_SLOTS.length; i++) {
+            int slot = BrowseUI.LIST_SLOTS[i];
             int distance = start + i + 1;
             if (distance > total) {
                 menu.replaceExistingItem(slot, total == 0 && i == 0 ? Icons.SEARCH_EMPTY : Icons.PREVIEW_FILL);
@@ -668,7 +668,7 @@ public final class ChainBindingMenu {
                 return false;
             });
         }
-        BrowseUi.wirePager(menu, session.page, totalPages, page -> {
+        BrowseUI.wirePager(menu, session.page, totalPages, page -> {
             session.page = page;
             renderDrag(menu, session);
         });

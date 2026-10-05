@@ -1,11 +1,10 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui;
 
 import com.balugaq.netex.utils.Lang;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NumberFormat;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
@@ -17,13 +16,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Cell;
 
-public final class CellUi {
+public final class CellUI {
 
     private static final int BAR_TOTAL = 20;
 
-    private CellUi() {
+    private CellUI() {
     }
 
     @NotNull

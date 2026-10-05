@@ -6,11 +6,11 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.Stora
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellPersistence;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUi;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellSlotUI;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.MenuShells;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
-import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
@@ -21,7 +21,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
 public class CellCleaner extends CellBrowserBase {
 
     public static final int[] DISPLAY_SLOTS = new int[]{
@@ -120,7 +118,7 @@ public class CellCleaner extends CellBrowserBase {
 
     @Override
     public void onCellInserted(@NotNull BlockMenu menu, @NotNull ItemStack cellItem, @NotNull Player player) {
-        if (!CellSlotUi.prepareInsertedCell(player, cellItem)) {
+        if (!CellSlotUI.prepareInsertedCell(player, cellItem)) {
             return;
         }
         pageCache.put(menu.getLocation(), 0);
@@ -130,7 +128,7 @@ public class CellCleaner extends CellBrowserBase {
 
     @Override
     public @Nullable ItemStack onCellEjected(@NotNull BlockMenu menu, int slot) {
-        return CellSlotUi.ejectCell(menu, slot,
+        return CellSlotUI.ejectCell(menu, slot,
             () -> CELL_SLOT_MARKER.clone(), DISPLAY_SLOTS, pageCache, () -> refresh(menu));
     }
 
@@ -140,7 +138,7 @@ public class CellCleaner extends CellBrowserBase {
 
         if (cellItem == null || !StorageCell.isStorageCell(cellItem)) {
             menu.replaceExistingItem(CELL_SLOT, CELL_SLOT_MARKER.clone());
-            CellSlotUi.clearDisplay(menu, DISPLAY_SLOTS);
+            CellSlotUI.clearDisplay(menu, DISPLAY_SLOTS);
             menu.replaceExistingItem(INFO, buildInfoItem(null, 0));
             menu.replaceExistingItem(PREV, pageButton(false, false));
             menu.replaceExistingItem(NEXT, pageButton(false, true));
@@ -164,7 +162,7 @@ public class CellCleaner extends CellBrowserBase {
             int slot = DISPLAY_SLOTS[i];
             if (i < end - start) {
                 CellLedger.CellEntry entry = entries.get(start + i);
-                menu.replaceExistingItem(slot, CellSlotUi.displayItem(
+                menu.replaceExistingItem(slot, CellSlotUI.displayItem(
                     entry.sample, entry.amount,
                     CellnetText.CLEANER_ITEM_COUNT, CellnetText.CLEANER_DELETE_HINT));
             } else {
