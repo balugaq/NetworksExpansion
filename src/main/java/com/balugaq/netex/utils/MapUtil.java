@@ -1,6 +1,6 @@
 package com.balugaq.netex.utils;
 
-import io.github.bakedlibs.dough.collections.Pair;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.collections.Pair;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

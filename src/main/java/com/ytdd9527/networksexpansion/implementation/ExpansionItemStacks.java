@@ -539,6 +539,8 @@ public class ExpansionItemStacks {
         Lang.getItem("NTW_EXPANSION_SUPER_TRASH", Material.BLACK_WOOL), Theme.MACHINE);
     public static final SlimefunItemStack LINKER_GRID = Theme.themedSlimefunItemStack(
         Lang.getItem("NTW_EXPANSION_LINKER_GRID", Material.JUKEBOX), Theme.MACHINE);
+    public static final SlimefunItemStack VISUAL_GRID = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_VISUAL_GRID", Material.NOTE_BLOCK), Theme.MACHINE);
 
     // Cellnet Drives and Storage Cells
     public static final SlimefunItemStack CELL_DRIVE = Theme.themedSlimefunItemStack(

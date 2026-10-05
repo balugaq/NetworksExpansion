@@ -6,6 +6,7 @@ import com.balugaq.netex.api.keybind.ActionResult;
 import com.balugaq.netex.api.keybind.Keybind;
 import com.balugaq.netex.api.keybind.Keybinds;
 import com.balugaq.netex.api.keybind.MultiActionHandle;
+import com.balugaq.netex.api.visual.Screen;
 import io.github.sefiraat.networks.NetworkStorage;
 import io.github.sefiraat.networks.network.GridItemRequest;
 import io.github.sefiraat.networks.network.NodeDefinition;
@@ -134,7 +135,7 @@ public interface BaseGrid {
 
     Map<Location, GridCache> getCacheMap();
 
-    void updateDisplay(BlockMenu blockMenu);
+    void updateDisplay(Screen screen);
 
     void receiveItem(Player player, ItemStack itemStack, ClickAction action, BlockMenu blockMenu);
 }

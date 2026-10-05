@@ -1171,4 +1171,10 @@ public class ExpansionRecipes {
         null, NETWORK_WIRELESS_CONFIGURATOR.getItem(), null,
         null, ExpansionItemStacks.CHAIN_MODULE_BINDING, null
     };
+
+    public static final ItemStack[] VISUAL_GRID = new ItemStack[]{
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_GLASS.getItem(), NETWORK_GRID.getItem(), OPTIC_GLASS.getItem(),
+        OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem(), OPTIC_GLASS.getItem()
+    };
 }

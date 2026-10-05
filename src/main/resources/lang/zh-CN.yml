@@ -4,6 +4,19 @@ messages:
     click-to-research: "&7点击解锁物品"
     cost: "花费 "
     cost-level: " 级"
+    grid-new-style-custom-amount:
+      display-name: "&a高级网格自定义单次取出数量"
+      current-amount: "&7当前数量: %s (限制范围: 1~%s)"
+      click-tip: "&7⇨ &e点击设置数量"
+      input-prompt: "&e请输入高级网格自定义单次取出数量"
+    quantum-hud-display-mode:
+      display-name-percent: "&b量子存储HUD显示方式: &a百分比显示"
+      display-name-value: "&b量子存储HUD显示方式: &4数值显示"
+      click-tip-to-percent: "&7⇨ &e点击使用量子存储HUD显示方式为 百分比显示"
+      click-tip-to-value: "&7⇨ &e点击使用量子存储HUD显示方式为 数值显示"
+    invalid-amount-input: "&e请输入 1 ~ %s 之间的正整数"
+    amount-input-prompt: "&e输入取出数量"
+    quantity-input-prompt: "&e输入数量"
   keybind:
     title: "&a选择你要编辑的按键控制集"
     sub-title: "&a点击你要修改的按键触发"
@@ -423,6 +436,7 @@ messages:
       not-enough-items: "&c没有足够的材料"
       node-type-not-same: "&c储存的配置种类与目标不一致"
       no-config: "&c请先加载一个配置"
+      missing-item-entry: "- &e%sx%s"
     display:
       unknown_type: "未知的展示组类型 '%s', 特殊模型已禁用。"
     memory_card:
@@ -433,6 +447,7 @@ messages:
     drawer:
       wrong_server: "<warning>请将此物品放置在正确的服务器中，抽屉所在服务器: %s ; 当前服务器: %s"
       already_exists: "&c该容器已在其它位置存在!"
+      unknown-world: "未知世界"
       invalid_container: "&c请在量子存储槽放入量子存储 或 物品转移棒"
       invalid_container_amount: "&c量子存储槽只能放入一个物品!"
       invalid_chosen_item: "&c请在下方放入你要传输的物品"
@@ -1081,6 +1096,13 @@ messages:
       lore_output: "<passive>产物"
       lore_inputs: "<passive>材料（每轮消耗）"
       lore_entry: "<aqua>{0}<passive> × <aqua>{1}"
+  match-option:
+    title: "物品匹配选项"
+    click_tip: "点击切换该忽略项"
+    enabled: "当前：已忽略"
+    disabled: "当前：不忽略"
+  purger:
+    match_option_settings: "左键点击设置物品的比较方式"
 icons:
   cellnet-back-button:
     name: "<gold>返回"
@@ -1259,6 +1281,36 @@ icons:
       - "<passive>手持物品<click_info>点击<passive>此处添加"
   keybind-settings:
     name: "&6按键控制设置"
+  match-option-settings:
+    name: "&6物品匹配选项"
+    lore:
+      - "&a设置此清除器匹配网络内物品时"
+      - "&a忽略哪些属性（默认全部不忽略）"
+  match-option-close:
+    name: "&c关闭"
+    lore:
+      - "&a关闭此界面"
+  match-option:
+    ignore-durability:
+      name: "&6忽略物品耐久"
+      lore:
+        - "&a匹配时不再比较物品的耐久"
+    ignore-enchantment:
+      name: "&6忽略物品附魔"
+      lore:
+        - "&a匹配时不再比较物品的附魔"
+    ignore-attribute:
+      name: "&6忽略物品属性"
+      lore:
+        - "&a匹配时不再比较物品的属性加成"
+    ignore-lore:
+      name: "&6忽略物品描述"
+      lore:
+        - "&a匹配时不再比较物品的lore"
+    ignore-custom-model-data:
+      name: "&6忽略自定义模型"
+      lore:
+        - "&a匹配时不再比较物品的自定义模型数据"
   light-gray-background:
     name: "&7"
   yellow-border:
@@ -1819,14 +1871,14 @@ icons:
 
 items:
   # DO NOT CHANGE OR DELETE THESE ANNOUNCEMENTS
-  NTW_EXPANSION_ANNOUNCE_1:
+  NTW_EXPANSION_ANNOUNCEMENT_01:
     name: "<color_random_string>定义"
     lore:
       - "<warning> 1) 声明 指代此处的所有声明。"
       - "<warning> 2) 网络(Networks) 是指一个粘液附属，而不是互联网、物联网等意义上的网络，或其他传统意义上的网络。"
       - "<warning> 3) 网络拓展(NetworksExpansion) (下称\"网络拓展\"、\"此附属\"或\"此项目\") 是指一个粘液附属，由网络拓展开发组在网络的基础上，完全遵守 GPLv3 协议，进行适当增删修改，基于 Paper 1.20.1，汉化版 Slimefun 开发的，不完全兼容 Paper 1.20.5 及以上版本的粘液科技附属。"
       - "<warning> 4) 网络拓展开发者们(下称\"网络拓展开发组\",\"网络拓展创作者们\") 是开发网络拓展的群体，并非由任何公司或组织所拥有。"
-  NTW_EXPANSION_ANNOUNCE_2:
+  NTW_EXPANSION_ANNOUNCEMENT_02:
     name: "<color_random_string>网络拓展作品声明"
     lore:
       - "<warning> 阅读此声明前，请务必先阅读定义。"
@@ -1841,36 +1893,7 @@ items:
       - "<warning> 9) 对于侵权人，应当根据情况，承担停止侵害、消除影响、赔礼道歉、赔偿损失等民事责任；同时损害公共利益的，可以由著作权行政管理部门责令停止侵权行为，没收违法所得，没收、销毁侵权复制品，并可处以罚款；情节严重构成犯罪的，依法追究刑事责任。"
       - "<warning> 10) 当网络拓展开发者们不追究侵权人的侵权行为时，不代表网络拓展开发者们对侵权行为的认可。也不代表侵权人无需承担任何责任。"
       - "<warning> 请您务必遵守上述声明。"
-  NTW_EXPANSION_ANNOUNCE_3:
-    name: "<color_random_string>网络拓展使用声明"
-    lore:
-      - "<warning> 阅读此声明前，请务必先阅读网络拓展作品声明。"
-      - "<warning> GuizhanLibPlugin 是此附属的前置插件，请确保其已正确安装。"
-      - "<warning> 开发版汉化版 Slimefun 是此附属的前置插件，同样请确保其已正确安装。"
-      - "<warning> 您在使用网络拓展或网络拓展内容时须遵守法律法规，不得利用网络拓展或网络拓展内容从事违法违规行为，包括但不限于以下行为："
-      - "<warning> 1. 违反宪法所确定的基本原则的；"
-      - "<warning> 1) 危害国家安全、泄露国家秘密，颠覆国家政策，破坏国家统一的；"
-      - "<warning> 2) 损害国家荣誉和利益的；"
-      - "<warning> 3) 歪曲、丑化、亵渎、否定英雄烈士事迹和精神，以侮辱、诽谤或者其他方式侵害英雄烈士的姓名、肖像、名誉、荣誉的；"
-      - "<warning> 4) 宣扬恐怖主义、极端主义或者煽动实施恐怖活动、极端主义活动的；"
-      - "<warning> 5) 煽动民族仇恨、民族歧视，破坏民族团结的；"
-      - "<warning> 6) 破坏国家宗教政策，宣扬邪教和封建迷信的；"
-      - "<warning> 7) 散布谣言，扰乱社会秩序和社会秩序的；"
-      - "<warning> 8) 散布淫秽、色情、赌博、暴力、凶杀、恐怖或者教唆犯罪的；"
-      - "<warning> 9) 侮辱或者诽谤他人，侵害他人名誉、隐私和其他合法权益的；"
-      - "<warning> 10) 违背社会公德的；"
-      - "<warning> 11) 法律、行政法规和国家规定禁止的其他内容的。"
-      - "<warning> 2. 您不得利用网络拓展或网络拓展内容制作、复制、发布含有下列内容的不良信息："
-      - "<warning> 1) 使用夸张标题，内容与标题严重不符的；"
-      - "<warning> 2) 炒作绯闻、丑闻、劣迹等的；"
-      - "<warning> 3) 不当评述自然灾害、重大事故等灾难的；"
-      - "<warning> 4) 带有性暗示、性挑逗等易使人产生性联想的；"
-      - "<warning> 5) 展现血腥、惊悚、残忍等致人身心不适的；"
-      - "<warning> 6) 煽动人群歧视、地域歧视等的；"
-      - "<warning> 7) 宣扬低俗、庸俗、媚俗内容的；"
-      - "<warning> 8) 可能引发未成年人模仿不安全行为和违反社会公德行为、诱导未成年人不良嗜好等的；"
-      - "<warning> 9) 其他对互联网生态造成不良影响的内容。"
-  NTW_EXPANSION_ANNOUNCE_4:
+  NTW_EXPANSION_ANNOUNCEMENT_03:
     name: "<color_random_string>网络拓展作者声明"
     lore:
       - "<warning> 阅读此声明前，请务必先阅读网络拓展使用声明。"
@@ -1887,7 +1910,7 @@ items:
       - "<passive> 此附属灵感来源于广大玩家。"
       - "<passive> 尤其要感谢 Utoboy，TouRuya，haiman233，matl114 等玩家的意见提供。"
       - "<passive> 感谢 Utoboy，TouRuya，haiman233，yitoudaidai，tinalness，matl114，lengshang 等测试员的测试。"
-  NTW_EXPANSION_ANNOUNCE_5:
+  NTW_EXPANSION_ANNOUNCEMENT_04:
     name: "<color_random_string>网络拓展相关链接"
     lore:
       - "<warning> 阅读此声明前，请务必先阅读网络拓展作者声明。"
@@ -1901,26 +1924,8 @@ items:
       - "<warning> 网络拓展开发版不接受 GitHub PR"
       - "<passive> 网络拓展作者 GitHub 页面: <click_info>https://github.com/ytdd9527"
       - "<passive> 网络拓展作者 GitHub 页面: <click_info>https://github.com/balugaq"
-  NTW_EXPANSION_ANNOUNCE_6:
-    name: "<color_random_string>网络拓展的目的"
-    lore:
-      - "<warning> 阅读此声明前，请务必先阅读网络拓展相关链接。"
-      - "<passive> 网络拓展的目的在于在网络的基础上，提供更多的便利与便捷，增强网络的运输功能。"
-      - "<passive> 同时也是尽可能降低因网络造成延迟问题，减少因网络造成的漏洞、错误。"
-  NTW_EXPANSION_ANNOUNCE_7:
-    name: "<color_random_string>网络拓展相关答疑"
-    lore:
-      - "<warning> 阅读此声明前，请务必先阅读网络拓展的目的。"
-      - "<warning> 1) 为什么网络拓展频繁修改，有时候会出现一些奇怪的问题？"
-      - "<passive> - 这是正常现象，网络拓展开发组无法保证每一个版本都能完美运行。如果可能，请使用构建站上的稳定版本。"
-      - "<warning> 2) 为什么一些很好的特性没有被加入网络拓展？"
-      - "<passive> - 由于网络拓展的特性，某些特性可能不适合在网络中使用，因为网络是一个运输系统。"
-      - "<warning> 3) 为什么一些已经实装的，便利玩家的特性在后来的版本中被删除了？"
-      - "<passive> - 删除已有的特性是网络拓展开发组经过长期考虑的决定，并不是随便删除的。"
-      - "<passive> - 通常来说，一些特性会因为延迟过高，造成了更多漏洞而被删除。"
-      - "<passive> - 当然，还会有因对网络拓展开发组成员言语攻击、恶意行为等原因而被删除的情况。"
-  NTW_EXPANSION_ANNOUNCE_8:
-    name: "<color_random_string>网络拓展补充说明"
+  NTW_EXPANSION_ANNOUNCEMENT_05:
+    name: "<color_random_string>网络拓展相关链接"
     lore:
       - "<warning> 阅读此声明前，请务必先阅读网络拓展相关答疑。"
       - "<warning> 1) 网络拓展开发者们没有义务维护此附属，对于稳定版网络拓展突然出现的错误、漏洞、问题，请及时向此附属稳定版 GitHub 仓库提交 Issue。"
@@ -3546,9 +3551,22 @@ items:
       - "网络拓展开发者"
 
   NTW_EXPANSION_AUTHOR_TINALNESS:
-    name: "tinalness"
+    name: "balugaq"
     lore:
       - "网络拓展开发者"
+
+  NTW_EXPANSION_VISUAL_GRID:
+    name: "交互式网格"
+    lore:
+      - "交互式允许你查看网络中所有的物品"
+      - "你也可以直接放入或取出物品"
+      - "支持自定义按键控制"
+      - "排序方式: "
+      - "&eAZ&7: &e按字母顺序排序"
+      - "&e数量&7: &e按物品数量排序"
+      - "&e数量倒序&7: &e按物品数量倒序排序"
+      - "&e附属&7: &e按物品所属附属字母顺序排序"
+      - "支持拼音搜索"
 
   NTW_EXPANSION_CARGO_NODE_QUICK_TOOL:
     name: "货运节点快配工具"

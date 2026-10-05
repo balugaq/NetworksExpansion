@@ -30,6 +30,7 @@ import io.github.sefiraat.networks.slimefun.network.NetworkDirectional;
 import io.github.sefiraat.networks.slimefun.network.NetworkGreedyBlock;
 import io.github.sefiraat.networks.slimefun.network.NetworkPowerNode;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;
+import io.github.sefiraat.networks.utils.MatchOption;
 import io.github.sefiraat.networks.utils.StackUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.ncbpfluffybear.fluffymachines.items.Barrel;
@@ -83,90 +84,53 @@ public class NetworkRoot extends NetworkNode {
         NetworkCell.SLOTS.stream().mapToInt(i -> i).toArray();
     public static final int[] GREEDY_BLOCK_AVAILABLE_SLOTS = new int[]{NetworkGreedyBlock.INPUT_SLOT};
     public static final int[] ADVANCED_GREEDY_BLOCK_AVAILABLE_SLOTS = AdvancedGreedyBlock.INPUT_SLOTS;
+
     @Getter
-    private final Set<Location> bridges = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> monitors = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> importers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> exporters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> grids = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> cells = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> grabbers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> pushers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> purgers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> crafters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> powerNodes = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> powerDisplays = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> encoders = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> greedyBlocks = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> cutters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> pasters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> vacuums = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> wirelessTransmitters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> wirelessReceivers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> powerOutlets = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> transferPushers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> transferGrabbers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> transfers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> advancedImporters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> advancedExporters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> advancedGreedyBlocks = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> advancedPurgers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> advancedVacuums = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> lineTransferVanillaPushers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> lineTransferVanillaGrabbers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> inputOnlyMonitors = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> outputOnlyMonitors = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> linePowerOutlets = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> decoders = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> quantumManagers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> drawerManagers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> crafterManagers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> itemFlowViewers = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> advancedWirelessTransmitters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> itemDifferenters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> storageCardConverters = ConcurrentHashMap.newKeySet();
-    @Getter
-    private final Set<Location> facingPresetters = ConcurrentHashMap.newKeySet();
+    private final Set<Location>
+        bridges = ConcurrentHashMap.newKeySet(),
+        monitors = ConcurrentHashMap.newKeySet(),
+        importers = ConcurrentHashMap.newKeySet(),
+        exporters = ConcurrentHashMap.newKeySet(),
+        grids = ConcurrentHashMap.newKeySet(),
+        cells = ConcurrentHashMap.newKeySet(),
+        grabbers = ConcurrentHashMap.newKeySet(),
+        pushers = ConcurrentHashMap.newKeySet(),
+        purgers = ConcurrentHashMap.newKeySet(),
+        crafters = ConcurrentHashMap.newKeySet(),
+        powerNodes = ConcurrentHashMap.newKeySet(),
+        powerDisplays = ConcurrentHashMap.newKeySet(),
+        encoders = ConcurrentHashMap.newKeySet(),
+        greedyBlocks = ConcurrentHashMap.newKeySet(),
+        cutters = ConcurrentHashMap.newKeySet(),
+        pasters = ConcurrentHashMap.newKeySet(),
+        vacuums = ConcurrentHashMap.newKeySet(),
+        wirelessTransmitters = ConcurrentHashMap.newKeySet(),
+        wirelessReceivers = ConcurrentHashMap.newKeySet(),
+        powerOutlets = ConcurrentHashMap.newKeySet(),
+        transferPushers = ConcurrentHashMap.newKeySet(),
+        transferGrabbers = ConcurrentHashMap.newKeySet(),
+        transfers = ConcurrentHashMap.newKeySet(),
+        advancedImporters = ConcurrentHashMap.newKeySet(),
+        advancedExporters = ConcurrentHashMap.newKeySet(),
+        advancedGreedyBlocks = ConcurrentHashMap.newKeySet(),
+        advancedPurgers = ConcurrentHashMap.newKeySet(),
+        advancedVacuums = ConcurrentHashMap.newKeySet(),
+        lineTransferVanillaPushers = ConcurrentHashMap.newKeySet(),
+        lineTransferVanillaGrabbers = ConcurrentHashMap.newKeySet(),
+        inputOnlyMonitors = ConcurrentHashMap.newKeySet(),
+        outputOnlyMonitors = ConcurrentHashMap.newKeySet(),
+        linePowerOutlets = ConcurrentHashMap.newKeySet(),
+        decoders = ConcurrentHashMap.newKeySet(),
+        quantumManagers = ConcurrentHashMap.newKeySet(),
+        drawerManagers = ConcurrentHashMap.newKeySet(),
+        crafterManagers = ConcurrentHashMap.newKeySet(),
+        itemFlowViewers = ConcurrentHashMap.newKeySet(),
+        advancedWirelessTransmitters = ConcurrentHashMap.newKeySet(),
+        aeSwitchers = ConcurrentHashMap.newKeySet(),
+        itemDifferenters = ConcurrentHashMap.newKeySet(),
+        storageCardConverters = ConcurrentHashMap.newKeySet(),
+        facingPresetters = ConcurrentHashMap.newKeySet(),
+        visualGrids = ConcurrentHashMap.newKeySet();
     @Deprecated
     private final boolean progressing = false;
     @Getter
@@ -608,6 +572,7 @@ public class NetworkRoot extends NetworkNode {
             case ITEM_DIFFERENTER -> itemDifferenters.add(location);
             case STORAGE_CARD_CONVERTER -> storageCardConverters.add(location);
             case FACING_PRESETTER -> facingPresetters.add(location);
+            case VISUAL_GRID -> visualGrids.add(location);
         }
     }
 
@@ -2095,6 +2060,17 @@ public class NetworkRoot extends NetworkNode {
     }
 
     public ItemStack getItemStack0(@NotNull Location accessor, @NotNull ItemRequest request) {
+        return getItemStack0(accessor, request, null);
+    }
+
+    /**
+     * @param accessor 取物的机器位置
+     * @param request  请求（会被消费，{@code receiveAmount} 递减剩余需求）
+     * @param option   物品匹配选项（忽略项），为 null 时使用 {@link MatchOption#DEFAULT}
+     * @return 匹配 {@code option} 的物品；数量为 0 时返回 null
+     */
+    public ItemStack getItemStack0(
+        @NotNull Location accessor, @NotNull ItemRequest request, @Nullable MatchOption option) {
         ItemStack stackToReturn = null;
 
         if (request.getAmount() <= 0) {
@@ -2117,7 +2093,7 @@ public class NetworkRoot extends NetworkNode {
                     // <editor-fold desc="do barrel">
                     final ItemStack itemStack = barrelIdentity.getItemStack();
 
-                    if (itemStack == null || !StackUtils.itemsMatch(request, itemStack)) {
+                    if (itemStack == null || !StackUtils.itemsMatch(request, itemStack, option)) {
                         // Netex - Cache start
                         misses.add(entry.getKey());
                         // Netex - Cache end
@@ -2214,7 +2190,7 @@ public class NetworkRoot extends NetworkNode {
             // <editor-fold desc="do barrel">
             final ItemStack itemStack = barrelIdentity.getItemStack();
 
-            if (itemStack == null || !StackUtils.itemsMatch(request, itemStack)) {
+            if (itemStack == null || !StackUtils.itemsMatch(request, itemStack, option)) {
                 continue;
             }
 
@@ -2303,7 +2279,7 @@ public class NetworkRoot extends NetworkNode {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack == null
                     || itemStack.getType() == Material.AIR
-                    || !StackUtils.itemsMatch(request, itemStack)) {
+                    || !StackUtils.itemsMatch(request, itemStack, option)) {
                     continue;
                 }
 
@@ -2342,7 +2318,7 @@ public class NetworkRoot extends NetworkNode {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack == null
                     || itemStack.getType() == Material.AIR
-                    || !StackUtils.itemsMatch(request, itemStack)) {
+                    || !StackUtils.itemsMatch(request, itemStack, option)) {
                     continue;
                 }
 
@@ -2375,7 +2351,7 @@ public class NetworkRoot extends NetworkNode {
                 final ItemStack itemStack = blockMenu.getItemInSlot(slot);
                 if (itemStack == null
                     || itemStack.getType() == Material.AIR
-                    || !StackUtils.itemsMatch(request, itemStack)) {
+                    || !StackUtils.itemsMatch(request, itemStack, option)) {
                     continue;
                 }
 
@@ -2408,7 +2384,7 @@ public class NetworkRoot extends NetworkNode {
             final ItemStack itemStack = blockMenu.getItemInSlot(slots[0]);
             if (itemStack == null
                 || itemStack.getType() == Material.AIR
-                || !StackUtils.itemsMatch(request, itemStack)) {
+                || !StackUtils.itemsMatch(request, itemStack, option)) {
                 continue;
             }
 

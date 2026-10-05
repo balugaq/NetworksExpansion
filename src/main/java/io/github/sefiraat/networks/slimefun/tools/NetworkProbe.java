@@ -89,6 +89,7 @@ public class NetworkProbe extends SpecialSlimefunItem implements CanCooldown {
             final int itemDifferenters = root.getItemDifferenters().size();
             final int storageCardConverters = root.getStorageCardConverters().size();
             final int facingPresetters = root.getFacingPresetters().size();
+            final int visualGrids = root.getVisualGrids().size();
 
             final Map<ItemStack, Long> allNetworkItems = root.getAllNetworkItemsLongTypeView();
             final int distinctItems = allNetworkItems.size();
@@ -137,6 +138,9 @@ public class NetworkProbe extends SpecialSlimefunItem implements CanCooldown {
                 stringOrSpaces(ExpansionItemStacks.LINE_POWER_OUTLET_1.getDisplayName())
                     .substring(0, 6),
                 linePowerOutlets));
+            player.sendMessage(
+                formatter(ExpansionItemStacks.VISUAL_GRID.getDisplayName(), visualGrids));
+
 
             player.sendMessage(Lang.getString("messages.completed-operation.probe.split"));
             player.sendMessage(Lang.getString("messages.completed-operation.probe.networks_title"));

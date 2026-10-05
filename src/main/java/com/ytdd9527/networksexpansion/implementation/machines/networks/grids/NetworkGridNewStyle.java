@@ -1,7 +1,8 @@
-package com.ytdd9527.networksexpansion.implementation.machines.networks.advanced;
+package com.ytdd9527.networksexpansion.implementation.machines.networks.grids;
 
 import com.balugaq.netex.api.keybind.Keybindable;
 import com.balugaq.netex.api.keybind.Keybinds;
+import com.balugaq.netex.api.visual.Screen;
 import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
 import io.github.sefiraat.networks.network.NodeType;
@@ -113,7 +114,7 @@ public class NetworkGridNewStyle extends AbstractGridNewStyle implements Keybind
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     gridCache.setPage(gridCache.getPage() <= 0 ? 0 : gridCache.getPage() - 1);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -125,7 +126,7 @@ public class NetworkGridNewStyle extends AbstractGridNewStyle implements Keybind
                             ? gridCache.getMaxPages()
                             : gridCache.getPage() + 1);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -134,14 +135,14 @@ public class NetworkGridNewStyle extends AbstractGridNewStyle implements Keybind
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     AbstractGrid.updateSortOrder(gridCache, action, 4);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
                 menu.replaceExistingItem(getFilterSlot(), getFilterStack());
                 menu.addMenuClickHandler(getFilterSlot(), (p, slot, item, action) -> {
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
-                    setFilter(p, menu, gridCache, action);
+                    setFilter(p, Screen.of(menu), gridCache, action);
                     return false;
                 });
 
@@ -151,7 +152,7 @@ public class NetworkGridNewStyle extends AbstractGridNewStyle implements Keybind
                         GridCache gridCache = getCacheMap().get(menu.getLocation());
                         gridCache.toggleDisplayMode();
                         menu.replaceExistingItem(getToggleModeSlot(), getModeStack(gridCache));
-                        updateDisplay(menu);
+                        updateDisplay(Screen.of(menu));
                     }
                     return false;
                 });

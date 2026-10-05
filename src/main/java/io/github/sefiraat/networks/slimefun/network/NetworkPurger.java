@@ -1,6 +1,7 @@
 package io.github.sefiraat.networks.slimefun.network;
 
 import com.balugaq.netex.api.enums.FeedbackType;
+import com.balugaq.netex.api.gui.MatchOptionMenu;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.utils.NetworksVersionedParticle;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
@@ -10,6 +11,7 @@ import io.github.sefiraat.networks.network.NodeDefinition;
 import io.github.sefiraat.networks.network.NodeType;
 import io.github.sefiraat.networks.network.stackcaches.ItemRequest;
 import io.github.sefiraat.networks.slimefun.NetworkSlimefunItems;
+import io.github.sefiraat.networks.utils.MatchOption;
 import io.github.sefiraat.networks.utils.StackUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
@@ -37,10 +39,11 @@ import java.util.List;
 public class NetworkPurger extends NetworkObject {
 
     private static final int[] BACKGROUND_SLOTS = {
-        0, 1, 2, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
+        0, 1, 2, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25
     };
     private static final int TEST_ITEM_SLOT = 13;
     private static final int[] TEST_ITEM_BACKDROP = {3, 4, 5, 12, 14, 21, 22, 23};
+    private static final int MATCH_OPTION_SLOT = 26;
 
     private final @NotNull ItemSetting<Integer> tickRate;
 
@@ -112,8 +115,9 @@ public class NetworkPurger extends NetworkObject {
         }
         ItemStack clone = StackUtils.getAsQuantity(testItem, 1);
 
+        MatchOption matchOption = MatchOptionMenu.getMatchOption(blockMenu.getLocation());
         ItemRequest itemRequest = new ItemRequest(clone, clone.getMaxStackSize());
-        ItemStack retrieved = definition.getNode().getRoot().getItemStack0(blockMenu.getLocation(), itemRequest);
+        ItemStack retrieved = definition.getNode().getRoot().getItemStack0(blockMenu.getLocation(), itemRequest, matchOption);
         if (retrieved != null) {
             retrieved.setAmount(0);
             sendFeedback(blockMenu.getLocation(), FeedbackType.WORKING);
@@ -132,6 +136,15 @@ public class NetworkPurger extends NetworkObject {
             public void init() {
                 drawBackground(BACKGROUND_SLOTS);
                 drawBackground(Icon.PURGER_TEMPLATE_BACKGROUND_STACK, TEST_ITEM_BACKDROP);
+                addItem(MATCH_OPTION_SLOT, Icon.MATCH_OPTION_SETTINGS, (p, i, itemStack, clickAction) -> false);
+            }
+
+            @Override
+            public void newInstance(@NotNull BlockMenu menu, @NotNull Block b) {
+                menu.addMenuClickHandler(MATCH_OPTION_SLOT, (player, slot, itemStack, clickAction) -> {
+                    MatchOptionMenu.openMenu(menu.getLocation(), player);
+                    return false;
+                });
             }
 
             @Override

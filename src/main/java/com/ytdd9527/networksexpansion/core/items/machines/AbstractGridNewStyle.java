@@ -7,13 +7,13 @@ import com.balugaq.netex.api.enums.FeedbackType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.interfaces.BaseGrid;
 import com.balugaq.netex.api.keybind.Keybindable;
+import com.balugaq.netex.api.visual.Screen;
 import com.balugaq.netex.utils.InventoryUtil;
 import com.balugaq.netex.utils.Lang;
 import com.github.houbb.pinyin.constant.enums.PinyinStyleEnum;
 import com.github.houbb.pinyin.util.PinyinHelper;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SmartNetworkCraftingGridNewStyle;
 import com.ytdd9527.networksexpansion.utils.TextUtil;
 import io.github.sefiraat.networks.NetworkStorage;
 import io.github.sefiraat.networks.Networks;
@@ -30,9 +30,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -88,7 +86,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
     @Nullable
     public ItemStack precheck(NodeDefinition definition, BlockMenu blockMenu, Player player, ItemStack itemStack) {
         if (definition == null || definition.getNode() == null) {
-            clearDisplay(blockMenu);
+            clearDisplay(Screen.of(blockMenu));
             blockMenu.close();
             Networks.getInstance()
                 .getLogger()
@@ -206,11 +204,11 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
     }
 
     @Override
-    public void updateDisplay(BlockMenu menu) {
-        Location location = menu.getLocation();
+    public void updateDisplay(Screen screen) {
+        Location location = screen.getLocation();
 
         // No viewer - lets not bother updating
-        if (!menu.hasViewer()) {
+        if (!screen.hasViewer()) {
             sendFeedback(location, FeedbackType.AFK);
             return;
         }
@@ -219,24 +217,22 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
 
         // No node located, weird
         if (definition == null || definition.getNode() == null) {
-            clearDisplay(menu);
+            clearDisplay(screen);
             sendFeedback(location, FeedbackType.NO_NETWORK_FOUND);
             return;
         }
 
         // Update Screen
-        Bukkit.getScheduler().runTaskAsynchronously(Networks.getInstance(), () -> {
-
-        final BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
-        if (blockMenu == null) {
+        final BlockMenu bm = StorageCacheUtils.getMenu(location);
+        if (bm == null) {
             return;
         }
 
         final NetworkRoot root = definition.getNode().getRoot();
 
-        final GridCache gridCache = getCacheMap().get(blockMenu.getLocation().clone());
+        final GridCache gridCache = getCacheMap().get(screen.getLocation());
 
-        SlimefunBlockData data = StorageCacheUtils.getBlock(blockMenu.getLocation());
+        SlimefunBlockData data = StorageCacheUtils.getBlock(screen.getLocation());
         if (data == null) {
             return;
         }
@@ -246,8 +242,8 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
             gridCache.setFilter(filter);
         }
 
-        blockMenu.replaceExistingItem(getChangeSort(), getSortOrderStack(gridCache.getSortOrder()));
-        blockMenu.replaceExistingItem(getFilterSlot(), getFilterStack(gridCache.getFilter()));
+        screen.setItem(getChangeSort(), getSortOrderStack(gridCache.getSortOrder()));
+        screen.setItem(getFilterSlot(), getFilterStack(gridCache.getFilter()));
 
         // Deprecated feature
         // autoSetFilter(blockMenu, gridCache);
@@ -260,7 +256,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
 
             // Set everything to blank and return if there are no pages (no items)
             if (pages < 0) {
-                clearDisplay(blockMenu);
+                clearDisplay(screen);
                 return;
             }
 
@@ -276,7 +272,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
             final int end = Math.min(start + getDisplaySlots().length, entries.size());
             final List<Entry<ItemStack, Long>> validEntries = entries.subList(start, end);
 
-            getCacheMap().put(blockMenu.getLocation(), gridCache);
+            getCacheMap().put(screen.getLocation(), gridCache);
 
             for (int i = 0; i < getDisplaySlots().length; i++) {
                 if (validEntries.size() > i) {
@@ -296,16 +292,12 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
 
                     itemMeta.setLore(lore);
                     displayStack.setItemMeta(itemMeta);
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], displayStack);
-                    blockMenu.addMenuClickHandler(getDisplaySlots()[i], displayKeybinds());
+                    screen.setItem(getDisplaySlots()[i], displayStack, displayKeybinds());
                 } else {
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], getBlankSlotStack());
-                    blockMenu.addMenuClickHandler(
-                        getDisplaySlots()[i], (p, slot, item, action) -> {
-                            receiveItem(p, action, blockMenu);
-                            return false;
-                        }
-                    );
+                    screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
+                        receiveItem(p, action, screen);
+                        return false;
+                    });
                 }
             }
         } else {
@@ -320,7 +312,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
 
             // Set everything to blank and return if there are no pages (no items)
             if (pages < 0) {
-                clearDisplay(blockMenu);
+                clearDisplay(screen);
                 return;
             }
 
@@ -333,7 +325,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
             final int end = Math.min(start + getDisplaySlots().length, history.size());
             final List<ItemStack> validHistory = history.subList(start, end);
 
-            getCacheMap().put(blockMenu.getLocation(), gridCache);
+            getCacheMap().put(screen.getLocation(), gridCache);
 
             for (int i = 0; i < getDisplaySlots().length; i++) {
                 if (validHistory.size() > i) {
@@ -352,32 +344,26 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
 
                     itemMeta.setLore(lore);
                     displayStack.setItemMeta(itemMeta);
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], displayStack);
-                    blockMenu.addMenuClickHandler(getDisplaySlots()[i], displayKeybinds());
+                    screen.setItem(getDisplaySlots()[i], displayStack, displayKeybinds());
                 } else {
-                    blockMenu.replaceExistingItem(getDisplaySlots()[i], getBlankSlotStack());
-                    blockMenu.addMenuClickHandler(
-                        getDisplaySlots()[i], (p, slot, item, action) -> {
-                            receiveItem(p, action, blockMenu);
-                            return false;
-                        }
-                    );
+                    screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
+                        receiveItem(p, action, screen);
+                        return false;
+                    });
                 }
             }
         }
 
-        blockMenu.replaceExistingItem(
+        screen.setItem(
             getPagePrevious(),
             Icon.getPageStack(getPagePreviousStack(), gridCache.getPage() + 1, gridCache.getMaxPages() + 1)
         );
-        blockMenu.replaceExistingItem(
+        screen.setItem(
             getPageNext(),
             Icon.getPageStack(getPageNextStack(), gridCache.getPage() + 1, gridCache.getMaxPages() + 1)
         );
 
-        sendFeedback(blockMenu.getLocation(), FeedbackType.WORKING);
-
-        });
+        sendFeedback(screen.getLocation(), FeedbackType.WORKING);
     }
 
     @Override
@@ -444,78 +430,6 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
             .toList();
         cache.setEntriesCache(result);
         return result;
-    }
-
-    @Override
-    public void postRegister() {
-        getPreset();
-    }
-
-
-    protected abstract BlockMenuPreset getPreset();
-
-    protected abstract int[] getBackgroundSlots();
-
-    protected abstract int[] getDisplaySlots();
-
-    protected abstract int getChangeSort();
-
-    protected abstract int getPagePrevious();
-
-    protected abstract int getPageNext();
-
-    protected abstract int getFilterSlot();
-
-    @Override
-    public void receiveItem(Player player, ClickAction action, BlockMenu blockMenu) {
-        NodeDefinition definition = NetworkStorage.getNode(blockMenu.getLocation());
-        if (definition == null || definition.getNode() == null) {
-            clearDisplay(blockMenu);
-            blockMenu.close();
-            Networks.getInstance()
-                .getLogger()
-                .warning(String.format(
-                    Lang.getString("messages.unsupported-operation.grid.may_duping"),
-                    player.getName(),
-                    blockMenu.getLocation()
-                ));
-            return;
-        }
-
-        ItemStack cursor = player.getItemOnCursor();
-        receiveItem(definition.getNode().getRoot(), player, cursor, action, blockMenu);
-    }
-
-    @Override
-    public void receiveItem(
-        Player player, ItemStack itemStack, ClickAction action, BlockMenu blockMenu) {
-        NodeDefinition definition = NetworkStorage.getNode(blockMenu.getLocation());
-        if (definition == null || definition.getNode() == null) {
-            clearDisplay(blockMenu);
-            blockMenu.close();
-            Networks.getInstance()
-                .getLogger()
-                .warning(String.format(
-                    Lang.getString("messages.unsupported-operation.grid.may_duping"),
-                    player.getName(),
-                    blockMenu.getLocation()
-                ));
-            return;
-        }
-
-        receiveItem(definition.getNode().getRoot(), player, itemStack, action, blockMenu);
-    }
-
-    @Override
-    public void receiveItem(
-        NetworkRoot root,
-        Player player,
-        @Nullable ItemStack itemStack,
-        ClickAction action,
-        BlockMenu blockMenu) {
-        if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
-            root.addItemStack0(blockMenu.getLocation(), itemStack);
-        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.github.sefiraat.networks;
 
+import com.balugaq.bim.BIMLoader;
 import com.balugaq.netex.api.algorithm.ID;
 import com.balugaq.netex.api.data.ItemFlowRecord;
 import com.balugaq.netex.api.enums.MinecraftVersion;
@@ -82,6 +83,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     private ListenerManager listenerManager;
     private SupportedPluginManager supportedPluginManager;
     private LocalizationService localizationService;
+    private BIMLoader bimLoader;
     private long slimefunTickCount;
 
     public Networks() {
@@ -100,19 +102,23 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
 
     @NotNull
     public static PluginManager getPluginManager() {
-        return Networks.getInstance().getServer().getPluginManager();
+        return getInstance().getServer().getPluginManager();
     }
 
     public static SupportedPluginManager getSupportedPluginManager() {
-        return Networks.getInstance().supportedPluginManager;
+        return getInstance().supportedPluginManager;
     }
 
     public static LocalizationService getLocalizationService() {
-        return Networks.getInstance().localizationService;
+        return getInstance().localizationService;
     }
 
     public static ListenerManager getListenerManager() {
-        return Networks.getInstance().listenerManager;
+        return getInstance().listenerManager;
+    }
+
+    public static BIMLoader getBIMLoader() {
+        return getInstance().bimLoader;
     }
 
     public static long getSlimefunTickCount() {
@@ -147,6 +153,8 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
 
         getLogger().info(getLocalizationService().getString("messages.startup.trying-auto-update"));
         tryUpdate();
+
+        this.bimLoader = new BIMLoader(this);
 
         this.supportedPluginManager = new SupportedPluginManager();
 
@@ -396,7 +404,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     }
 
     public void setupMetrics() {
-        final Metrics metrics = new Metrics(this, 13644);
+        final Metrics metrics = new Metrics(this, 34492);
 
         AdvancedPie networksChart = new AdvancedPie("networks", () -> {
             Map<String, Integer> networksMap = new HashMap<>();

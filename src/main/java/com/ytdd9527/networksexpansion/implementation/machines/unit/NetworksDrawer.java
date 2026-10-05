@@ -833,7 +833,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                 Location currLoc = data.getLastLocation();
                 p.sendMessage(TextUtil.YELLOW
                     + (currLoc.getWorld() == null
-                    ? "Unknown"
+                    ? Lang.getString("messages.unsupported-operation.drawer.unknown-world")
                     : currLoc.getWorld().getName()) + " " + TextUtil.GRAY + "| " + TextUtil.YELLOW
                     + currLoc.getBlockX() + TextUtil.GRAY + "/" + TextUtil.YELLOW
                     + currLoc.getBlockY() + TextUtil.GRAY + "/" + TextUtil.YELLOW + currLoc.getBlockZ()

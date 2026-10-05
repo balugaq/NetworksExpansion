@@ -150,6 +150,7 @@ public class SetupUtil {
             ExpansionItems.STORAGE_CARD_CONVERTER.registerThis(),
             ExpansionItems.FACING_PRESETTER.registerThis(),
             ExpansionItems.SUPER_TRASH.registerThis(),
+//            ExpansionItems.VISUAL_GRID.registerThis(), // todo: 以后再写
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE.registerThis(),
             ExpansionItems.ADVANCED_AUTO_CRAFTING_TABLE_WITHHOLDING.registerThis());
 

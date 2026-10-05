@@ -1,16 +1,16 @@
-package com.ytdd9527.networksexpansion.implementation.machines.networks.advanced;
+package com.ytdd9527.networksexpansion.implementation.machines.networks.grids;
 
 import com.balugaq.jeg.api.recipe_complete.RecipeCompletableRegistry;
 import com.balugaq.netex.api.enums.AmountHandleStrategy;
 import com.balugaq.netex.api.enums.FeedbackType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.helpers.SupportedCraftingTableRecipes;
-import com.balugaq.netex.api.interfaces.RecipeCompletableWithGuide;
 import com.balugaq.netex.api.keybind.Action;
 import com.balugaq.netex.api.keybind.ActionResult;
 import com.balugaq.netex.api.keybind.Keybind;
 import com.balugaq.netex.api.keybind.Keybinds;
 import com.balugaq.netex.api.keybind.MultiActionHandle;
+import com.balugaq.netex.api.visual.Screen;
 import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.Debug;
 import com.balugaq.netex.utils.InventoryUtil;
@@ -45,7 +45,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ import java.util.Map;
 
 @NullMarked
 @SuppressWarnings("DuplicatedCode")
-public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle implements RecipeCompletableWithGuide {
+public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle {
     private static final int[] BACKGROUND_SLOTS = {
         12, 29
     };
@@ -192,7 +191,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     gridCache.setPage(gridCache.getPage() <= 0 ? 0 : gridCache.getPage() - 1);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -204,7 +203,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                             ? gridCache.getMaxPages()
                             : gridCache.getPage() + 1);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
@@ -213,14 +212,14 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     AbstractGrid.updateSortOrder(gridCache, action, 4);
                     getCacheMap().put(menu.getLocation(), gridCache);
-                    updateDisplay(menu);
+                    updateDisplay(Screen.of(menu));
                     return false;
                 });
 
                 menu.replaceExistingItem(getFilterSlot(), getFilterStack());
                 menu.addMenuClickHandler(getFilterSlot(), (p, slot, item, action) -> {
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
-                    setFilter(p, menu, gridCache, action);
+                    setFilter(p, Screen.of(menu), gridCache, action);
                     return false;
                 });
 
@@ -230,7 +229,7 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
                         GridCache gridCache = getCacheMap().get(menu.getLocation());
                         gridCache.toggleDisplayMode();
                         menu.replaceExistingItem(getToggleModeSlot(), getModeStack(gridCache));
-                        updateDisplay(menu);
+                        updateDisplay(Screen.of(menu));
                     }
                     return false;
                 });
@@ -467,10 +466,5 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle imple
 
     public ItemStack[] copyStacks(ItemStack[] array) {
         return Arrays.stream(array).map(i -> i == null ? null : i.clone()).toArray(ItemStack[]::new);
-    }
-
-    @Override
-    public @NotNull SlimefunItem getSlimefunItem() {
-        return this;
     }
 }

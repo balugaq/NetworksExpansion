@@ -1,15 +1,11 @@
 plugins {
     java
-    id("com.gradleup.shadow") version "9.0.0"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.shadow") version "9.6.1"
+    id("xyz.jpenilla.run-paper") version "3.1.0"
 }
 
 group = "com.ytdd9527.networksexpansion"
-<<<<<<< HEAD
-version = "2.1.120"
-=======
-version = "2.1.121"
->>>>>>> 788d79ed22cca5bd40fea52b0529da1629068192
+version = "2.1.124"
 
 java {
     toolchain {
@@ -42,15 +38,16 @@ dependencies {
     // Tools etc.
     implementation("org.bstats:bstats-bukkit:3.2.1")
     implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
-    implementation("dev.sefiraat:SefiLib:0.2.6")
+    implementation("dev.sefiraat:SefiLib:0.3.0")
     implementation("net.byteflux:libby-bukkit:1.3.2")
+    implementation("com.github.balugaq:BigInteractionMenu:8991544824")
 
     compileOnly("com.google.code.findbugs:annotations:3.0.1u2") {
         exclude("net.jcip", "jcip-annotations")
         exclude("com.google.code.findbugs", "jsr305")
     }
-    compileOnly("org.projectlombok:lombok:1.18.46")
-    annotationProcessor("org.projectlombok:lombok:1.18.46")
+    compileOnly("org.projectlombok:lombok:1.18.48")
+    annotationProcessor("org.projectlombok:lombok:1.18.48")
     compileOnly("com.github.houbb:pinyin:0.4.0")
 
     // Supported Plugins
@@ -66,10 +63,10 @@ dependencies {
         exclude("com.sk89q.worldguard", "worldguard-legacy")
         exclude("com.comphenix.protocol", "ProtocolLib")
     }
-    compileOnly("net.guizhanss:GuizhanLibPlugin:1.7.6")
+    compileOnly("net.guizhanss:GuizhanLibPlugin:2.5.0")
     compileOnly("com.github.balugaq:FluffyMachines:43d7444e4c")
     compileOnly("com.github.TimetownDev:GuguSlimefunLib:45627c6f8e")
-    compileOnly("com.github.balugaq:JustEnoughGuide:7f21e113a2")
+    compileOnly("com.github.balugaq:JustEnoughGuide:09e106914d")
     // System-scoped local JARs
     compileOnly(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
 }
@@ -139,7 +136,7 @@ tasks {
             "-Dnet.kyori.adventure.text.warn_when_legacy_formatting_detected=false"
         )
         maxHeapSize = "4G"
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.21.11")
     }
 }
 
