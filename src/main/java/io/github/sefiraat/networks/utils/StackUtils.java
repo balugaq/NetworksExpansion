@@ -9,6 +9,8 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.Persis
 import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.entity.LivingEntity;
@@ -44,6 +46,7 @@ import org.jspecify.annotations.NullMarked;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +59,7 @@ public class StackUtils {
     private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMCVersion();
     public static final boolean IS_1_20_5 = MC_VERSION.isAtLeast(MinecraftVersion.V1_20_5);
     public static final boolean IS_1_21 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21);
+    public static final boolean IS_1_21_3 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_3);
     public static final boolean IS_1_21_4 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_4);
 
     /**
@@ -366,10 +370,21 @@ public class StackUtils {
                 cacheItem.getData(DataComponentTypes.LORE).styledLines(),
                 itemStack.getData(DataComponentTypes.LORE).styledLines());
         }
-        if (!checkCustomModelId) {
-            excluded.add(DataComponentTypes.CUSTOM_MODEL_DATA);
+
+        return true;
+    }
+
+    /**
+     * Compare plain text (no style) only,
+     * Fix #436
+     */
+    private static boolean loreMatchesLoose(List<Component> a1, List<Component> a2) {
+        if (a1.size() != a2.size()) return false;
+        var serializer = PlainTextComponentSerializer.plainText();
+        for (int i = 0; i < a1.size(); i++) {
+            if (!serializer.serialize(a1.get(i)).equals(serializer.serialize(a2.get(i)))) return false;
         }
-        return cacheItem.matchesWithoutData(itemStack, excluded, true);
+        return true;
     }
 
     private static boolean shouldCompareLore(ItemStack itemStack) {

@@ -32,7 +32,7 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -402,7 +402,7 @@ public abstract class AbstractGrid extends NetworkObject {
           final ItemStack cursor = player.getItemOnCursor();
           if (cursor.getType() != Material.AIR
               && !StackUtils.itemsMatch(clone, StackUtils.getAsQuantity(player.getItemOnCursor(), 1))) {
-              root.addItemStack0(blockMenu.getLocation(), player.getItemOnCursor());
+              root.addItemStack0(screen.getLocation(), player.getItemOnCursor());
               return;
           }
 
@@ -435,7 +435,7 @@ public abstract class AbstractGrid extends NetworkObject {
 
           InventoryUtil.addItem(player, requestingStack);
           if (requestingStack.getAmount() > 0) {
-              definition.getNode().getRoot().addItemStack0(menu.getLocation(), requestingStack);
+              definition.getNode().getRoot().addItemStack0(screen.getLocation(), requestingStack);
           }
     }
 
@@ -538,26 +538,26 @@ public abstract class AbstractGrid extends NetworkObject {
         }
 
         ItemStack cursor = player.getItemOnCursor();
-        receiveItem(definition.getNode().getRoot(), player, cursor, action);
+        receiveItem(player, cursor, action, screen);
     }
 
     @SuppressWarnings("deprecation")
     public void receiveItem(
-        @NotNull Player player, ItemStack itemStack, ClickAction action, @NotNull BlockMenu blockMenu) {
-        NodeDefinition definition = NetworkStorage.getNode(blockMenu.getLocation());
+        @NotNull Player player, ItemStack itemStack, ClickAction action, @NotNull Screen screen) {
+        NodeDefinition definition = NetworkStorage.getNode(screen.getLocation());
         if (definition == null || definition.getNode() == null) {
-            clearDisplay(Screen.of(blockMenu));
-            blockMenu.close();
+            clearDisplay(screen);
+            screen.close();
             Networks.getInstance()
                 .getLogger()
                 .warning(String.format(
                     Lang.getString("messages.unsupported-operation.grid.may_duping"),
                     player.getName(),
-                    blockMenu.getLocation()));
+                    screen.getLocation()));
             return;
         }
 
-        receiveItem(definition.getNode().getRoot(), player, itemStack, action);
+        receiveItem(player, itemStack, action, screen);
     }
 
     @SuppressWarnings({"deprecation", "unused"})
@@ -566,22 +566,10 @@ public abstract class AbstractGrid extends NetworkObject {
         Player player,
         @Nullable ItemStack itemStack,
         ClickAction action,
-        @NotNull BlockMenu blockMenu) {
+        @NotNull Screen screen) {
           if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
-              root.addItemStack0(blockMenu.getLocation(), itemStack);
+              root.addItemStack0(screen.getLocation(), itemStack);
           }
-    }
-
-    @SuppressWarnings("deprecation")
-    public void receiveItem(
-        @NotNull NetworkRoot root,
-        Player player,
-        @Nullable ItemStack itemStack,
-        ClickAction action,
-        boolean doubleClick) {
-        if (!doubleClick) {
-            receiveItem(root, player, itemStack, action);
-        }
     }
 
     public static void updateSortOrder(GridCache gridCache, ClickAction action, @Range(from = 1, to = 4) int limit) {
