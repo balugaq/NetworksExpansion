@@ -55,6 +55,7 @@ public class StackUtils {
     private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMCVersion();
     public static final boolean IS_1_20_5 = MC_VERSION.isAtLeast(MinecraftVersion.V1_20_5);
     public static final boolean IS_1_21 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21);
+    public static final boolean IS_1_21_3 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_3);
     public static final boolean IS_1_21_4 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_4);
 
     @NotNull
@@ -281,6 +282,7 @@ public class StackUtils {
         }
 
         // Check the lore
+<<<<<<< HEAD
         if (checkLore
             || FORCE_CHECK_LORE
             || itemStack.getMaxStackSize() == 1 // Fix RPG weapons
@@ -292,6 +294,9 @@ public class StackUtils {
             || itemStack.getType() == Material.MINECART // Fix Dolly(possible) in FluffyMachines
             || itemStack.getType() == Material.CHEST_MINECART // Fix Packed Dolly(possible) in FluffyMachines
         ) {
+=======
+        if (shouldCompareLore(itemStack, checkLore) || shouldCompareLore(cache.getItemStack(), checkLore)) {
+>>>>>>> 788d79ed22cca5bd40fea52b0529da1629068192
             if (itemMeta.hasLore() && cachedMeta.hasLore()) {
                 if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
                     return false;
@@ -338,8 +343,18 @@ public class StackUtils {
         if (!shouldCompareLore(itemStack, checkLore)) {
             excluded.add(DataComponentTypes.LORE);
         }
+<<<<<<< HEAD
         if (!checkCustomModelId) {
             excluded.add(DataComponentTypes.CUSTOM_MODEL_DATA);
+=======
+
+        if (shouldCompareLore(itemStack, checkLore) || shouldCompareLore(cacheItem, checkLore)) {
+            // we have to check lore manually, otherwise `matchesWithoutData` cannot identify non-style-preset text.
+            // of course, we can use CraftBukkit utils like `ItemMeta.getLore()`, but it needs reflection.
+            return loreMatchesLoose(
+                cacheItem.getData(DataComponentTypes.LORE).styledLines(),
+                itemStack.getData(DataComponentTypes.LORE).styledLines());
+>>>>>>> 788d79ed22cca5bd40fea52b0529da1629068192
         }
         return cacheItem.matchesWithoutData(itemStack, excluded, true);
     }
@@ -720,6 +735,23 @@ public class StackUtils {
     }
 
     private static boolean isBundle(@NotNull Material material) {
-        return material == Material.BUNDLE || material.name().endsWith("_BUNDLE");
+        return material == Material.BUNDLE
+            || IS_1_21_3 && (
+                material == Material.BLACK_BUNDLE
+            || material == Material.BLUE_BUNDLE
+            || material == Material.BROWN_BUNDLE
+            || material == Material.CYAN_BUNDLE
+            || material == Material.GRAY_BUNDLE
+            || material == Material.GREEN_BUNDLE
+            || material == Material.LIGHT_BLUE_BUNDLE
+            || material == Material.LIGHT_GRAY_BUNDLE
+            || material == Material.LIME_BUNDLE
+            || material == Material.MAGENTA_BUNDLE
+            || material == Material.ORANGE_BUNDLE
+            || material == Material.PINK_BUNDLE
+            || material == Material.PURPLE_BUNDLE
+            || material == Material.RED_BUNDLE
+            || material == Material.WHITE_BUNDLE
+            || material == Material.YELLOW_BUNDLE);
     }
 }

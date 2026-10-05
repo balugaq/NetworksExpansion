@@ -5,7 +5,11 @@ plugins {
 }
 
 group = "com.ytdd9527.networksexpansion"
+<<<<<<< HEAD
 version = "2.1.120"
+=======
+version = "2.1.121"
+>>>>>>> 788d79ed22cca5bd40fea52b0529da1629068192
 
 java {
     toolchain {
