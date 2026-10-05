@@ -102,23 +102,30 @@ public class NetworkRoot extends NetworkNode {
     @Getter
     private final @Nullable ItemFlowRecord itemFlowRecord;
     @Getter
-    private @Nullable Location controller = null;
+    private Location controller;
 
     @Getter
     private boolean isOverburdened = false;
 
-    private @Nullable Set<BarrelIdentity> barrels = null;
-    private @Nullable Set<BarrelIdentity> inputAbleBarrels = null;
-    private @Nullable Set<BarrelIdentity> outputAbleBarrels = null;
+    private volatile @Nullable Set<BarrelIdentity>
+        barrels = null,
+        inputAbleBarrels = null,
+        outputAbleBarrels = null;
 
-    private @Nullable Map<Location, StorageUnitData> drawerData = null;
-    private @Nullable Map<Location, StorageUnitData> inputAbleDrawerData = null;
-    private @Nullable Map<Location, StorageUnitData> outputAbleDrawerData = null;
-    private volatile @Nullable Map<Location, BarrelIdentity> mapInputAbleBarrels = null;
-    private volatile @Nullable Map<Location, BarrelIdentity> mapOutputAbleBarrels = null;
-    private @Nullable Set<BlockMenu> cellDriveMenus = null;
-    private @Nullable Set<BlockMenu> inputAbleCellDriveMenus = null;
-    private @Nullable Set<BlockMenu> outputAbleCellDriveMenus = null;
+    private volatile @Nullable Map<Location, StorageUnitData>
+        drawerData = null,
+        inputAbleDrawerData = null,
+        outputAbleDrawerData = null;
+
+    private volatile @Nullable Map<Location, BarrelIdentity>
+        mapInputAbleBarrels = null,
+        mapOutputAbleBarrels = null;
+
+    private volatile @Nullable Set<BlockMenu>
+        cellDriveMenus = null,
+        inputAbleCellDriveMenus = null,
+        outputAbleCellDriveMenus = null;
+
     private final DriveCache driveCache = new DriveCache();
 
     /**
@@ -460,6 +467,10 @@ public class NetworkRoot extends NetworkNode {
 
     public int getNodeCount() {
         return this.nodeLocations.size();
+    }
+
+    public int getNodeCount(NodeType type) {
+        return indexes.get(type).locations.size();
     }
 
     /** 显式失效纪元：markDirty / refreshRootItems 递增，同刻与跨刻复用都会校验。 */
@@ -1008,11 +1019,18 @@ public class NetworkRoot extends NetworkNode {
     }
 
     public void addRootPower(long power) {
-        this.rootPower.getAndAdd(power);
+        rootPower.getAndAdd(power);
+    }
+
+    public long getRootPower() {
+        return rootPower.get();
     }
 
     public void removeRootPower(long power) {
-        if (power <= 0) return;
+        if (power <= 0) {
+            addRootPower(-power);
+            return;
+        }
 
         long removed = 0;
         for (Location node : getNodes(NodeType.POWER_NODE)) {
@@ -1028,7 +1046,7 @@ public class NetworkRoot extends NetworkNode {
             }
             if (removed >= power) break;
         }
-        this.rootPower.getAndAdd(-removed);
+        rootPower.getAndAdd(-removed);
     }
 
     public List<ItemStack> getItemStacks0(Location location, List<ItemRequest> itemRequests) {
@@ -1641,7 +1659,7 @@ public class NetworkRoot extends NetworkNode {
     public List<@Nullable ItemStack> getItemStacksBatch0(Location accessor, List<ItemRequest> requests) {
         if (!allowAccessOutput(accessor)) {
             FeedbackSendable.sendFeedback0(accessor, FeedbackType.ROOT_LIMITING_ACCESS_OUTPUT);
-            return null;
+            return List.of();
         }
 
         final List<@Nullable ItemStack> results = new ArrayList<>(requests.size());
@@ -2060,8 +2078,7 @@ public class NetworkRoot extends NetworkNode {
             }
 
             for (BatchTake take : pending) {
-                if (take.collected == null || take.collected.getAmount() == 0) {
-                } else {
+                if (take.collected != null && take.collected.getAmount() != 0) {
                     // Netex - Reduce start
                     uncontrolAccessOutput(accessor);
                     // Netex - Reduce end

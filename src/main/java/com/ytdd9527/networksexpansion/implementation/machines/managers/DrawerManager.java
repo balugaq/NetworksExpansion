@@ -209,7 +209,7 @@ public class DrawerManager extends NetworkObject {
 
     public static @NotNull List<StorageUnitData> getStorageUnitDatas(
         @NotNull NetworkRoot root, @NotNull GridCache cache) {
-        return root.getDrawerData(MANAGER_STRATEGY, true).keySet().stream()
+        return root.getDrawerData(MANAGER_STRATEGY).values().stream()
             .filter(entry -> {
                 if (cache.getFilter() == null) {
                     return true;
