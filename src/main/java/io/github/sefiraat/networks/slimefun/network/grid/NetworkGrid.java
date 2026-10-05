@@ -134,7 +134,7 @@ public class NetworkGrid extends AbstractGrid {
                     }
 
                     // Shift+Left-click
-                    receiveItem(p, i, a, menu);
+                    receiveItem(p, i, a, Screen.of(menu));
                     return false;
                 });
             }

@@ -2064,7 +2064,7 @@ public class NetworkRoot extends NetworkNode {
      * @param option   物品匹配选项（忽略项），为 null 时使用 {@link MatchOption#DEFAULT}
      * @return 匹配 {@code option} 的物品；数量为 0 时返回 null
      */
-    public ItemStack getItemStack0(
+    public synchronized ItemStack getItemStack0(
         @NotNull Location accessor, @NotNull ItemRequest request, @Nullable MatchOption option) {
         ItemStack stackToReturn = null;
 
@@ -2887,7 +2887,7 @@ public class NetworkRoot extends NetworkNode {
         }
     }
 
-    public void addItemStack0(@NotNull Location accessor, @NotNull ItemStack incoming) {
+    public synchronized void addItemStack0(@NotNull Location accessor, @NotNull ItemStack incoming) {
         if (StackUtils.isBlacklisted(incoming)) {
             return;
         }

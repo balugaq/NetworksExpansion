@@ -104,7 +104,7 @@ public interface BaseGrid {
                 );
 
                 Action storeItem = Action.of(Keys.newKey("store-item"), (p, s, i, a, menu) -> {
-                    receiveItem(p, i, a, menu);
+                    receiveItem(p, i, a, Screen.of(menu));
                     return ActionResult.of(MultiActionHandle.BREAK, false);
                 });
 
@@ -137,5 +137,5 @@ public interface BaseGrid {
 
     void updateDisplay(Screen screen);
 
-    void receiveItem(Player player, ItemStack itemStack, ClickAction action, BlockMenu blockMenu);
+    void receiveItem(Player player, ItemStack itemStack, ClickAction action, Screen screen);
 }

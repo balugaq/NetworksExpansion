@@ -290,7 +290,7 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle {
                     if (menu.getItemInSlot(recipeSlot) == null) {
                         // Process item request
                         final GridItemRequest request = new GridItemRequest(itemInSlotClone, 1, player);
-                        final ItemStack requestingStack = root.getItemStack(request);
+                        final ItemStack requestingStack = root.getItemStack0(menu.getLocation(), request);
                         if (requestingStack != null) {
                             menu.replaceExistingItem(recipeSlot, requestingStack);
                         }
