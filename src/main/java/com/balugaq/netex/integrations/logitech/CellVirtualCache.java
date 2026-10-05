@@ -172,6 +172,12 @@ public class CellVirtualCache extends QuantumCache {
         }
     }
 
+    public static void removeDrive(@NotNull Location driveLocation) {
+        NetworkQuantumStorage.getCaches().values()
+                .removeIf(cache -> cache instanceof CellVirtualCache virtual
+                        && virtual.driveLocation.equals(driveLocation));
+    }
+
     static void preWarmResolvers() {
         if (resolversPrewarmed) {
             return;

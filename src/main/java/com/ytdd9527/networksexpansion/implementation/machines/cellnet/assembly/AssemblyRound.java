@@ -79,7 +79,7 @@ final class AssemblyRound {
         boolean enabled = true;
         boolean needsStockSnapshot;
         int maxGear = GEAR_MAX - 1;
-        long nextRun;
+        volatile long nextRun;
         @Nullable Boolean lastStatusEnabled;
         @Nullable Boolean lastStatusHadRoot;
         @Nullable Boolean lastToggleEnabled;

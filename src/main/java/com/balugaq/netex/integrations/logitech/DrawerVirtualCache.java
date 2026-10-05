@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class DrawerVirtualCache extends QuantumCache {
 
-    private static final long VIRTUAL_Y_BASE = -2_000_000L;
+    private static final long VIRTUAL_Y_BASE = -1_000_001_000L;
     private static final long VIRTUAL_Y_RANGE = 1_000_000_000L;
 
     private final Location drawerLocation;
@@ -119,5 +119,11 @@ public class DrawerVirtualCache extends QuantumCache {
         if (!caches.containsKey(virtual)) {
             caches.put(virtual, new DrawerVirtualCache(drawerLocation, sample));
         }
+    }
+
+    public static void removeDrawer(@NotNull Location drawerLocation) {
+        NetworkQuantumStorage.getCaches().values()
+                .removeIf(cache -> cache instanceof DrawerVirtualCache virtual
+                        && virtual.drawerLocation.equals(drawerLocation));
     }
 }

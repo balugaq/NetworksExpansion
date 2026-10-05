@@ -6,6 +6,7 @@ import com.balugaq.netex.api.enums.QuickTransferMode;
 import com.balugaq.netex.api.enums.StorageUnitType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.interfaces.ModellableItem;
+import com.balugaq.netex.integrations.logitech.DrawerVirtualCache;
 import com.balugaq.netex.integrations.logitech.LinkBindingStore;
 import com.balugaq.netex.utils.InventoryUtil;
 import com.balugaq.netex.utils.Lang;
@@ -906,6 +907,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
 
         // Remove data cache
         StorageUnitData data = storages.remove(l);
+        DrawerVirtualCache.removeDrawer(l);
         b.setType(Material.AIR);
         // Drop custom item if data exists
         if (data != null) {

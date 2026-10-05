@@ -64,6 +64,7 @@ final class AssemblyMenu {
                 DriveRuntimeState rs = AssemblyRound.runtimeState(block.getLocation());
                 if (rs.machineState == null) {
                     rs.machineState = new MachineState();
+                    rs.machineState.enabled = AssemblyDrive.isEnabled(block.getLocation());
                 }
                 MachineState state = rs.machineState;
                 for (int slot : AssemblyDrive.RECIPE_SLOTS) {

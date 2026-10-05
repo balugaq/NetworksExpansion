@@ -1,5 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive;
 
+import com.balugaq.netex.integrations.logitech.CellVirtualCache;
 import com.balugaq.netex.integrations.logitech.LinkBindingStore;
 import com.balugaq.netex.integrations.logitech.LinkerGrid;
 import com.balugaq.netex.utils.Lang;
@@ -192,6 +193,7 @@ public class CellDrive extends SpecialSlimefunItem {
         clearLocalState(location);
         CellUniqueness.unregisterDrive(location);
         storage.dropCellCache(location);
+        CellVirtualCache.removeDrive(location);
         final BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
         if (blockMenu != null) {
             blockMenu.dropItems(location, CELL_SLOTS);

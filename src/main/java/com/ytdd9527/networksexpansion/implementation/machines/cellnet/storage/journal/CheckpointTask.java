@@ -249,6 +249,8 @@ public class CheckpointTask implements Runnable {
             }
         }
         if (!corruptedIds.isEmpty()) {
+            Debug.debug("Journal checkpoint skipped " + corruptedIds.size()
+                    + " corrupted entries (CRC mismatch), ids=" + corruptedIds);
             markCorruptedApplied(conn, corruptedIds);
         }
         return new LoadedJournal(entries, readCount);

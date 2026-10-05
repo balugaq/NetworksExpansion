@@ -55,11 +55,11 @@ public final class ChainBindingStore {
         if (raw == null || raw.isEmpty()) {
             return result;
         }
-        try {
-            for (String entry : raw.split("\\" + ENTRY_SEPARATOR)) {
-                if (entry.isEmpty()) {
-                    continue;
-                }
+        for (String entry : raw.split("\\" + ENTRY_SEPARATOR)) {
+            if (entry.isEmpty()) {
+                continue;
+            }
+            try {
                 int sep = entry.indexOf(DISTANCE_SEPARATOR);
                 if (sep <= 0) {
                     continue;
@@ -85,10 +85,9 @@ public final class ChainBindingStore {
                     }
                 }
                 result.put(distance, list);
+            } catch (RuntimeException e) {
+                Debug.trace(e, "解析链式绑定表条目失败，已跳过: " + entry);
             }
-        } catch (RuntimeException e) {
-            Debug.trace(e, "解析链式绑定表失败");
-            return new LinkedHashMap<>();
         }
         return result;
     }
@@ -133,7 +132,8 @@ public final class ChainBindingStore {
                         continue;
                     }
                     if (CellAcceptRules.isNbtOversized(sample)) {
-                        return null;
+                        Debug.debug("链式绑定物品 NBT 超限，已跳过该物品: " + sample.getType());
+                        continue;
                     }
                     ItemStack normalized = sample.clone();
                     normalized.setAmount(1);

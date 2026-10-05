@@ -1,5 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive;
 
+import com.balugaq.netex.integrations.logitech.CellVirtualCache;
 import com.balugaq.netex.utils.Lang;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.Limits;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.ledger.CellLedger;
@@ -274,6 +275,7 @@ public class EnderDrive extends CellDrive {
                 CellDrive.clearLocalState(location);
                 CellUniqueness.unregisterDrive(location);
                 CellDrive.getStorage().dropCellCache(location);
+                CellVirtualCache.removeDrive(location);
                 BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
                 if (blockMenu != null) {
                     EnderChannelController controller = EnderChannelController.getInstance();

@@ -8,6 +8,7 @@ import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.A
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyRound.DriveRuntimeState;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyRound.MachineState;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.core.GearCore;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.core.SmartCore;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveOwnership;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.Limits;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.NetworkUtil;
@@ -234,6 +235,12 @@ public class AssemblyDrive extends SpecialSlimefunItem {
             && GearCore.isUpgradeCore(core) && location.getWorld() != null) {
             blockMenu.replaceExistingItem(UPGRADE_SLOT, null);
             location.getWorld().dropItemNaturally(location.clone().add(0.5, 1.0, 0.5), core);
+        }
+        ItemStack smart = blockMenu.getItemInSlot(SMART_SLOT);
+        if (smart != null && !smart.getType().isAir()
+            && SmartCore.isSmartCore(smart) && location.getWorld() != null) {
+            blockMenu.replaceExistingItem(SMART_SLOT, null);
+            location.getWorld().dropItemNaturally(location.clone().add(0.5, 1.0, 0.5), smart);
         }
     }
 }

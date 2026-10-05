@@ -1,5 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly;
 
+import com.balugaq.netex.api.enums.CraftType;
 import io.github.sefiraat.networks.utils.StackUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 public final class RecipeLegitimacy {
 
     private RecipeLegitimacy() {
@@ -29,7 +32,39 @@ public final class RecipeLegitimacy {
         ItemStack outOne = output.clone();
         outOne.setAmount(1);
 
-        return matchesVanillaRecipe(merged, output, outOne) || matchesSlimefunRecipe(merged, output, outOne);
+        return matchesVanillaRecipe(merged, output, outOne)
+                || matchesCraftTypeRecipe(merged, output, outOne)
+                || matchesSlimefunRecipe(merged, output, outOne);
+    }
+
+    private static boolean matchesCraftTypeRecipe(
+            @NotNull List<ItemStack> merged, @NotNull ItemStack output, @NotNull ItemStack outOne) {
+        for (Map.Entry<CraftType, Set<Map.Entry<ItemStack[], ItemStack>>> craftEntry : CraftType.map().entrySet()) {
+            for (Map.Entry<ItemStack[], ItemStack> recipe : craftEntry.getValue()) {
+                ItemStack result = recipe.getValue();
+                if (result == null || result.getType().isAir() || result.getAmount() != output.getAmount()) {
+                    continue;
+                }
+                ItemStack resultOne = result.clone();
+                resultOne.setAmount(1);
+                if (!StackUtils.itemsMatch(outOne, resultOne)) {
+                    continue;
+                }
+                List<ItemStack> need = new ArrayList<>();
+                for (ItemStack cell : recipe.getKey()) {
+                    if (cell != null && !cell.getType().isAir()) {
+                        need.add(cell);
+                    }
+                }
+                if (need.isEmpty()) {
+                    continue;
+                }
+                if (sameConsumption(merged, need)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static boolean matchesVanillaRecipe(
