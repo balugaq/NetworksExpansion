@@ -1,7 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly;
 
 import com.balugaq.netex.api.helpers.Icon;
-import com.balugaq.netex.api.interfaces.RecipeCompletableWithGuide;
 import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.Lang;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
@@ -43,12 +42,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.CellnetText;
-public class AssemblyWorkshop extends SpecialSlimefunItem implements RecipeCompletableWithGuide {
+
+public class AssemblyWorkshop extends SpecialSlimefunItem {
 
     private static final int[] RECIPE_SLOTS = new int[]{12, 13, 14, 21, 22, 23, 30, 31, 32};
     private static final int CARD_SLOT = 19;
@@ -340,11 +339,5 @@ public class AssemblyWorkshop extends SpecialSlimefunItem implements RecipeCompl
 
     public int[] getIngredientSlots() {
         return RECIPE_SLOTS;
-    }
-
-    @Override
-    @NotNull
-    public SlimefunItem getSlimefunItem() {
-        return this;
     }
 }

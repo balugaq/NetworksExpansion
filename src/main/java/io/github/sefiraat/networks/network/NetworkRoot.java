@@ -580,11 +580,6 @@ public class NetworkRoot extends NetworkNode {
         return this.nodeLocations.size();
     }
 
-    @NotNull
-    public Set<Location> getNodeLocations() {
-        return this.nodeLocations;
-    }
-
     /** 显式失效纪元：markDirty / refreshRootItems 递增，同刻与跨刻复用都会校验。 */
     private void bumpInvalidationEpoch() {
         INVALIDATION_EPOCHS.computeIfAbsent(this.nodePosition, k -> new AtomicLong()).incrementAndGet();
