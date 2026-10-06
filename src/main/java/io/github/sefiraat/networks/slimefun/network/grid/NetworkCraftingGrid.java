@@ -267,7 +267,6 @@ public class NetworkCraftingGrid extends AbstractGrid {
         }
 
         NetworkRoot root = definition.getNode().getRoot();
-        root.refreshRootItems();
 
         // Let's clear down all the items
         for (int recipeSlot : CRAFT_ITEMS) {

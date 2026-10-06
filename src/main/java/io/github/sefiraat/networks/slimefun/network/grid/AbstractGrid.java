@@ -254,12 +254,12 @@ public abstract class AbstractGrid extends NetworkObject {
                 itemMeta.setLore(lore);
                 displayStack.setItemMeta(itemMeta);
                 screen.setItem(getDisplaySlots()[i], displayStack, (player, slot, item, action) -> {
-                    retrieveItem(player, item, action, screen);
+                    takeItem(player, item, action, screen);
                     return false;
                 });
             } else {
                 screen.setItem(getDisplaySlots()[i], Icon.BLANK_SLOT_STACK, (p, slot, item, action) -> {
-                    receiveItem(p, action, screen);
+                    receiveItem(p, p.getItemOnCursor(), action, screen);
                     return false;
                 });
             }
@@ -358,7 +358,7 @@ public abstract class AbstractGrid extends NetworkObject {
 
     @SuppressWarnings("deprecation")
     @ParametersAreNonnullByDefault
-    protected synchronized void retrieveItem(
+    protected synchronized void takeItem(
         Player player, @Nullable ItemStack itemStack, ClickAction action, Screen screen) {
         NodeDefinition definition = NetworkStorage.getNode(screen.getLocation());
         if (definition == null || definition.getNode() == null) {
@@ -388,26 +388,21 @@ public abstract class AbstractGrid extends NetworkObject {
             return;
         }
 
-        cloneLore.remove(cloneLore.size() - 1);
-        cloneLore.remove(cloneLore.size() - 1);
+        cloneLore.removeLast();
+        cloneLore.removeLast();
         cloneMeta.setLore(cloneLore);
         clone.setItemMeta(cloneMeta);
 
         NetworkRoot root = definition.getNode().getRoot();
-        boolean success = root.refreshRootItems();
-        if (!success) {
+
+        final ItemStack cursor = player.getItemOnCursor();
+        if (cursor.getType() != Material.AIR
+            && !StackUtils.itemsMatch(clone, StackUtils.getAsQuantity(player.getItemOnCursor(), 1))) {
+            root.addItemStack0(screen.getLocation(), player.getItemOnCursor());
             return;
         }
 
-          final ItemStack cursor = player.getItemOnCursor();
-          if (cursor.getType() != Material.AIR
-              && !StackUtils.itemsMatch(clone, StackUtils.getAsQuantity(player.getItemOnCursor(), 1))) {
-              root.addItemStack0(screen.getLocation(), player.getItemOnCursor());
-              return;
-          }
-
         int amount = 1;
-
         if (action.isRightClicked()) {
             amount = clone.getMaxStackSize();
         }
@@ -523,25 +518,6 @@ public abstract class AbstractGrid extends NetworkObject {
     }
 
     @SuppressWarnings("deprecation")
-    public void receiveItem(@NotNull Player player, ClickAction action, @NotNull Screen screen) {
-        NodeDefinition definition = NetworkStorage.getNode(screen.getLocation());
-        if (definition == null || definition.getNode() == null) {
-            clearDisplay(screen);
-            screen.close();
-            Networks.getInstance()
-                .getLogger()
-                .warning(String.format(
-                    Lang.getString("messages.unsupported-operation.grid.may_duping"),
-                    player.getName(),
-                    screen.getLocation()));
-            return;
-        }
-
-        ItemStack cursor = player.getItemOnCursor();
-        receiveItem(player, cursor, action, screen);
-    }
-
-    @SuppressWarnings("deprecation")
     public void receiveItem(
         @NotNull Player player, ItemStack itemStack, ClickAction action, @NotNull Screen screen) {
         NodeDefinition definition = NetworkStorage.getNode(screen.getLocation());
@@ -557,19 +533,9 @@ public abstract class AbstractGrid extends NetworkObject {
             return;
         }
 
-        receiveItem(player, itemStack, action, screen);
-    }
-
-    @SuppressWarnings({"deprecation", "unused"})
-    public void receiveItem(
-        @NotNull NetworkRoot root,
-        Player player,
-        @Nullable ItemStack itemStack,
-        ClickAction action,
-        @NotNull Screen screen) {
-          if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
-              root.addItemStack0(screen.getLocation(), itemStack);
-          }
+        if (itemStack != null && itemStack.getType() != Material.AIR && !StackUtils.isBlacklisted(itemStack)) {
+            definition.getNode().getRoot().addItemStack0(screen.getLocation(), itemStack);
+        }
     }
 
     public static void updateSortOrder(GridCache gridCache, ClickAction action, @Range(from = 1, to = 4) int limit) {

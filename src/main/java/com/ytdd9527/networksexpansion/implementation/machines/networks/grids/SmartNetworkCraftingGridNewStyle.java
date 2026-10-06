@@ -390,8 +390,6 @@ public class SmartNetworkCraftingGridNewStyle extends AbstractGridNewStyle {
             return;
         }
 
-        root.refreshRootItems();
-
         for (int k = 0; k < times; k++) {
             // check if it has enough input
             for (ItemStack template : templates) {

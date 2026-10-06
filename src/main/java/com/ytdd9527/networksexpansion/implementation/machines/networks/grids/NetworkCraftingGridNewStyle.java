@@ -224,7 +224,6 @@ public class NetworkCraftingGridNewStyle extends AbstractGridNewStyle {
         }
 
         NetworkRoot root = definition.getNode().getRoot();
-        root.refreshRootItems();
 
         for (int k = 0; k < times; k++) {
             // Get the recipe input

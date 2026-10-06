@@ -119,12 +119,6 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
         cloneMeta.setLore(cloneLore);
         clone.setItemMeta(cloneMeta);
 
-        NetworkRoot root = definition.getNode().getRoot();
-        boolean success = root.refreshRootItems();
-        if (!success) {
-            return null;
-        }
-
         return clone;
     }
 
@@ -295,7 +289,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
                     screen.setItem(getDisplaySlots()[i], displayStack, displayKeybinds());
                 } else {
                     screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
-                        receiveItem(p, action, screen);
+                        receiveItem(p, p.getItemOnCursor(), action, screen);
                         return false;
                     });
                 }
@@ -347,7 +341,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
                     screen.setItem(getDisplaySlots()[i], displayStack, displayKeybinds());
                 } else {
                     screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
-                        receiveItem(p, action, screen);
+                        receiveItem(p, p.getItemOnCursor(), action, screen);
                         return false;
                     });
                 }

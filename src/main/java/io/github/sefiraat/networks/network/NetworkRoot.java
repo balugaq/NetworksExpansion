@@ -129,9 +129,14 @@ public class NetworkRoot extends NetworkNode {
     private final DriveCache driveCache = new DriveCache();
 
     /**
+     * 用来 fallback
+     */
+    public static final Location SHARED_UNKNOWN_LOCATION = new Location(Bukkit.getWorlds().getFirst(), 0, 0, 0);
+
+    /**
      * 聚合物品快照按网络（控制器位置）静态共享：root 实例每刻由 NetworkController 重建，
      * 实例级缓存无法跨刻复用，空闲网络（无写入）借此零重扫。失效条件：
-     * 同刻——仅显式失效（{@link #markDirty()} / {@link #refreshRootItems()}）重建，
+     * 同刻——仅显式失效（{@link #markDirty()}）重建，
      * 刻内普通写沿用既有"至多 1 刻延迟"契约（写纪元不影响同刻复用）；
      * 跨刻——期间无任何写（写纪元不变）且未超 {@link #SNAPSHOT_MAX_AGE_MS} 才复用。
      * 时间上限兜底绕过 root 的直改存储（抽屉/单元 GUI 手改、区块加载、结构变更）——陈旧度至多 500ms。
@@ -473,7 +478,7 @@ public class NetworkRoot extends NetworkNode {
         return indexes.get(type).locations.size();
     }
 
-    /** 显式失效纪元：markDirty / refreshRootItems 递增，同刻与跨刻复用都会校验。 */
+    /** 显式失效纪元：markDirty 递增，同刻与跨刻复用都会校验。 */
     private void bumpInvalidationEpoch() {
         INVALIDATION_EPOCHS.computeIfAbsent(this.nodePosition, k -> new AtomicLong()).incrementAndGet();
     }
@@ -522,7 +527,7 @@ public class NetworkRoot extends NetworkNode {
 
     /**
      * 返回网络全量物品的聚合快照。快照按网络静态共享：
-     * 同刻内——仅显式失效（{@link #refreshRootItems()} / {@link #markDirty()}）重建，
+     * 同刻内——仅显式失效（{@link {@link #markDirty()}）重建，
      * 普通物品写沿用既有"至多 1 刻延迟"契约；
      * 跨刻——期间无任何写（写纪元不变）且距发布不超过 500ms 时直接复用（空闲网络零重扫），
      * 否则重建。绕过 root 的直改存储（GUI 手改、区块加载、结构变更）由时间上限兜底。
@@ -1199,20 +1204,6 @@ public class NetworkRoot extends NetworkNode {
         outputAbleDrawerData = searchDrawers(AccessMode.OUTPUT);
         new NetworkRootLocateStorageEvent(this, StorageType.DRAWER, false, true, Bukkit.isPrimaryThread()).callEvent();
         return outputAbleDrawerData;
-    }
-
-    public boolean refreshRootItems() {
-        bumpInvalidationEpoch();
-        this.barrels = null;
-        this.drawerData = null;
-        this.inputAbleBarrels = null;
-        this.outputAbleBarrels = null;
-        this.inputAbleDrawerData = null;
-        this.outputAbleDrawerData = null;
-        this.cellDriveMenus = null;
-        this.inputAbleCellDriveMenus = null;
-        this.outputAbleCellDriveMenus = null;
-        return true;
     }
 
     @Nullable
@@ -2437,7 +2428,26 @@ public class NetworkRoot extends NetworkNode {
         return getNodes(NodeType.CELL).size();
     }
 
+    /**
+     * 说实话这个治标不治本
+     */
     public static boolean isRealCell(BlockMenu menu) {
         return StorageCacheUtils.getSfItem(menu.getLocation()) instanceof NetworkCell;
+    }
+
+    /**
+     * fallback, use {@link #getItemStack0(Location, ItemRequest)} instead.
+     */
+    @Deprecated
+    public ItemStack getItemStack(ItemRequest request) {
+        return getItemStack0(SHARED_UNKNOWN_LOCATION, request);
+    }
+
+    /**
+     * fallback, use {@link #addItemStack0(Location, ItemStack)} instead.
+     */
+    @Deprecated
+    public void addItemStack(ItemStack stack) {
+        addItemStack0(SHARED_UNKNOWN_LOCATION, stack);
     }
 }
