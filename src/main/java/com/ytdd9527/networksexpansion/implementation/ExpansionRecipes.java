@@ -1029,9 +1029,9 @@ public class ExpansionRecipes {
 
     /** 装配驱动器 = 蓝图 + 元件驱动器 + 桥梁。 */
     public static final ItemStack[] ASSEMBLY_DRIVE = new ItemStack[]{
-        ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT, ExpansionItemStacks.NETWORK_BRIDGE_ORDINAL, ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT,
+        OPTIC_CABLE.getItem(), ExpansionItemStacks.NETWORK_BRIDGE_ORDINAL, OPTIC_CABLE.getItem(),
         OPTIC_GLASS.getItem(), ExpansionItemStacks.CELL_DRIVE, OPTIC_GLASS.getItem(),
-        ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT, ExpansionItemStacks.NETWORK_BRIDGE_ORDINAL, ExpansionItemStacks.EXPANSION_WORKBENCH_BLUEPRINT
+        OPTIC_CABLE.getItem(), ExpansionItemStacks.NETWORK_BRIDGE_ORDINAL, OPTIC_CABLE.getItem()
     };
 
     /** 虚空元件 = 枯萎玫瑰 + 基础存储元件。 */
