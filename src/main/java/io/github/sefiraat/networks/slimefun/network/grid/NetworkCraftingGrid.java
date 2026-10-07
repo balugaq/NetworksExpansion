@@ -2,6 +2,7 @@ package io.github.sefiraat.networks.slimefun.network.grid;
 
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.helpers.SupportedCraftingTableRecipes;
+import com.balugaq.netex.api.visual.Screen;
 import com.balugaq.netex.utils.BlockMenuUtil;
 import com.balugaq.netex.utils.Lang;
 import io.github.sefiraat.networks.NetworkStorage;
@@ -159,7 +160,7 @@ public class NetworkCraftingGrid extends AbstractGrid {
                     }
 
                     // Shift+Left-click
-                    receiveItem(p, i, a, menu);
+                    receiveItem(p, i, a, Screen.of(menu));
                     return false;
                 });
             }
@@ -266,7 +267,6 @@ public class NetworkCraftingGrid extends AbstractGrid {
         }
 
         NetworkRoot root = definition.getNode().getRoot();
-        root.refreshRootItems();
 
         // Let's clear down all the items
         for (int recipeSlot : CRAFT_ITEMS) {
@@ -280,7 +280,7 @@ public class NetworkCraftingGrid extends AbstractGrid {
                 if (menu.getItemInSlot(recipeSlot) == null) {
                     // Process item request
                     final GridItemRequest request = new GridItemRequest(itemInSlotClone, 1, player);
-                    final ItemStack requestingStack = root.getItemStack(request);
+                    final ItemStack requestingStack = root.getItemStack0(menu.getLocation(), request);
                     if (requestingStack != null) {
                         menu.replaceExistingItem(recipeSlot, requestingStack);
                     }

@@ -10,6 +10,8 @@ import com.balugaq.netex.utils.MapUtil;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.unusable.Blueprint;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.collect.CollectService;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter.CellQuantumConverter;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.sefiraat.networks.network.NetworkRoot;
 import io.github.sefiraat.networks.network.stackcaches.BlueprintInstance;
@@ -178,7 +180,7 @@ public class NetworksMain implements TabExecutor {
         }
 
         clone.setAmount(amount);
-        data.depositItemStack(clone, false);
+        data.depositItemStack0(player.getLocation(), clone, false);
         NetworksDrawer.setStorageData(targetLocation, data);
         player.sendMessage(Lang.getString("messages.commands.updated-drawer"));
     }
@@ -222,7 +224,7 @@ public class NetworksMain implements TabExecutor {
         }
 
         clone.setAmount(1);
-        data.requestItem(new ItemRequest(clone, amount));
+        data.requestItem0(player.getLocation(), new ItemRequest(clone, amount));
         NetworksDrawer.setStorageData(targetLocation, data);
         player.sendMessage(Lang.getString("messages.commands.updated-drawer"));
     }
@@ -359,6 +361,11 @@ public class NetworksMain implements TabExecutor {
                     sender.sendMessage(message);
                 }
             }
+            case "celltoquantum" -> {
+                for (String message : Lang.getStringList("messages.commands.example.celltoquantum")) {
+                    sender.sendMessage(message);
+                }
+            }
             case "fillquantum" -> {
                 for (String message : Lang.getStringList("messages.commands.example.fillquantum")) {
                     sender.sendMessage(message);
@@ -433,7 +440,9 @@ public class NetworksMain implements TabExecutor {
                  "addstorageitem",
                  "reducestorageitem",
                  "setquantum",
-                 "setcontainerid" -> {
+                 "setcontainerid",
+                 "celltoquantum",
+                 "unbind" -> {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage(getErrorMessage(ErrorType.MUST_BE_PLAYER));
                     return false;
@@ -535,6 +544,15 @@ public class NetworksMain implements TabExecutor {
                         player.sendMessage(e.getMessage());
                     }
 
+                    return true;
+                }
+                case "celltoquantum" -> {
+                    if (!player.hasPermission("networks.admin")
+                        && !player.hasPermission("networks.commands.celltoquantum")) {
+                        player.sendMessage(getErrorMessage(ErrorType.NO_PERMISSION));
+                        return true;
+                    }
+                    convertCellToQuantumStorage(player);
                     return true;
                 }
                 case "addstorageitem" -> {
@@ -663,18 +681,16 @@ public class NetworksMain implements TabExecutor {
 
                     String filePath = args[1];
                     Pair<ItemStack, MapView> pair = MapUtil.getImageItem(filePath);
-                    if (pair != null) {
-                        ItemStack first = pair.getFirstValue();
-                        MapView second = pair.getSecondValue();
-                        if (second == null) {
-                            player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "filePath"));
-                            return true;
-                        }
+                    ItemStack first = pair.getFirstValue();
+                    MapView second = pair.getSecondValue();
+                    if (second == null) {
+                        player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "filePath"));
+                        return true;
+                    }
 
-                        if (first != null) {
-                            InventoryUtil.addItem(player, first);
-                            player.sendMap(second);
-                        }
+                    if (first != null) {
+                        InventoryUtil.addItem(player, first);
+                        player.sendMap(second);
                     }
                 }
 
@@ -696,12 +712,7 @@ public class NetworksMain implements TabExecutor {
                     }
 
                     final SlimefunItem slimefunItem = StorageCacheUtils.getSfItem(targetBlock.getLocation());
-                    if (slimefunItem == null) {
-                        player.sendMessage(Lang.getString("messages.commands.must-admin-debuggable"));
-                        return true;
-                    }
-
-                    if (!(slimefunItem instanceof AdminDebuggable debuggable)) {
+                    if (slimefunItem == null || !(slimefunItem instanceof AdminDebuggable)) {
                         player.sendMessage(Lang.getString("messages.commands.must-admin-debuggable"));
                         return true;
                     }
@@ -715,12 +726,12 @@ public class NetworksMain implements TabExecutor {
                             player.sendMessage("l", "oah", "pah", "tmih", "tmoh", "caih", "caoh");
                             return true;
                         }
-                        case "oah" -> map = NetworkRoot.observingAccessHistory;
-                        case "pah" -> map = NetworkRoot.persistentAccessHistory;
-                        case "tmih" -> map = NetworkRoot.transportMissInputHistory;
-                        case "tmoh" -> map = NetworkRoot.transportMissOutputHistory;
-                        case "caih" -> map = NetworkRoot.controlledAccessInputHistory;
-                        case "caoh" -> map = NetworkRoot.controlledAccessOutputHistory;
+                        case "oah" -> map = NetworkRoot.getObservingAccessHistory();
+                        case "pah" -> map = NetworkRoot.getPersistentAccessHistory();
+                        case "tmih" -> map = NetworkRoot.getTransportMissInputHistory();
+                        case "tmoh" -> map = NetworkRoot.getTransportMissOutputHistory();
+                        case "caih" -> map = NetworkRoot.getControlledAccessInputHistory();
+                        case "caoh" -> map = NetworkRoot.getControlledAccessOutputHistory();
                         default -> {
                             player.sendMessage(getErrorMessage(ErrorType.INVALID_REQUIRED_ARGUMENT, "cchName"));
                             return true;
@@ -749,6 +760,17 @@ public class NetworksMain implements TabExecutor {
                         player.sendMessage("缓存: " + cchName);
                         player.sendMessage("值: " + n.intValue());
                     }
+                }
+
+                case "unbind" -> {
+                    ItemStack weapon = player.getInventory().getItemInMainHand();
+                    if (CollectService.hasMark(weapon)) {
+                        CollectService.unbind(weapon);
+                        player.sendMessage(Lang.getString("messages.cellnet.collect.unbind"));
+                    } else {
+                        player.sendMessage(Lang.getString("messages.cellnet.collect.no-bind"));
+                    }
+                    return true;
                 }
 
                 default -> help(player, null);
@@ -784,6 +806,10 @@ public class NetworksMain implements TabExecutor {
         quantumCache.updateMetaLore(meta);
         itemStack.setItemMeta(meta);
         player.sendMessage(Lang.getString("messages.commands.updated-quantum-storage"));
+    }
+
+    public void convertCellToQuantumStorage(@NotNull Player player) {
+        CellQuantumConverter.convert(player);
     }
 
     // change "networks-changed:recipe" -> "networks:recipe"
@@ -836,6 +862,8 @@ public class NetworksMain implements TabExecutor {
             case 1 -> {
                 return List.of(
                     "addStorageItem",
+                    "celltoQuantum",
+                    "unbind",
                     "fillQuantum",
                     "fixBlueprint",
                     "getStorageItem",

@@ -7,6 +7,7 @@ import com.balugaq.netex.utils.Lang;
 import com.balugaq.netex.utils.NetworksVersionedEnchantment;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.GhostItems;
 import com.ytdd9527.networksexpansion.utils.TextUtil;
 import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.NetworkStorage;
@@ -128,6 +129,7 @@ public abstract class AdvancedDirectional extends NetworkDirectional {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         displayStack.setItemMeta(itemMeta);
+        GhostItems.mark(displayStack);
         return displayStack;
     }
 
@@ -155,12 +157,15 @@ public abstract class AdvancedDirectional extends NetworkDirectional {
                 itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
             displayStack.setItemMeta(itemMeta);
+            GhostItems.mark(displayStack);
             return displayStack;
         } else {
             Material material = active ? Material.GREEN_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
-            return ItemStackUtil.getCleanItem(new CustomItemStack(
+            ItemStack emptyPane = ItemStackUtil.getCleanItem(new CustomItemStack(
                 material,
                 String.format(Lang.getString("messages.normal-operation.directional.display_empty"), blockFace)));
+            GhostItems.mark(emptyPane);
+            return emptyPane;
         }
     }
 
@@ -363,12 +368,13 @@ public abstract class AdvancedDirectional extends NetworkDirectional {
 
                 if (getCargoNumberSlot() != -1) {
                     blockMenu.addMenuClickHandler(getCargoNumberSlot(), (player, i, itemStack, clickAction) -> {
-                        player.sendMessage(ChatColors.color("&e输入数量"));
+                        player.sendMessage(Lang.getString("messages.guide.quantity-input-prompt"));
                         ChatUtils.awaitInput(player, input -> {
                             try {
                                 int value = Calculator.calculate(input).intValue();
                                 if (value <= 0 || value > getMaxLimit()) {
-                                    player.sendMessage("请输入 1 ~ " + getMaxLimit() + " 之间的正整数");
+                                    player.sendMessage(String.format(
+                                        Lang.getString("messages.guide.invalid-amount-input"), getMaxLimit()));
                                     BlockMenu menu = StorageCacheUtils.getMenu(location);
                                     if (menu != null) menu.open(player);
                                     return;

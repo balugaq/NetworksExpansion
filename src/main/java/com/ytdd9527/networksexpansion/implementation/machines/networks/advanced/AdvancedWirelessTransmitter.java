@@ -15,7 +15,6 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.common.ChatColors;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -131,12 +130,13 @@ public class AdvancedWirelessTransmitter extends AdvancedDirectional implements 
 
                 if (getCargoNumberSlot() != -1) {
                     blockMenu.addMenuClickHandler(getCargoNumberSlot(), (player, i, itemStack, clickAction) -> {
-                        player.sendMessage(ChatColors.color("&e输入数量"));
+                        player.sendMessage(Lang.getString("messages.guide.quantity-input-prompt"));
                         ChatUtils.awaitInput(player, input -> {
                             try {
                                 int value = Calculator.calculate(input).intValue();
                                 if (value <= 0 || value > getMaxLimit()) {
-                                    player.sendMessage("请输入 1 ~ " + getMaxLimit() + " 之间的正整数");
+                                    player.sendMessage(String.format(
+                                        Lang.getString("messages.guide.invalid-amount-input"), getMaxLimit()));
                                     BlockMenu menu = StorageCacheUtils.getMenu(location);
                                     if (menu != null) menu.open(player);
                                     return;
@@ -230,7 +230,7 @@ public class AdvancedWirelessTransmitter extends AdvancedDirectional implements 
             ItemStack itemStack = src.getItemStack0(location, new ItemRequest(template, getLimitQuantity(location)));
             if (itemStack != null && itemStack.getAmount() > 0) {
                 tgt.addItemStack0(target, itemStack);
-                src.addItemStack(itemStack);
+                src.addItemStack0(location, itemStack);
             }
         }
         sendFeedback(location, FeedbackType.WORKING);

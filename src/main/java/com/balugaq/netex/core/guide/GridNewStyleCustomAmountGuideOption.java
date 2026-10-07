@@ -2,12 +2,12 @@ package com.balugaq.netex.core.guide;
 
 import com.balugaq.jeg.api.patches.JEGGuideSettings;
 import com.balugaq.netex.api.algorithm.Calculator;
+import com.balugaq.netex.utils.Lang;
 import io.github.sefiraat.networks.Networks;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.core.guide.options.SlimefunGuideOption;
 import io.github.thebusybiscuit.slimefun4.core.guide.options.SlimefunGuideSettings;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.chat.ChatInput;
-import io.github.thebusybiscuit.slimefun4.libraries.dough.common.ChatColors;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.PersistentDataAPI;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import org.bukkit.Material;
@@ -58,10 +58,13 @@ public class GridNewStyleCustomAmountGuideOption implements SlimefunGuideOption<
 
         ItemStack item = new CustomItemStack(
             Material.FURNACE,
-            "&a高级网格自定义单次取出数量",
+            Lang.getString("messages.guide.grid-new-style-custom-amount.display-name"),
             "",
-            "&7当前数量: " + value + " (限制范围: 1~" + GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT + ")",
-            "&7\u21E8 &e点击设置数量"
+            String.format(
+                Lang.getString("messages.guide.grid-new-style-custom-amount.current-amount"),
+                value,
+                GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT),
+            Lang.getString("messages.guide.grid-new-style-custom-amount.click-tip")
         );
         return Optional.of(item);
     }
@@ -69,12 +72,13 @@ public class GridNewStyleCustomAmountGuideOption implements SlimefunGuideOption<
     @Override
     public void onClick(@NotNull Player p, @NotNull ItemStack guide) {
         p.closeInventory();
-        p.sendMessage(ChatColors.color("&e请输入高级网格自定义单次取出数量"));
+        p.sendMessage(Lang.getString("messages.guide.grid-new-style-custom-amount.input-prompt"));
         ChatInput.waitForPlayer(Networks.getInstance(), p, s -> {
             try {
                 int value = Calculator.calculate(s).intValue();
                 if (value < 1 || value > GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT) {
-                    p.sendMessage("请输入 1 ~ " + GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT + " 之间的正整数");
+                    p.sendMessage(String.format(
+                        Lang.getString("messages.guide.invalid-amount-input"), GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT));
                     return;
                 }
 
@@ -85,7 +89,9 @@ public class GridNewStyleCustomAmountGuideOption implements SlimefunGuideOption<
                     SlimefunGuideSettings.openSettings(p, guide);
                 }
             } catch (NumberFormatException e) {
-                p.sendMessage("请输入 1 ~ " + GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT + " 之间的正整数" + e.getMessage());
+                p.sendMessage(String.format(
+                        Lang.getString("messages.guide.invalid-amount-input"), GRID_NEW_STYLE_MAX_CUSTOM_AMOUNT)
+                    + e.getMessage());
             }
         });
     }

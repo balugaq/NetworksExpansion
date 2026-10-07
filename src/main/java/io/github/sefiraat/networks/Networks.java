@@ -11,6 +11,8 @@ import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.managers.ConfigManager;
 import com.ytdd9527.networksexpansion.core.services.LocalizationService;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.storage.CellStorageDatabase;
 import com.ytdd9527.networksexpansion.setup.SetupUtil;
 import com.ytdd9527.networksexpansion.utils.databases.DataSource;
 import com.ytdd9527.networksexpansion.utils.databases.DataStorage;
@@ -66,6 +68,12 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
 
     @Getter
     private static BukkitRunnable autoSaveThread;
+
+    @Getter
+    private static BukkitRunnable aeAutoSaveThread;
+
+    @Getter
+    private static CellStorageDatabase cellStorageDatabase;
 
     private static MinecraftVersion minecraftVersion = MinecraftVersion.UNKNOWN;
     private final @NotNull String username;
@@ -176,6 +184,25 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         long period = 20L * seconds;
         autoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
 
+        // 元件驱动器元件数据自动保存
+        aeAutoSaveThread = new BukkitRunnable() {
+            @Override
+            public void run() {
+                CellDrive.saveAllDriveCells();
+            }
+        };
+        aeAutoSaveThread.runTaskTimerAsynchronously(this, 2 * period, period);
+
+        getLogger().info(getLocalizationService().getString("messages.startup.initializing-cell-database"));
+        try {
+            cellStorageDatabase = new CellStorageDatabase();
+            cellStorageDatabase.init();
+        } catch (Exception e) {
+            cellStorageDatabase = null;
+            getLogger().warning(getLocalizationService().getString("messages.startup.failed-to-init-cell-database"));
+            Debug.trace(e);
+        }
+
         getLogger().info(getLocalizationService().getString("messages.startup.registering-items"));
         SetupUtil.setupAll();
 
@@ -250,7 +277,14 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         if (autoSaveThread != null) {
             autoSaveThread.cancel();
         }
+        if (aeAutoSaveThread != null) {
+            aeAutoSaveThread.cancel();
+        }
         DataStorage.saveAmountChange();
+        CellDrive.saveAllDriveCells();
+        if (cellStorageDatabase != null) {
+            cellStorageDatabase.shutdown();
+        }
         if (queryQueue != null) {
             while (!queryQueue.isAllDone()) {
                 getLogger()
@@ -370,7 +404,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
     }
 
     public void setupMetrics() {
-        final Metrics metrics = new Metrics(this, 34489);
+        final Metrics metrics = new Metrics(this, 34492);
 
         AdvancedPie networksChart = new AdvancedPie("networks", () -> {
             Map<String, Integer> networksMap = new HashMap<>();

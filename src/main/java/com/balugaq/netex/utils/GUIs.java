@@ -79,6 +79,31 @@ public class GUIs {
         "BBBBBBBBB"
     );
 
+    public static final GUI CG = new GUI(
+        "BoDBBBBBq",
+        "BBBBBBBBB",
+        "BBBBBBBBB",
+        "BBBBBBBBB",
+        "BnuwBesdB",
+        "BBBBBmmmm"
+    );
+    public static final GUI CP = new GUI(
+        "BoDBBBBBq",
+        "ttttttttt",
+        "ttttttttt",
+        "ttttttttt",
+        "BnuwBesdB",
+        "BBBBBmmmm"
+    );
+    public static final GUI CGP = new GUI(
+        "BoDBBBBBq",
+        "ttttttttt",
+        "ttttttttt",
+        "ttttttttt",
+        "BnuwBesdB",
+        "BBBBBmmmm"
+    );
+
     public static final GUI AT = new GUI(
         "BnuTttttt",
         "wBeTttttt",

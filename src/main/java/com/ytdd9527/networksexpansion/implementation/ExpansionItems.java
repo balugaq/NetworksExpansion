@@ -42,6 +42,22 @@ import com.ytdd9527.networksexpansion.implementation.machines.manual.FacingPrese
 import com.ytdd9527.networksexpansion.implementation.machines.manual.ItemDifferenter;
 import com.ytdd9527.networksexpansion.implementation.machines.manual.StorageCardConverter;
 import com.ytdd9527.networksexpansion.implementation.machines.manual.StorageUnitUpgradeTable;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.collect.CollectRune;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainBrush;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainConfigurator;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainTransceiver;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainGrabber;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainModuleItem;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.chain.ChainPusher;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyWorkshop;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.filler.ContainerFiller;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.EnderDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter.CellCleaner;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.converter.CellConverter;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyMonitor;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.DriveMonitor;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedExport;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedGreedyBlock;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.AdvancedImport;
@@ -57,6 +73,11 @@ import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SmartPusher;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SuperTrash;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.advanced.SwitchingMonitor;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.VoidCell;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.AssemblyCard;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.ender.ChannelConfigurator;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.core.SmartCore;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.assembly.core.OverclockCore;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.HangingGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.NetworkCraftingGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.machines.networks.grids.NetworkGridNewStyle;
@@ -735,6 +756,78 @@ public class ExpansionItems {
         ExpansionWorkbench.TYPE,
         ExpansionRecipes.LINE_TRANSFER_VANILLA_GRABBER);
 
+    public static final ChainGrabber CHAIN_GRABBER = new ChainGrabber(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_GRABBER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_GRABBER);
+
+    public static final ChainPusher CHAIN_PUSHER = new ChainPusher(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_PUSHER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_PUSHER);
+
+    public static final ChainTransceiver CHAIN_TRANSCEIVER = new ChainTransceiver(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_TRANSCEIVER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_TRANSCEIVER);
+
+    public static final ChainModuleItem CHAIN_MODULE_RANGE = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_RANGE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_RANGE);
+
+    public static final ChainModuleItem CHAIN_MODULE_CAPACITY = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_CAPACITY,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_CAPACITY);
+
+    public static final ChainModuleItem CHAIN_MODULE_MODE = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_MODE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_MODE);
+
+    public static final ChainModuleItem CHAIN_MODULE_VANILLA = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_VANILLA,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_VANILLA);
+
+    public static final ChainModuleItem CHAIN_MODULE_MULTI_DIRECTION = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_MULTI_DIRECTION,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_MULTI_DIRECTION);
+
+    public static final ChainModuleItem CHAIN_MODULE_BINDING = new ChainModuleItem(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_MODULE_BINDING,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_MODULE_BINDING);
+
+    public static final ChainConfigurator CHAIN_CONFIGURATOR = new ChainConfigurator(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_CONFIGURATOR,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_CONFIGURATOR);
+
+    public static final ChainBrush CHAIN_BRUSH = new ChainBrush(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHAIN_BRUSH,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHAIN_BRUSH);
+
+    public static final CollectRune RUNE_COLLECT = new CollectRune(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.RUNE_COLLECT,
+        RecipeType.NULL,
+        ExpansionRecipes.RUNE_COLLECT);
+
     public static final AdvancedLineTransferPusher ADVANCED_LINE_TRANSFER_PUSHER = new AdvancedLineTransferPusher(
         ExpansionItemsMenus.MENU_CARGO_SYSTEM,
         ExpansionItemStacks.ADVANCED_LINE_TRANSFER_PUSHER,
@@ -1172,11 +1265,11 @@ public class ExpansionItems {
     public static final SpecialSlimefunItem AUTHOR_YITOUDAIDAI =
         new AuthorHead(ExpansionItemsMenus.MENU_TROPHY, ExpansionItemStacks.AUTHOR_YITOUDAIDAI);
 
-    public static final SpecialSlimefunItem AUTHOR_BALUGAQ = new AuthorHead(
+    public static final SpecialSlimefunItem AUTHOR_TINALNESS = new AuthorHead(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.AUTHOR_BALUGAQ,
+        ExpansionItemStacks.AUTHOR_TINALNESS,
         ExpansionWorkbench.TYPE,
-        ExpansionRecipes.AUTHOR_BALUGAQ
+        ExpansionRecipes.AUTHOR_TINALNESS
     );
 
     public static final DueMachineConfigurator DUE_MACHINE_CONFIGURATOR = new DueMachineConfigurator(
@@ -1282,33 +1375,62 @@ public class ExpansionItems {
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_01 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_1 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_01,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_1,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_02 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_2 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_02,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_2,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_03 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_3 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_03,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_3,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_04 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_4 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_04,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_4,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
-    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCEMENT_05 = new UnusableSlimefunItem(
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_5 = new UnusableSlimefunItem(
         ExpansionItemsMenus.MENU_TROPHY,
-        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCEMENT_05,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_5,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_6 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_6,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_7 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_7,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_8 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_8,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_9 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_9,
+        RecipeType.NULL,
+        ExpansionRecipes.NULL);
+
+    public static final UnusableSlimefunItem NTW_EXPANSION_ANNOUNCE_10 = new UnusableSlimefunItem(
+        ExpansionItemsMenus.MENU_TROPHY,
+        ExpansionItemStacks.NTW_EXPANSION_ANNOUNCE_10,
         RecipeType.NULL,
         ExpansionRecipes.NULL);
 
@@ -1453,6 +1575,94 @@ public class ExpansionItems {
         ExpansionWorkbench.TYPE,
         ExpansionRecipes.SUPER_TRASH
     );
+
+    // Cellnet Drive
+    public static final CellDrive CELL_DRIVE = new CellDrive(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CELL_DRIVE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CELL_DRIVE);
+
+    // Cell Cleaner
+    public static final CellCleaner CELL_CLEANER = new CellCleaner(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CELL_CLEANER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CELL_CLEANER);
+
+    // Cell Converter
+    public static final CellConverter CELL_CONVERTER = new CellConverter(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CELL_CONVERTER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CELL_CONVERTER);
+
+    public static final AssemblyDrive ASSEMBLY_DRIVE = new AssemblyDrive(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.ASSEMBLY_DRIVE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.ASSEMBLY_DRIVE);
+
+    public static final VoidCell VOID_CELL = new VoidCell(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.VOID_CELL,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.VOID_CELL);
+
+    public static final EnderDrive ENDER_DRIVE = new EnderDrive(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.ENDER_DRIVE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.ENDER_DRIVE);
+
+    public static final AssemblyCard ASSEMBLY_CARD = new AssemblyCard(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.ASSEMBLY_CARD,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.ASSEMBLY_CARD);
+
+    public static final AssemblyWorkshop ASSEMBLY_WORKSHOP = new AssemblyWorkshop(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.ASSEMBLY_WORKSHOP,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.ASSEMBLY_WORKSHOP);
+
+    public static final ContainerFiller CONTAINER_FILLER = new ContainerFiller(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CONTAINER_FILLER,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CONTAINER_FILLER);
+
+    public static final ChannelConfigurator CHANNEL_CONFIGURATOR = new ChannelConfigurator(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.CHANNEL_CONFIGURATOR,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.CHANNEL_CONFIGURATOR);
+
+    public static final OverclockCore OVERCLOCK_CORE = new OverclockCore(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.OVERCLOCK_CORE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.OVERCLOCK_CORE);
+
+
+    public static final SmartCore SMART_CORE = new SmartCore(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.SMART_CORE,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.SMART_CORE);
+
+    public static final AssemblyMonitor ASSEMBLY_MONITOR = new AssemblyMonitor(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.ASSEMBLY_MONITOR,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.ASSEMBLY_MONITOR);
+
+    public static final DriveMonitor DRIVE_MONITOR = new DriveMonitor(
+        ExpansionItemsMenus.MENU_CARGO_SYSTEM,
+        ExpansionItemStacks.DRIVE_MONITOR,
+        ExpansionWorkbench.TYPE,
+        ExpansionRecipes.DRIVE_MONITOR);
 
     public static final VisualGrid VISUAL_GRID = new VisualGrid(
         ExpansionItemsMenus.MENU_FUNCTIONAL_MACHINE,
