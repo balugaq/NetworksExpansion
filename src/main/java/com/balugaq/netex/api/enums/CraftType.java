@@ -44,7 +44,7 @@ public enum CraftType {
     QUANTUM_WORKBENCH(SupportedQuantumWorkbenchRecipes.getRecipes(), SupportedQuantumWorkbenchRecipes::testRecipe),
     SMELTERY(SupportedSmelteryRecipes.getRecipes(), SupportedSmelteryRecipes::testRecipe);
 
-    private static final Map<CraftType, Set<Map.Entry<ItemStack[], ItemStack>>> map = new HashMap<>();
+    private static final Map<CraftType, Set<Map.Entry<ItemStack[], ItemStack>>> map = buildMap();
 
     @Getter
     private final Set<Map.Entry<ItemStack[], ItemStack>> recipeEntries;
@@ -53,6 +53,14 @@ public enum CraftType {
     CraftType(Map<ItemStack[], ItemStack> recipes, BiPredicate<ItemStack[], ItemStack[]> testRecipe) {
         this.recipeEntries = recipes.entrySet();
         this.testRecipe = testRecipe;
+    }
+
+    private static Map<CraftType, Set<Map.Entry<ItemStack[], ItemStack>>> buildMap() {
+        Map<CraftType, Set<Map.Entry<ItemStack[], ItemStack>>> result = new HashMap<>();
+        for (CraftType type : values()) {
+            result.put(type, type.recipeEntries);
+        }
+        return java.util.Collections.unmodifiableMap(result);
     }
 
     public boolean testRecipe(ItemStack[] inputs, ItemStack[] recipe) {
@@ -84,21 +92,6 @@ public enum CraftType {
     }
 
     public static Map<CraftType, Set<Map.Entry<ItemStack[], ItemStack>>> map() {
-        if (map.isEmpty()) {
-            map.put(ANCIENT_ALTAR, ANCIENT_ALTAR.recipeEntries);
-            map.put(ARMOR_FORGE, ARMOR_FORGE.recipeEntries);
-            map.put(COMPRESSOR, COMPRESSOR.recipeEntries);
-            map.put(CRAFTING, CRAFTING.recipeEntries);
-            map.put(EXPANSION_WORKBENCH, EXPANSION_WORKBENCH.recipeEntries);
-            map.put(GRIND_STONE, GRIND_STONE.recipeEntries);
-            map.put(JUICER, JUICER.recipeEntries);
-            map.put(MAGIC_WORKBENCH, MAGIC_WORKBENCH.recipeEntries);
-            map.put(ORE_CRUSHER, ORE_CRUSHER.recipeEntries);
-            map.put(PRESSURE_CHAMBER, PRESSURE_CHAMBER.recipeEntries);
-            map.put(QUANTUM_WORKBENCH, QUANTUM_WORKBENCH.recipeEntries);
-            map.put(SMELTERY, SMELTERY.recipeEntries);
-        }
-
         return map;
     }
 }

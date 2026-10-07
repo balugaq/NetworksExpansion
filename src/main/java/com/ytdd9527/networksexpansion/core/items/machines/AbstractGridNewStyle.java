@@ -31,7 +31,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -118,12 +118,6 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
         cloneLore.remove(cloneLore.size() - 1);
         cloneMeta.setLore(cloneLore);
         clone.setItemMeta(cloneMeta);
-
-        NetworkRoot root = definition.getNode().getRoot();
-        boolean success = root.refreshRootItems();
-        if (!success) {
-            return null;
-        }
 
         return clone;
     }
@@ -295,7 +289,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
                     screen.setItem(getDisplaySlots()[i], displayStack, displayKeybinds());
                 } else {
                     screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
-                        receiveItem(p, action, screen);
+                        receiveItem(p, p.getItemOnCursor(), action, screen);
                         return false;
                     });
                 }
@@ -347,7 +341,7 @@ public abstract class AbstractGridNewStyle extends AbstractGrid implements Keybi
                     screen.setItem(getDisplaySlots()[i], displayStack, displayKeybinds());
                 } else {
                     screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
-                        receiveItem(p, action, screen);
+                        receiveItem(p, p.getItemOnCursor(), action, screen);
                         return false;
                     });
                 }

@@ -5,9 +5,11 @@ import io.github.sefiraat.networks.Networks;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.text.MessageFormat;
 import java.util.List;
 
 public class Lang {
@@ -23,6 +25,21 @@ public class Lang {
     @NotNull
     public static SlimefunItemStack getItem(@NotNull String key, @NotNull Material material) {
         return get().getItem(key, material);
+    }
+
+    @NotNull
+    public static SlimefunItemStack getItem(@NotNull String id, @NotNull Material material, Object... args) {
+        SlimefunItemStack stack = get().getItem(id, material);
+        if (args.length > 0) {
+            ItemMeta meta = stack.getItemMeta();
+            meta.setDisplayName(MessageFormat.format(meta.getDisplayName(), args));
+            List<String> lore = meta.getLore();
+            if (lore != null) {
+                lore.replaceAll(line -> MessageFormat.format(line, args));
+            }
+            stack.setItemMeta(meta);
+        }
+        return stack;
     }
 
     @NotNull

@@ -267,7 +267,6 @@ public class NetworksSlimefunItemStacks {
         NETWORK_QUANTUM_STORAGE_14 = Theme.themedSlimefunItemStack(
             Lang.getItem("NTW_QUANTUM_STORAGE_14", new ItemStack(Material.RED_GLAZED_TERRACOTTA)), Theme.MACHINE);
 
-
         NETWORK_CAPACITOR_1 = Theme.themedSlimefunItemStack(
             Lang.getItem("NTW_CAPACITOR_1", new ItemStack(Material.BROWN_GLAZED_TERRACOTTA)), Theme.MACHINE);
 

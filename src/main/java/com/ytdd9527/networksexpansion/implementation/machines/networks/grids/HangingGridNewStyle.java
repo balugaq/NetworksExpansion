@@ -214,7 +214,7 @@ public class HangingGridNewStyle extends NetworkGridNewStyle implements HangingB
                     });
                 } else {
                     screen.setItem(getDisplaySlots()[i], getBlankSlotStack(), (p, slot, item, action) -> {
-                        receiveItem(p, action, screen);
+                        receiveItem(p, p.getItemOnCursor(), action, screen);
                         return false;
                     });
                 }

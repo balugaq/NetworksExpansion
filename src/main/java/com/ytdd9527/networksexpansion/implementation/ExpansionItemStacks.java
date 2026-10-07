@@ -62,6 +62,32 @@ public class ExpansionItemStacks {
         Lang.getItem("NTW_EXPANSION_LINE_TRANSFER_PLUS_GRABBER", Material.WAXED_COPPER_BLOCK), Theme.MACHINE);
     public static final SlimefunItemStack LINE_TRANSFER_PLUS =
         Theme.random(Lang.getItem("NTW_EXPANSION_LINE_TRANSFER_PLUS", Material.STICKY_PISTON), Theme.MACHINE);
+
+    public static final SlimefunItemStack CHAIN_GRABBER =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_GRABBER", Material.HAY_BLOCK), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_PUSHER =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_PUSHER", Material.OBSERVER), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_TRANSCEIVER =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_TRANSCEIVER", Material.PISTON), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_RANGE =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_RANGE", Material.SPYGLASS), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_CAPACITY =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_CAPACITY", Material.BUNDLE), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_MODE =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_MODE", Material.REPEATER), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_VANILLA =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_VANILLA", Material.CHEST_MINECART), Theme.MACHINE);
+    public static final SlimefunItemStack RUNE_COLLECT =
+        Theme.random(Lang.getItem("NTW_EXPANSION_RUNE_COLLECT", Material.FIREWORK_STAR), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_MULTI_DIRECTION =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_MULTI_DIRECTION", Material.LEAD), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_MODULE_BINDING =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_MODULE_BINDING", Material.NAME_TAG), Theme.MACHINE);
+    public static final SlimefunItemStack CHAIN_CONFIGURATOR =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_CONFIGURATOR", Material.CLOCK), Theme.TOOL);
+    public static final SlimefunItemStack CHAIN_BRUSH =
+        Theme.random(Lang.getItem("NTW_EXPANSION_CHAIN_BRUSH", Material.FEATHER), Theme.TOOL);
+
     public static final SlimefunItemStack LINE_TRANSFER_VANILLA_PUSHER =
         Theme.random(Lang.getItem("NTW_EXPANSION_LINE_TRANSFER_VANILLA_PUSHER", Material.OBSERVER), Theme.MACHINE);
     public static final SlimefunItemStack LINE_TRANSFER_VANILLA_GRABBER = Theme.random(
@@ -355,8 +381,8 @@ public class ExpansionItemStacks {
         Theme.random(Lang.getItem("NTW_EXPANSION_AUTHOR_YBW0014", Skins.AUTHOR_YBW0014.getHash()), Theme.GUIDE);
     public static final SlimefunItemStack AUTHOR_YITOUDAIDAI =
         Theme.random(Lang.getItem("NTW_EXPANSION_AUTHOR_YITOUDAIDAI", Material.PLAYER_HEAD), Theme.GUIDE);
-    public static final SlimefunItemStack AUTHOR_BALUGAQ = // keep the legacy sf id
-        Theme.random(Lang.getItem("NTW_EXPANSION_AUTHOR_TINALNESS", Skins.AUTHOR_BALUGAQ.getHash()), Theme.GUIDE);
+    public static final SlimefunItemStack AUTHOR_TINALNESS =
+        Theme.random(Lang.getItem("NTW_EXPANSION_AUTHOR_TINALNESS", Skins.AUTHOR_TINALNESS.getHash()), Theme.GUIDE);
     // Cargo Nodes
     public static final SlimefunItemStack CARGO_NODE_QUICK_TOOL =
         Theme.random(Lang.getItem("NTW_EXPANSION_CARGO_NODE_QUICK_TOOL", Material.BONE), Theme.MACHINE);
@@ -441,16 +467,27 @@ public class ExpansionItemStacks {
     public static final SlimefunItemStack BETTER_GRABBER = Theme.themedSlimefunItemStack(
         Lang.getItem("NTW_EXPANSION_BETTER_GRABBER", Material.PINK_STAINED_GLASS), Theme.MACHINE);
 
-    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCEMENT_01 =
-        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCEMENT_01", Material.BOOK), Theme.GUIDE);
-    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCEMENT_02 =
-        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCEMENT_02", Material.BOOK), Theme.GUIDE);
-    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCEMENT_03 =
-        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCEMENT_03", Material.BOOK), Theme.GUIDE);
-    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCEMENT_04 =
-        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCEMENT_04", Material.BOOK), Theme.GUIDE);
-    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCEMENT_05 =
-        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCEMENT_05", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_1 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_1", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_2 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_2", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_3 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_3", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_4 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_4", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_5 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_5", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_6 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_6", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_7 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_7", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_8 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_8", Material.BOOK), Theme.GUIDE);
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_9 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_9", Material.BOOK), Theme.GUIDE);
+
+    public static final SlimefunItemStack NTW_EXPANSION_ANNOUNCE_10 =
+        Theme.themedSlimefunItemStack(Lang.getItem("NTW_EXPANSION_ANNOUNCE_10", Material.BOOK), Theme.GUIDE);
     public static final SlimefunItemStack NETWORK_CRAFTING_GRID_NEW_STYLE = Theme.themedSlimefunItemStack(
         Lang.getItem("NTW_EXPANSION_CRAFTING_GRID_NEW_STYLE", Material.CRAFTING_TABLE), Theme.MACHINE);
     public static final SlimefunItemStack STATUS_VIEWER =
@@ -505,6 +542,39 @@ public class ExpansionItemStacks {
     public static final SlimefunItemStack VISUAL_GRID = Theme.themedSlimefunItemStack(
         Lang.getItem("NTW_EXPANSION_VISUAL_GRID", Material.NOTE_BLOCK), Theme.MACHINE);
 
+    // Cellnet Drives and Storage Cells
+    public static final SlimefunItemStack CELL_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CELL_DRIVE", Material.CHISELED_BOOKSHELF), Theme.MACHINE);
+    public static final SlimefunItemStack CELL_CLEANER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CELL_CLEANER", Material.CARTOGRAPHY_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack CELL_CONVERTER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CELL_CONVERTER", Material.SMITHING_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack VOID_CELL = themedCell("NTW_EXPANSION_VOID_CELL", Material.MUSIC_DISC_WAIT);
+    public static final SlimefunItemStack ASSEMBLY_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_DRIVE", Material.BEACON), Theme.MACHINE);
+    public static final SlimefunItemStack ENDER_DRIVE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ENDER_DRIVE", Material.ENDER_CHEST), Theme.MACHINE);
+    public static final SlimefunItemStack ASSEMBLY_CARD = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_CARD", Material.PAPER), Theme.TOOL);
+    public static final SlimefunItemStack ASSEMBLY_WORKSHOP = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_WORKSHOP", Material.SMITHING_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack CONTAINER_FILLER = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CONTAINER_FILLER", Material.FLETCHING_TABLE), Theme.MACHINE);
+    public static final SlimefunItemStack CHANNEL_CONFIGURATOR = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_CHANNEL_CONFIGURATOR", Material.ENDER_EYE), Theme.TOOL);
+    public static final SlimefunItemStack OVERCLOCK_CORE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_OVERCLOCK_CORE", Material.NETHER_STAR), Theme.TOOL);
+    public static final SlimefunItemStack SMART_CORE = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_SMART_CORE", Material.ECHO_SHARD), Theme.TOOL);
+    public static final SlimefunItemStack ASSEMBLY_MONITOR = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_ASSEMBLY_MONITOR", Material.TARGET), Theme.MACHINE);
+    public static final SlimefunItemStack DRIVE_MONITOR = Theme.themedSlimefunItemStack(
+        Lang.getItem("NTW_EXPANSION_DRIVE_MONITOR", Material.OBSERVER), Theme.MACHINE);
+
+
+    private static @NotNull SlimefunItemStack themedCell(@NotNull String key, @NotNull Material disc) {
+        return Theme.themedSlimefunItemStack(Lang.getItem(key, disc), Theme.MACHINE);
+    }
 
     public static @NotNull ItemStack enchanted(@NotNull Material material) {
         return ItemStackUtil.getPreEnchantedItemStack(material);

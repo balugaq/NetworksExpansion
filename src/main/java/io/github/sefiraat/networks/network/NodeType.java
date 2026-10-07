@@ -55,8 +55,4 @@ public enum NodeType {
     SWITCHING_MONITOR,
     // will NOT count as a node
     HANGING_GRID,
-
-    // from other addons
-    // For SlimeAEPlugin
-    AE_SWITCHER
 }

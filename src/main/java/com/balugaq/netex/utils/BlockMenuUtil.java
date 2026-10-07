@@ -244,6 +244,12 @@ public class BlockMenuUtil {
         }
 
         final ItemStack item = blockMenu.getItemInSlot(slot);
+        if (item == null || item.getType() == Material.AIR) {
+            return;
+        }
         ItemStackUtil.consumeItem(item, amount, replaceConsumables);
+        if (item.getAmount() <= 0) {
+            blockMenu.replaceExistingItem(slot, null);
+        }
     }
 }

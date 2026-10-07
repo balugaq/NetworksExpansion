@@ -6,6 +6,7 @@ import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.stackcaches.ItemStackCache;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.data.persistent.PersistentDataAPI;
+import io.papermc.paper.datacomponent.DataComponentType;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
@@ -44,9 +45,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("deprecation")
 @UtilityClass
@@ -74,7 +77,7 @@ public class StackUtils {
         if (!checkAmount)        flags |= MatchOption.IGNORE_AMOUNT;
         return MatchOption.of(flags);
     }
-    
+
     public static ItemStack getAsQuantity(@Nullable ItemStack itemStack, int amount) {
         if (itemStack == null) return ItemStackUtil.AIR;
 
@@ -172,7 +175,6 @@ public class StackUtils {
             return false;
         }
 
-        // Don't handle them, ensure no one could be transferred by networks
         if (isBlacklisted(itemStack) || isBlacklisted(cache.getItemStack())) {
             return false;
         }
@@ -188,7 +190,7 @@ public class StackUtils {
 
         return legacyItemsMatch(cache, itemStack, matchOption);
     }
-    
+
     private static boolean legacyItemsMatch(ItemStackCache cache, ItemStack itemStack, MatchOption matchOption) {
         final boolean ignoreDurability = matchOption.isIgnoreDurability();
         final boolean ignoreEnchantment = matchOption.isIgnoreEnchantment();
@@ -196,10 +198,11 @@ public class StackUtils {
         final boolean ignoreLore = matchOption.isIgnoreLore();
         final boolean ignoreCustomModelData = matchOption.isIgnoreCustomModelData();
         // below 1.21.4
-
-        // If either item does not have a meta then either a mismatch or both without meta = vanilla
-        if (!itemStack.hasItemMeta() || !cache.getItemStack().hasItemMeta()) {
-            return itemStack.hasItemMeta() == cache.getItemStack().hasItemMeta();
+        // If either item has no custom data components then either a mismatch or both without components = vanilla
+        final boolean itemHasComponents = ItemStackUtil.hasCustomComponents(itemStack);
+        final boolean cachedHasComponents = ItemStackUtil.hasCustomComponents(cache.getItemStack());
+        if (!itemHasComponents || !cachedHasComponents) {
+            return itemHasComponents == cachedHasComponents;
         }
 
         // Now we need to compare meta's directly - cache is already out, but let's fetch the 2nd meta also
@@ -314,7 +317,6 @@ public class StackUtils {
         // Check the lore
         if (!ignoreLore || shouldCompareLore(itemStack) || shouldCompareLore(cache.getItemStack())) {
             if (itemMeta.hasLore() && cachedMeta.hasLore()) {
-                // Bukkit automatically handled unset style in lore, so it always downs to correct results.
                 if (!Objects.equals(itemMeta.getLore(), cachedMeta.getLore())) {
                     return false;
                 }

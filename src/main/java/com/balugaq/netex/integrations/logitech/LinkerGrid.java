@@ -1,14 +1,21 @@
 package com.balugaq.netex.integrations.logitech;
 
 import com.balugaq.netex.api.data.ItemFlowRecord;
+import com.balugaq.netex.api.data.StorageUnitData;
 import com.balugaq.netex.api.enums.FeedbackType;
 import com.balugaq.netex.api.helpers.Icon;
+import com.balugaq.netex.utils.Debug;
 import com.balugaq.netex.utils.InventoryUtil;
 import com.balugaq.netex.utils.Lang;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.api.DriveType;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellHandle;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
+import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
+import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import com.ytdd9527.networksexpansion.utils.ReflectionUtil;
 import com.ytdd9527.networksexpansion.utils.TextUtil;
 import io.github.sefiraat.networks.NetworkStorage;
@@ -37,7 +44,7 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -79,6 +86,10 @@ public class LinkerGrid extends NetworkObject {
     private static final String NAMESPACE_SF = "sf";
     private static final String NAMESPACE_MC = "mc";
     private static final String BS_LINKER_TYPE = "LinkerType";
+    private static final String BS_LINKER_TARGET = "LinkerTarget";
+    private static final String BS_GRID_FILTER = "GridFilter";
+    private static final String BS_GRID_SORT = "GridSort";
+    private static final int TARGET_SWITCH_SLOT = 8;
     private final @NotNull IntRangeSetting tickRate;
     private final ItemStack HyperLinkStack, QuantumLinkStack;
     private static final Class<?> hyperLinkClass, storageLinkClass;
@@ -338,7 +349,7 @@ public class LinkerGrid extends NetworkObject {
 
         var root = definition.getNode().getRoot();
         var tp = getLinkerType(blockMenu.getLocation());
-        Location location = getLocationOf(root, itemStack, tp);
+        Location location = getLocationOf(root, itemStack, tp, getLinkerTarget(blockMenu.getLocation()));
         if (location == null) {
             sendFeedback(blockMenu.getLocation(), FeedbackType.NO_LOCATION_FOUND);
             player.sendMessage(Lang.getString("messages.unsupported-operation.viewer.location-not-found"));
@@ -367,8 +378,26 @@ public class LinkerGrid extends NetworkObject {
             return;
         }
 
-        if (tp == LinkerType.HyperLink) setLink$HyperLink(meta, location);
-        else setLink$QuantumLink(meta, location);
+        Location bindLocation = location;
+        if (tp == LinkerType.QuantumLink) {
+            SlimefunItem targetItem = StorageCacheUtils.getSfItem(location);
+            if (DriveType.of(targetItem) != null) {
+                ItemKey key = new ItemKey(itemStack);
+                CellVirtualCache.inject(location, key);
+                LinkBindingStore.record(location, key.getItemStack());
+                bindLocation = CellVirtualCache.virtualLocation(location, key);
+            } else if (targetItem instanceof NetworksDrawer) {
+                StorageUnitData drawerData = NetworkRoot.getCargoStorageUnitData(location);
+                if (drawerData != null) {
+                    DrawerVirtualCache.inject(location, itemStack);
+                    LinkBindingStore.record(location, itemStack);
+                    bindLocation = DrawerVirtualCache.virtualLocation(location, itemStack);
+                }
+            }
+        }
+
+        if (tp == LinkerType.HyperLink) setLink$HyperLink(meta, bindLocation);
+        else setLink$QuantumLink(meta, bindLocation);
         link.setItemMeta(meta);
         InventoryUtil.give(player, link);
 
@@ -378,14 +407,42 @@ public class LinkerGrid extends NetworkObject {
         }
     }
 
-    public static Location getLocationOf(NetworkRoot root, ItemStack itemStack, LinkerType type) {
+    public static Location getLocationOf(NetworkRoot root, ItemStack itemStack, LinkerType type, LinkerTarget target) {
         Location location = null;
         if (type == LinkerType.QuantumLink) {
-            // only check quantum storage
-            for (var b : root.getBarrels()) {
-                if (StackUtils.itemsMatch(b, itemStack)) {
-                    location = b.getLocation();
-                    break;
+            if (target == LinkerTarget.AUTO || target == LinkerTarget.QUANTUM_STORAGE) {
+                for (var b : root.getBarrels()) {
+                    if (StackUtils.itemsMatch(b, itemStack)) {
+                        location = b.getLocation();
+                        break;
+                    }
+                }
+            }
+            if (location == null && (target == LinkerTarget.AUTO || target == LinkerTarget.CELL)) {
+                ItemKey key = new ItemKey(itemStack);
+                for (BlockMenu driveMenu : root.getOutputAbleCellDriveMenus()) {
+                    for (CellHandle cell : CellDrive.getStorage().getCells(driveMenu)) {
+                        if (cell.getAmount(key) > 0) {
+                            location = driveMenu.getLocation();
+                            break;
+                        }
+                    }
+                    if (location != null) {
+                        break;
+                    }
+                }
+            }
+            if (location == null && (target == LinkerTarget.AUTO || target == LinkerTarget.DRAWER)) {
+                for (var c : root.getDrawerData().values()) {
+                    for (var ic : c.getStoredItemsDirectly()) {
+                        if (StackUtils.itemsMatch(ic, itemStack)) {
+                            location = c.getLastLocation();
+                            break;
+                        }
+                    }
+                    if (location != null) {
+                        break;
+                    }
                 }
             }
             return location;
@@ -396,7 +453,7 @@ public class LinkerGrid extends NetworkObject {
                 return b.getLocation();
             }
         }
-        for (var c : root.getCargoStorageUnitDatas().keySet()) {
+        for (var c : root.getDrawerData().values()) {
             for (var ic : c.getStoredItemsDirectly()) {
                 if (StackUtils.itemsMatch(ic, itemStack)) {
                     return c.getLastLocation();
@@ -455,6 +512,44 @@ public class LinkerGrid extends NetworkObject {
         return LinkerType.valueOf(s);
     }
 
+    @NotNull
+    public static LinkerTarget getLinkerTarget(Location location) {
+        return LinkerTarget.of(StorageCacheUtils.getData(location, BS_LINKER_TARGET));
+    }
+
+    private static @NotNull GridCache.SortOrder restoredSort(@NotNull Location location) {
+        String s = StorageCacheUtils.getData(location, BS_GRID_SORT);
+        if (s != null) {
+            try {
+                return GridCache.SortOrder.valueOf(s);
+            } catch (IllegalArgumentException e) {
+                Debug.debug("排序记录非法，回退默认: " + s);
+            }
+        }
+        return GridCache.SortOrder.ALPHABETICAL;
+    }
+
+    private void setLinkerTarget(Location location, LinkerTarget target) {
+        StorageCacheUtils.setData(location, BS_LINKER_TARGET, target.name());
+    }
+
+    @NotNull
+    public ItemStack getLinkerTargetStack(@NotNull Location location) {
+        LinkerTarget target = getLinkerTarget(location);
+        ItemStack stack = Icon.LINKER_TARGET_SWITCH.clone();
+        stack.editMeta(meta -> {
+            List<String> lore = meta.getLore();
+            if (lore == null) {
+                lore = new ArrayList<>();
+            }
+            lore.add(Lang.getString(
+                "messages.normal-operation.viewer.linker-target-current",
+                Lang.getString("messages.normal-operation.viewer.linker-target-" + target.name().toLowerCase(Locale.ROOT))));
+            meta.setLore(lore);
+        });
+        return stack;
+    }
+
     @Nullable
     private ItemStack getLinkStack(@NotNull BlockMenu menu, @NotNull NetworkRoot root, @NotNull Player player) {
         ItemStack link = root.getItemStack0(menu.getLocation(), new ItemRequest(getLink(menu.getLocation()), 1));
@@ -502,7 +597,12 @@ public class LinkerGrid extends NetworkObject {
 
             @Override
             public void newInstance(@NotNull BlockMenu menu, @NotNull Block b) {
-                getCacheMap().put(menu.getLocation(), new GridCache(0, 0, GridCache.SortOrder.ALPHABETICAL));
+                GridCache cache = new GridCache(0, 0, restoredSort(menu.getLocation()));
+                String filter = StorageCacheUtils.getData(menu.getLocation(), BS_GRID_FILTER);
+                if (filter != null && !filter.isEmpty()) {
+                    cache.setFilter(filter);
+                }
+                getCacheMap().put(menu.getLocation(), cache);
 
                 menu.replaceExistingItem(getPagePrevious(), getPagePreviousStack());
                 menu.addMenuClickHandler(getPagePrevious(), (p, slot, item, action) -> {
@@ -530,6 +630,7 @@ public class LinkerGrid extends NetworkObject {
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     AbstractGrid.updateSortOrder(gridCache, action, 4);
                     getCacheMap().put(menu.getLocation(), gridCache);
+                    StorageCacheUtils.setData(menu.getLocation(), BS_GRID_SORT, gridCache.getSortOrder().name());
                     updateDisplay(menu);
                     return false;
                 });
@@ -553,6 +654,14 @@ public class LinkerGrid extends NetworkObject {
                         case QuantumLink -> LinkerType.HyperLink;
                     });
                     menu.replaceExistingItem(TYPE_SWITCH_SLOT, getLinkerTypeStack(menu.getLocation()));
+
+                    return false;
+                });
+
+                menu.addItem(TARGET_SWITCH_SLOT, getLinkerTargetStack(menu.getLocation()));
+                menu.addMenuClickHandler(TARGET_SWITCH_SLOT, (p, slot, item, action) -> {
+                    setLinkerTarget(menu.getLocation(), getLinkerTarget(menu.getLocation()).next());
+                    menu.replaceExistingItem(TARGET_SWITCH_SLOT, getLinkerTargetStack(menu.getLocation()));
 
                     return false;
                 });
@@ -593,6 +702,8 @@ public class LinkerGrid extends NetworkObject {
         @NotNull ClickAction action) {
         if (action.isRightClicked()) {
             gridCache.setFilter(null);
+            getCacheMap().put(blockMenu.getLocation(), gridCache);
+            StorageCacheUtils.removeData(blockMenu.getLocation(), BS_GRID_FILTER);
         } else {
             player.closeInventory();
             player.sendMessage(Lang.getString("messages.normal-operation.grid.waiting_for_filter"));
@@ -603,6 +714,7 @@ public class LinkerGrid extends NetworkObject {
                 s = s.toLowerCase(Locale.ROOT);
                 gridCache.setFilter(s);
                 getCacheMap().put(blockMenu.getLocation(), gridCache);
+                StorageCacheUtils.setData(blockMenu.getLocation(), BS_GRID_FILTER, s);
                 player.sendMessage(Lang.getString("messages.completed-operation.grid.filter_set"));
 
                 SlimefunBlockData data = StorageCacheUtils.getBlock(blockMenu.getLocation());

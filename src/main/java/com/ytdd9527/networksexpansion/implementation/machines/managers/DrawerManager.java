@@ -36,7 +36,7 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -203,13 +203,13 @@ public class DrawerManager extends NetworkObject {
         if (itemContainers.isEmpty()) {
             return null;
         } else {
-            return itemContainers.get(0).getSample();
+            return itemContainers.getFirst().getSample();
         }
     }
 
     public static @NotNull List<StorageUnitData> getStorageUnitDatas(
         @NotNull NetworkRoot root, @NotNull GridCache cache) {
-        return root.getCargoStorageUnitDatas(MANAGER_STRATEGY, true).keySet().stream()
+        return root.getDrawerData(MANAGER_STRATEGY).values().stream()
             .filter(entry -> {
                 if (cache.getFilter() == null) {
                     return true;

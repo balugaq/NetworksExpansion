@@ -6,6 +6,8 @@ import com.balugaq.netex.api.enums.QuickTransferMode;
 import com.balugaq.netex.api.enums.StorageUnitType;
 import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.api.interfaces.ModellableItem;
+import com.balugaq.netex.integrations.logitech.DrawerVirtualCache;
+import com.balugaq.netex.integrations.logitech.LinkBindingStore;
 import com.balugaq.netex.utils.InventoryUtil;
 import com.balugaq.netex.utils.Lang;
 import com.jeff_media.morepersistentdatatypes.DataType;
@@ -43,7 +45,7 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import net.guizhanss.guizhanlib.minecraft.helper.inventory.ItemStackHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.inventory.ItemStackHelper;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -120,6 +122,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
             public void newInstance(@NotNull BlockMenu menu, @NotNull Block b) {
                 Location l = b.getLocation();
                 requestData(l, getContainerId(l));
+                LinkBindingStore.replayDrawer(l);
                 // Restore mode
                 SlimefunBlockData blockData = StorageCacheUtils.getBlock(l);
                 String lock = null;
@@ -444,18 +447,18 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                             itemRequest.setAmount(take.getMaxStackSize() * 36);
                         }
 
-                        final ItemStack requestedItemStack = data.requestItem0(l, itemRequest, false);
-                        if (requestedItemStack != null) {
+                        final ItemStack requested = data.requestItem0(l, itemRequest, false);
+                        if (requested != null) {
                             do {
                                 int max =
-                                    Math.min(requestedItemStack.getAmount(), requestedItemStack.getMaxStackSize());
-                                final ItemStack clone = StackUtils.getAsQuantity(requestedItemStack, max);
-                                requestedItemStack.setAmount(requestedItemStack.getAmount() - max);
+                                    Math.min(requested.getAmount(), requested.getMaxStackSize());
+                                final ItemStack clone = StackUtils.getAsQuantity(requested, max);
+                                requested.setAmount(requested.getAmount() - max);
                                 InventoryUtil.addItem(player, clone);
                                 if (clone.getAmount() > 0) {
                                     data.depositItemStack0(l, clone, false);
                                 }
-                            } while (requestedItemStack.getAmount() > 0);
+                            } while (requested.getAmount() > 0);
                         }
                     } else {
                         for (ItemStack each : player.getInventory().getStorageContents()) {
@@ -578,7 +581,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
                                 return;
                             }
 
-                            final int left = (int) quantumAmount - canAdd;
+                            final long left = quantumAmount - canAdd;
                             if (left > 0) {
                                 quantumCache.setAmount(left);
                                 DataTypeMethods.setCustom(
@@ -904,6 +907,7 @@ public class NetworksDrawer extends SpecialSlimefunItem implements DistinctiveIt
 
         // Remove data cache
         StorageUnitData data = storages.remove(l);
+        DrawerVirtualCache.removeDrawer(l);
         b.setType(Material.AIR);
         // Drop custom item if data exists
         if (data != null) {

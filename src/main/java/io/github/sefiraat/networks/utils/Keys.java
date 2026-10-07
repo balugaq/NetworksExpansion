@@ -254,6 +254,29 @@ public class Keys {
 
     public static final NamespacedKey FACING_PRESET = newKey("facing_preset");
 
+    public static final NamespacedKey CELL_UUID = newKey("cell_uuid");
+    public static final NamespacedKey CELL_CAPACITY = newKey("cell_capacity");
+    public static final NamespacedKey CELL_CURRENT_CAPACITY = newKey("cell_current_capacity");
+    public static final NamespacedKey CELL_CUSTOM_NAME = newKey("cell_custom_name");
+    public static final NamespacedKey CELL_SERVER = newKey("cell_server");
+    public static final NamespacedKey CELL_CLEANER_MARKER = newKey("cell_cleaner_marker");
+    public static final NamespacedKey CELL_CONVERTER_MARKER = newKey("cell_converter_marker");
+    public static final NamespacedKey CRAFT_TARGET = newKey("craft_target");
+    public static final NamespacedKey CRAFT_GEAR = newKey("craft_gear");
+    public static final NamespacedKey CRAFT_MODE = newKey("craft_mode");
+    public static final NamespacedKey CRAFT_REMAINING = newKey("craft_remaining");
+    public static final NamespacedKey CRAFT_KEEP = newKey("craft_keep");
+    public static final NamespacedKey CRAFT_GEAR_BACKUP = newKey("craft_gear_backup");
+    public static final NamespacedKey SMART_CHANNEL = newKey("smart_channel");
+    public static final NamespacedKey ASSEMBLY_SLOT_MARKER = newKey("assembly_slot_marker");
+    public static final NamespacedKey ASSEMBLY_CARD_INGREDIENTS = newKey("card_ingredients");
+    public static final NamespacedKey ASSEMBLY_CARD_OUTPUT = newKey("card_output");
+    public static final NamespacedKey ASSEMBLY_CARD_HASH = newKey("card_hash");
+    public static final NamespacedKey VOID_FILTERS = newKey("void_filters");
+    public static final NamespacedKey CELL_RESERVED_ITEMS = newKey("cell_reserved_items");
+    public static final NamespacedKey CELL_VOID_EXCESS = newKey("cell_void_excess");
+    public static final NamespacedKey CELL_VOID_EXCESS_ITEMS = newKey("cell_void_excess_items");
+
     public static final NamespacedKey INFINITY_DISPLAY;
 
     static {
