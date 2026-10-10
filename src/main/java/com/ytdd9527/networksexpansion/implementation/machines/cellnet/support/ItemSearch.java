@@ -3,6 +3,7 @@ package com.ytdd9527.networksexpansion.implementation.machines.cellnet.support;
 import com.balugaq.netex.utils.Lang;
 import com.github.houbb.pinyin.constant.enums.PinyinStyleEnum;
 import com.github.houbb.pinyin.util.PinyinHelper;
+import io.github.sefiraat.networks.Networks;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.ui.Icons;
 import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ChatInput;
 import com.ytdd9527.networksexpansion.utils.TextUtil;
@@ -33,7 +34,7 @@ public final class ItemSearch {
             if (hay.contains(search)) {
                 return true;
             }
-            if (search.matches("^[a-zA-Z]+$")) {
+            if (search.matches("^[a-zA-Z]+$") && Networks.getConfigManager().isPinyinSearchEnabled()) {
                 if (PinyinHelper.toPinyin(hay, PinyinStyleEnum.INPUT, "").contains(search)) {
                     return true;
                 }

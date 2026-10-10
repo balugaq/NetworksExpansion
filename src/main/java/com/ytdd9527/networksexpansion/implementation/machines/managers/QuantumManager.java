@@ -7,6 +7,7 @@ import com.balugaq.netex.api.helpers.Icon;
 import com.balugaq.netex.utils.Lang;
 import com.github.houbb.pinyin.constant.enums.PinyinStyleEnum;
 import com.github.houbb.pinyin.util.PinyinHelper;
+import io.github.sefiraat.networks.Networks;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
@@ -243,8 +244,9 @@ public class QuantumManager extends NetworkObject {
                 String name = TextUtil.stripColor(
                     ItemStackHelper.getDisplayName(itemStack).toLowerCase(Locale.ROOT));
                 if (cache.getFilter().matches("^[a-zA-Z]+$")) {
-                    final String pinyinName = PinyinHelper.toPinyin(name, PinyinStyleEnum.INPUT, "");
-                    final String pinyinFirstLetter = PinyinHelper.toPinyin(name, PinyinStyleEnum.FIRST_LETTER, "");
+                    final boolean pinyinEnabled = Networks.getConfigManager().isPinyinSearchEnabled();
+                    final String pinyinName = pinyinEnabled ? PinyinHelper.toPinyin(name, PinyinStyleEnum.INPUT, "") : "";
+                    final String pinyinFirstLetter = pinyinEnabled ? PinyinHelper.toPinyin(name, PinyinStyleEnum.FIRST_LETTER, "") : "";
                     return name.contains(cache.getFilter())
                         || pinyinName.contains(cache.getFilter())
                         || pinyinFirstLetter.contains(cache.getFilter());

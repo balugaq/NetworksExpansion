@@ -22,6 +22,9 @@ disable-profile-check: false
 
 fast-interact-quantum: true
 
+# 拼音搜索开关：关闭后物品搜索仅匹配原文名，不再做拼音/拼音首字母匹配（省去 pinyin 库的运行时开销）。
+enable-pinyin-search: true
+
 # 元件网络设置
 cellnet:
   # 元件可升级到的物品种类上限。新元件初始1种,每个量子储存+1,直至此上限。
