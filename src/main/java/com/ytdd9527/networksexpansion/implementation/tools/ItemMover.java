@@ -13,6 +13,7 @@ import io.github.sefiraat.networks.managers.SupportedPluginManager;
 import io.github.sefiraat.networks.network.barrel.FluffyBarrel;
 import io.github.sefiraat.networks.network.barrel.InfinityBarrel;
 import io.github.sefiraat.networks.network.barrel.NetworkStorage;
+import io.github.sefiraat.networks.network.barrel.TsingshanBarrel;
 import io.github.sefiraat.networks.network.stackcaches.BarrelIdentity;
 import io.github.sefiraat.networks.network.stackcaches.ItemRequest;
 import io.github.sefiraat.networks.network.stackcaches.QuantumCache;
@@ -271,12 +272,16 @@ public class ItemMover extends SpecialSlimefunItem implements DistinctiveItem {
         }
 
         final boolean infinityEnabled = SupportedPluginManager.getInstance().isInfinityExpansion();
+        final boolean tsingshanEnabled = SupportedPluginManager.getInstance().isTsingshanTechnology();
         final boolean fluffyEnabled = SupportedPluginManager.getInstance().isFluffyMachines();
 
         /*if (infinityEnabled && sfitem instanceof StorageUnit unit) {
             return getInfinityBarrel(location, unit);
         } else */
-        if (fluffyEnabled && sfitem instanceof Barrel barrel) {
+        if (tsingshanEnabled
+            && sfitem instanceof io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit) {
+            return getTsingshanBarrel(location, unit);
+        } else if (fluffyEnabled && sfitem instanceof Barrel barrel) {
             return getFluffyBarrel(location, barrel);
         } else if (sfitem instanceof NetworkQuantumStorage) {
             return getNetworkStorage(location);
@@ -324,6 +329,45 @@ public class ItemMover extends SpecialSlimefunItem implements DistinctiveItem {
 
 
         return new InfinityBarrel(location, InfinityBarrel.getActualItemStack(blockMenu), stored, cache);
+    }
+
+    @Nullable
+    public static TsingshanBarrel getTsingshanBarrel(
+        @NotNull Location location,
+        @NotNull io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit) {
+        io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageCache cache = unit.getCache(location);
+        if (cache == null) {
+            return null;
+        }
+
+        BlockMenu blockMenu = StorageCacheUtils.getMenu(location);
+        if (blockMenu == null) {
+            return null;
+        }
+
+        final SlimefunBlockData data = StorageCacheUtils.getBlock(blockMenu.getLocation());
+        if (data == null) {
+            return null;
+        }
+
+        // TsingshanTechnology 的数量落盘键为 "sstored"（区别于无尽存储的 "stored"）
+        final String storedString = data.getData("sstored");
+        if (storedString == null || storedString.isEmpty()) {
+            return null;
+        }
+
+        final int stored;
+        try {
+            stored = Integer.parseInt(storedString);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        if (stored <= 0) {
+            return null;
+        }
+
+        return new TsingshanBarrel(location, TsingshanBarrel.getActualItemStack(blockMenu), stored, cache);
     }
 
     @Nullable

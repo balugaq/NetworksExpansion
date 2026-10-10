@@ -23,6 +23,7 @@ import io.github.mooy1.infinityexpansion.items.storage.StorageUnit;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.barrel.FluffyBarrel;
 import io.github.sefiraat.networks.network.barrel.InfinityBarrel;
+import io.github.sefiraat.networks.network.barrel.TsingshanBarrel;
 import io.github.sefiraat.networks.network.barrel.NetworkStorage;
 import io.github.sefiraat.networks.network.stackcaches.BarrelIdentity;
 import io.github.sefiraat.networks.network.stackcaches.ItemRequest;
@@ -342,6 +343,46 @@ public class NetworkRoot extends NetworkNode {
     }
 
     @Nullable
+    public static TsingshanBarrel getTsingshanBarrel(
+        BlockMenu blockMenu, io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit storageUnit) {
+        return getTsingshanBarrel(blockMenu, storageUnit, false);
+    }
+
+    @Nullable
+    public static TsingshanBarrel getTsingshanBarrel(
+        BlockMenu blockMenu, io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit storageUnit,
+        boolean includeEmpty) {
+        final ItemStack itemStack = blockMenu.getItemInSlot(16);
+        // TsingshanTechnology 的数量落盘键为 "sstored"（区别于无尽存储的 "stored"）
+        final String storedString = StorageCacheUtils.getData(blockMenu.getLocation(), "sstored");
+        if (storedString == null) return null;
+
+        final int storedInt;
+        try {
+            storedInt = Integer.parseInt(storedString);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        if (!includeEmpty && (itemStack == null || itemStack.getType() == Material.AIR)) {
+            return null;
+        }
+
+        final io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageCache cache =
+            storageUnit.getCache(blockMenu.getLocation());
+        if (cache == null) return null;
+
+        ItemStack clone = null;
+        if (itemStack != null) {
+            clone = itemStack.clone();
+            clone.setAmount(1);
+        }
+
+        return new TsingshanBarrel(
+            blockMenu.getLocation(), clone, storedInt + (itemStack == null ? 0 : itemStack.getAmount()), cache);
+    }
+
+    @Nullable
     public static FluffyBarrel getFluffyBarrel(BlockMenu blockMenu, Barrel barrel) {
         return getFluffyBarrel(blockMenu, barrel, false);
     }
@@ -426,6 +467,9 @@ public class NetworkRoot extends NetworkNode {
                 getFluffyBarrel(menu, barrel, includeEmpty);
             case StorageUnit storageUnit when Networks.getSupportedPluginManager().isInfinityExpansion() ->
                 getInfinityBarrel(menu, storageUnit, includeEmpty);
+            case io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit
+                when Networks.getSupportedPluginManager().isTsingshanTechnology() ->
+                getTsingshanBarrel(menu, unit, includeEmpty);
             case null, default -> null;
         };
     }
@@ -1092,6 +1136,15 @@ public class NetworkRoot extends NetworkNode {
                 if (infinityBarrel != null && filter.test(infinityBarrel)) barrelSet.add(infinityBarrel);
                 continue;
             }
+            else if (Networks.getSupportedPluginManager().isTsingshanTechnology()
+                && slimefunItem instanceof io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit) {
+                final BlockMenu menu = StorageCacheUtils.getMenu(testLocation);
+                if (menu == null) continue;
+
+                final TsingshanBarrel tsingshanBarrel = getTsingshanBarrel(menu, unit, includeEmpty);
+                if (tsingshanBarrel != null && filter.test(tsingshanBarrel)) barrelSet.add(tsingshanBarrel);
+                continue;
+            }
             else if (Networks.getSupportedPluginManager().isFluffyMachines() && slimefunItem instanceof Barrel barrel) {
                 final BlockMenu menu = StorageCacheUtils.getMenu(testLocation);
                 if (menu == null) continue;
@@ -1168,6 +1221,11 @@ public class NetworkRoot extends NetworkNode {
             if (Networks.getSupportedPluginManager().isInfinityExpansion() && slimefunItem instanceof StorageUnit unit) {
                 final InfinityBarrel infinityBarrel = getInfinityBarrel(menu, unit);
                 if (infinityBarrel != null) barrelSet.add(infinityBarrel);
+            }
+            else if (Networks.getSupportedPluginManager().isTsingshanTechnology()
+                && slimefunItem instanceof io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit) {
+                final TsingshanBarrel tsingshanBarrel = getTsingshanBarrel(menu, unit);
+                if (tsingshanBarrel != null) barrelSet.add(tsingshanBarrel);
             }
             else if (Networks.getSupportedPluginManager().isFluffyMachines() && slimefunItem instanceof Barrel barrel) {
                 final FluffyBarrel fluffyBarrel = getFluffyBarrel(menu, barrel);
