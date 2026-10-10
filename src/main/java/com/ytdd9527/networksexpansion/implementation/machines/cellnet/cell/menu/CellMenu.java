@@ -53,7 +53,7 @@ public final class CellMenu {
     public static final int SEARCH_SLOT = 51;
     public static final int WHITELIST_TOGGLE = 4;
     public static final int WHITELIST_BACK = 49;
-    public static final int[] WHITELIST_BACKGROUND = new int[]{1, 2, 3, 5, 6, 7, 45, 46, 47, 48, 50, 51, 52, 53};
+    public static final int[] WHITELIST_BACKGROUND = new int[]{0, 1, 2, 3, 5, 6, 7, 8, 45, 46, 47, 48, 50, 51, 52, 53};
 
     private static final Map<UUID, Integer> ITEM_PAGE = new HashMap<>();
     private static final Map<UUID, String> SEARCH_TERMS = new HashMap<>();
