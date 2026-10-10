@@ -461,17 +461,19 @@ public class NetworkRoot extends NetworkNode {
         BlockMenu menu = StorageCacheUtils.getMenu(barrelLocation);
         if (menu == null) return null;
 
-        return switch (item) {
-            case NetworkQuantumStorage ignored -> getNetworkStorage(menu, includeEmpty);
-            case Barrel barrel when Networks.getSupportedPluginManager().isFluffyMachines() ->
-                getFluffyBarrel(menu, barrel, includeEmpty);
-            case StorageUnit storageUnit when Networks.getSupportedPluginManager().isInfinityExpansion() ->
-                getInfinityBarrel(menu, storageUnit, includeEmpty);
-            case io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit
-                when Networks.getSupportedPluginManager().isTsingshanTechnology() ->
-                getTsingshanBarrel(menu, unit, includeEmpty);
-            case null, default -> null;
-        };
+        // Class loading of Barrel/StorageUnit happens during pattern testing, before the when guard
+        // is evaluated, causing NoClassDefFoundError when FluffyMachines/InfinityExpansion is absent.
+        // Use short-circuit conditions so instanceof is never reached when the plugin is missing.
+        if (item instanceof NetworkQuantumStorage) {
+            return getNetworkStorage(menu, includeEmpty);
+        } else if (Networks.getSupportedPluginManager().isFluffyMachines() && item instanceof Barrel barrel) {
+            return getFluffyBarrel(menu, barrel, includeEmpty);
+        } else if (Networks.getSupportedPluginManager().isInfinityExpansion() && item instanceof StorageUnit storageUnit) {
+            return getInfinityBarrel(menu, storageUnit, includeEmpty);
+        } else if (Networks.getSupportedPluginManager().isTsingshanTechnology() && item instanceof io.gitee.crankygoudan.tsingshantechnology.items.chucun.StorageUnit unit) {
+            return getTsingshanBarrel(menu, unit, includeEmpty);
+        }
+        return null;
     }
 
     @Nullable
