@@ -1371,6 +1371,13 @@ public class NetworkRoot extends NetworkNode {
                             continue;
                         }
 
+                        // 复验实际取到的物品：匹配用的是扫描快照，requestItem 读的是活状态，
+                        // 两者之间存储内容可能已被更换（如清空后改存其他物品）。
+                        // 只读型桶（Infinity/Tsingshan）尚未扣量，跳过即无损。
+                        if (!StackUtils.itemsMatch(request, fetched, option)) {
+                            continue;
+                        }
+
                         // Stack is null, so we can fill it here
                         if (stackToReturn == null) {
                             stackToReturn = fetched.clone();
@@ -1461,6 +1468,13 @@ public class NetworkRoot extends NetworkNode {
                 boolean infinity = barrelIdentity instanceof InfinityBarrel;
                 final ItemStack fetched = barrelIdentity.requestItem(request);
                 if (fetched == null || fetched.getType() == Material.AIR || (infinity && fetched.getAmount() == 1)) {
+                    continue;
+                }
+
+                // 复验实际取到的物品：匹配用的是扫描快照，requestItem 读的是活状态，
+                // 两者之间存储内容可能已被更换（如清空后改存其他物品）。
+                // 只读型桶（Infinity/Tsingshan）尚未扣量，跳过即无损。
+                if (!StackUtils.itemsMatch(request, fetched, option)) {
                     continue;
                 }
 
@@ -1763,6 +1777,12 @@ public class NetworkRoot extends NetworkNode {
                                 continue;
                             }
 
+                            // 复验实际取到的物品：匹配用扫描快照，requestItem 读活状态，
+                            // 两者之间存储内容可能已被更换；只读型桶尚未扣量，跳过即无损。
+                            if (!StackUtils.itemsMatch(request, fetched)) {
+                                continue;
+                            }
+
                             if (take.collected == null) {
                                 take.collected = fetched.clone();
                                 take.collected.setAmount(0);
@@ -1866,6 +1886,12 @@ public class NetworkRoot extends NetworkNode {
 
                     final ItemStack fetched = barrelIdentity.requestItem(request);
                     if (fetched == null || fetched.getType() == Material.AIR || (infinity && fetched.getAmount() == 1)) {
+                        continue;
+                    }
+
+                    // 复验实际取到的物品：匹配用扫描快照，requestItem 读活状态，
+                    // 两者之间存储内容可能已被更换；只读型桶尚未扣量，跳过即无损。
+                    if (!StackUtils.itemsMatch(request, fetched)) {
                         continue;
                     }
 
