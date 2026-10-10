@@ -305,8 +305,9 @@ public abstract class AbstractGrid extends NetworkObject {
                 String name = TextUtil.stripColor(
                     ItemStackHelper.getDisplayName(itemStack).toLowerCase(Locale.ROOT));
                 if (filter.matches("^[a-zA-Z]+$")) {
-                    final String pinyinName = PinyinHelper.toPinyin(name, PinyinStyleEnum.INPUT, "");
-                    final String pinyinFirstLetter = PinyinHelper.toPinyin(name, PinyinStyleEnum.FIRST_LETTER, "");
+                    final boolean pinyinEnabled = Networks.getConfigManager().isPinyinSearchEnabled();
+                    final String pinyinName = pinyinEnabled ? PinyinHelper.toPinyin(name, PinyinStyleEnum.INPUT, "") : "";
+                    final String pinyinFirstLetter = pinyinEnabled ? PinyinHelper.toPinyin(name, PinyinStyleEnum.FIRST_LETTER, "") : "";
                     return name.contains(filter)
                         || pinyinName.contains(filter)
                         || pinyinFirstLetter.contains(filter);

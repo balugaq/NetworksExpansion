@@ -1,11 +1,11 @@
 plugins {
     java
-    id("com.gradleup.shadow") version "9.6.1"
-    id("xyz.jpenilla.run-paper") version "3.1.0"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.run.paper)
 }
 
 group = "com.ytdd9527.networksexpansion"
-version = "2.1.124"
+version = "2.1.125"
 
 java {
     toolchain {
@@ -32,41 +32,41 @@ repositories {
 
 dependencies {
     // Core
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    compileOnly("com.github.SlimefunGuguProject:Slimefun4:2025.1")
+    compileOnly(libs.paper.api)
+    compileOnly(libs.slimefun4)
 
     // Tools etc.
-    implementation("org.bstats:bstats-bukkit:3.2.1")
-    implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
-    implementation("dev.sefiraat:SefiLib:0.3.0")
-    implementation("net.byteflux:libby-bukkit:1.3.2")
-    implementation("com.github.balugaq:BigInteractionMenu:8991544824")
+    implementation(libs.bstats)
+    implementation(libs.more.persistent.data.types)
+    implementation(libs.sefilib)
+    implementation(libs.libby.bukkit)
+    implementation(libs.big.interaction.menu)
 
-    compileOnly("com.google.code.findbugs:annotations:3.0.1u2") {
+    compileOnly(libs.findbugs.annotations) {
         exclude("net.jcip", "jcip-annotations")
         exclude("com.google.code.findbugs", "jsr305")
     }
-    compileOnly("org.projectlombok:lombok:1.18.48")
-    annotationProcessor("org.projectlombok:lombok:1.18.48")
-    compileOnly("com.github.houbb:pinyin:0.4.0")
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+    compileOnly(libs.pinyin)
 
     // Supported Plugins
-    compileOnly("com.github.SlimefunGuguProject:InfinityExpansion:3c5db3650a")
-    compileOnly("com.github.Sefiraat:Netheopoiesis:8d1af6c570")
-    compileOnly("com.github.schntgaispock:SlimeHUD:1.2.7")
-    compileOnly("com.bgsoftware:WildChestsAPI:2026.2")
-    compileOnly("com.bgsoftware:WildStackerAPI:2026.2")
-    compileOnly("dev.rosewood:rosestacker:1.5.23")
-    compileOnly("com.gmail.nossr50.mcMMO:mcMMO:2.3.000") {
+    compileOnly(libs.infinity.expansion)
+    compileOnly(libs.netheopoiesis)
+    compileOnly(libs.slimehud)
+    compileOnly(libs.wild.chests.api)
+    compileOnly(libs.wild.stacker.api)
+    compileOnly(libs.rosestacker)
+    compileOnly(libs.mcmmo) {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldguard", "worldguard-legacy")
         exclude("com.comphenix.protocol", "ProtocolLib")
     }
-    compileOnly("net.guizhanss:GuizhanLibPlugin:2.5.0")
-    compileOnly("com.github.balugaq:FluffyMachines:43d7444e4c")
-    compileOnly("com.github.TimetownDev:GuguSlimefunLib:45627c6f8e")
-    compileOnly("com.github.balugaq:JustEnoughGuide:09e106914d")
+    compileOnly(libs.guizhan.lib.plugin)
+    compileOnly(libs.fluffy.machines)
+    compileOnly(libs.gugu.slimefun.lib)
+    compileOnly(libs.just.enough.guide)
     // System-scoped local JARs
     compileOnly(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
 }

@@ -1,0 +1,67 @@
+# Gradle Version Catalog
+# 依赖集中管理：build.gradle.kts 里用 `libs.xxx` 引用。
+# alias 一律 kebab-case，Kotlin DSL 访问时自动转驼峰（如 `paper-api` → `libs.paper.api`）。
+
+[versions]
+# Core
+paper-api = "1.21.11-R0.1-SNAPSHOT"
+slimefun4 = "2025.1"
+
+# Tools etc.
+bstats = "3.2.1"
+more-persistent-data-types = "2.4.0"
+sefilib = "0.3.0"
+libby = "1.3.2"
+big-interaction-menu = "8991544824"
+findbugs-annotations = "3.0.1u2"
+lombok = "1.18.48"
+pinyin = "0.4.0"
+
+# Supported Plugins
+infinity-expansion = "3c5db3650a"
+netheopoiesis = "8d1af6c570"
+slimehud = "1.2.7"
+wild-chests-api = "2026.2"
+wild-stacker-api = "2026.2"
+rosestacker = "1.5.23"
+mcmmo = "2.3.000"
+guizhan-lib-plugin = "2.5.0"
+fluffy-machines = "43d7444e4c"
+gugu-slimefun-lib = "45627c6f8e"
+just-enough-guide = "09e106914d"
+
+# Plugins
+shadow = "9.6.1"
+run-paper = "3.1.0"
+
+[libraries]
+# Core
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+slimefun4 = { module = "com.github.SlimefunGuguProject:Slimefun4", version.ref = "slimefun4" }
+
+# Tools etc.
+bstats = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+more-persistent-data-types = { module = "com.jeff-media:MorePersistentDataTypes", version.ref = "more-persistent-data-types" }
+sefilib = { module = "dev.sefiraat:SefiLib", version.ref = "sefilib" }
+libby-bukkit = { module = "net.byteflux:libby-bukkit", version.ref = "libby" }
+big-interaction-menu = { module = "com.github.balugaq:BigInteractionMenu", version.ref = "big-interaction-menu" }
+findbugs-annotations = { module = "com.google.code.findbugs:annotations", version.ref = "findbugs-annotations" }
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+pinyin = { module = "com.github.houbb:pinyin", version.ref = "pinyin" }
+
+# Supported Plugins
+infinity-expansion = { module = "com.github.SlimefunGuguProject:InfinityExpansion", version.ref = "infinity-expansion" }
+netheopoiesis = { module = "com.github.Sefiraat:Netheopoiesis", version.ref = "netheopoiesis" }
+slimehud = { module = "com.github.schntgaispock:SlimeHUD", version.ref = "slimehud" }
+wild-chests-api = { module = "com.bgsoftware:WildChestsAPI", version.ref = "wild-chests-api" }
+wild-stacker-api = { module = "com.bgsoftware:WildStackerAPI", version.ref = "wild-stacker-api" }
+rosestacker = { module = "dev.rosewood:rosestacker", version.ref = "rosestacker" }
+mcmmo = { module = "com.gmail.nossr50.mcMMO:mcMMO", version.ref = "mcmmo" }
+guizhan-lib-plugin = { module = "net.guizhanss:GuizhanLibPlugin", version.ref = "guizhan-lib-plugin" }
+fluffy-machines = { module = "com.github.balugaq:FluffyMachines", version.ref = "fluffy-machines" }
+gugu-slimefun-lib = { module = "com.github.TimetownDev:GuguSlimefunLib", version.ref = "gugu-slimefun-lib" }
+just-enough-guide = { module = "com.github.balugaq:JustEnoughGuide", version.ref = "just-enough-guide" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }

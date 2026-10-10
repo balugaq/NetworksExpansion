@@ -175,6 +175,14 @@ public class ConfigManager {
         return Networks.getInstance().getConfig().getBoolean("fast-interact-quantum", false);
     }
 
+    /**
+     * 拼音搜索开关。关闭后物品搜索仅匹配原文名，跳过 pinyin 库的拼音/首字母转换。
+     * 所有 {@code PinyinHelper.toPinyin} 调用点都必须先经此检测。
+     */
+    public boolean isPinyinSearchEnabled() {
+        return getBoolean("enable-pinyin-search", true);
+    }
+
     public int getCellnetMaxItemTypes() {
         return getInt("cellnet.max-item-types", 64);
     }
