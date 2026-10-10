@@ -29,6 +29,7 @@ guizhan-lib-plugin = "2.5.0"
 fluffy-machines = "43d7444e4c"
 gugu-slimefun-lib = "45627c6f8e"
 just-enough-guide = "09e106914d"
+tsingshan-technology = "8846e149c1"
 
 # Plugins
 shadow = "9.6.1"
@@ -61,6 +62,7 @@ guizhan-lib-plugin = { module = "net.guizhanss:GuizhanLibPlugin", version.ref = 
 fluffy-machines = { module = "com.github.balugaq:FluffyMachines", version.ref = "fluffy-machines" }
 gugu-slimefun-lib = { module = "com.github.TimetownDev:GuguSlimefunLib", version.ref = "gugu-slimefun-lib" }
 just-enough-guide = { module = "com.github.balugaq:JustEnoughGuide", version.ref = "just-enough-guide" }
+tsingshan-technology = { module = "com.github.balugaq:TsingshanTechnology", version.ref = "tsingshan-technology" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
