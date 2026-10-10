@@ -19,6 +19,7 @@ public class SupportedPluginManager {
     private @Nullable @Getter LogitechIntegration logitechIntegration = null;
 
     private final @Getter boolean infinityExpansion;
+    private final @Getter boolean tsingshanTechnology;
     private final @Getter boolean fluffyMachines;
     private final @Getter boolean netheopoiesis;
     private final @Getter boolean slimeHud;
@@ -41,6 +42,9 @@ public class SupportedPluginManager {
         Preconditions.checkArgument(instance == null, "Cannot instantiate class");
         instance = this;
         this.infinityExpansion = Bukkit.getPluginManager().isPluginEnabled("InfinityExpansion");
+        this.tsingshanTechnology =
+            Bukkit.getPluginManager().isPluginEnabled("TsingshanTechnology-Fixed")
+                || Bukkit.getPluginManager().isPluginEnabled("TsingshanTechnology");
         this.fluffyMachines = Bukkit.getPluginManager().isPluginEnabled("FluffyMachines");
         this.netheopoiesis = Bukkit.getPluginManager().isPluginEnabled("Netheopoiesis");
         this.slimeHud = Bukkit.getPluginManager().isPluginEnabled("SlimeHUD") || Bukkit.getPluginManager().isPluginEnabled("SlimeHUDPlus");

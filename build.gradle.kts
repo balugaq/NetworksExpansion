@@ -67,6 +67,7 @@ dependencies {
     compileOnly(libs.fluffy.machines)
     compileOnly(libs.gugu.slimefun.lib)
     compileOnly(libs.just.enough.guide)
+    compileOnly(libs.tsingshan.technology)
     // System-scoped local JARs
     compileOnly(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
 }
