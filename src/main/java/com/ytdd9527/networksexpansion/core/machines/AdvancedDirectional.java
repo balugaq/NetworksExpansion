@@ -28,7 +28,7 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
-import net.guizhanss.guizhanlib.minecraft.helper.MaterialHelper;
+import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.MaterialHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -370,20 +370,22 @@ public abstract class AdvancedDirectional extends NetworkDirectional {
                     blockMenu.addMenuClickHandler(getCargoNumberSlot(), (player, i, itemStack, clickAction) -> {
                         player.sendMessage(Lang.getString("messages.guide.quantity-input-prompt"));
                         ChatUtils.awaitInput(player, input -> {
+                            BlockMenu menu = StorageCacheUtils.getMenu(location);
+                            if (menu == null || !menu.getPreset().getID().equals(getId())) {
+                                return;
+                            }
                             try {
                                 int value = Calculator.calculate(input).intValue();
                                 if (value <= 0 || value > getMaxLimit()) {
                                     player.sendMessage(String.format(
                                         Lang.getString("messages.guide.invalid-amount-input"), getMaxLimit()));
-                                    BlockMenu menu = StorageCacheUtils.getMenu(location);
-                                    if (menu != null) menu.open(player);
+                                    menu.open(player);
                                     return;
                                 }
 
                                 setLimitQuantity(location, value);
                                 updateShowIcon(location);
-                                BlockMenu menu = StorageCacheUtils.getMenu(location);
-                                if (menu != null) menu.open(player);
+                                menu.open(player);
                             } catch (NumberFormatException e) {
                                 player.sendMessage(e.getMessage());
                             }
