@@ -3,7 +3,7 @@ package com.ytdd9527.networksexpansion.implementation.machines.manual;
 import com.balugaq.netex.api.data.SuperRecipe;
 import com.balugaq.netex.api.helpers.Icon;
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import com.ytdd9527.networksexpansion.core.items.machines.AbstractManualCrafter;
+import com.ytdd9527.networksexpansion.core.machines.AbstractManualCrafter;
 import com.ytdd9527.networksexpansion.implementation.ExpansionRecipes;
 import io.github.sefiraat.networks.utils.Keys;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;

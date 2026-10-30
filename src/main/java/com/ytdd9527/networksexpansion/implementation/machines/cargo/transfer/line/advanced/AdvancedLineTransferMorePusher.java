@@ -3,7 +3,7 @@ package com.ytdd9527.networksexpansion.implementation.machines.cargo.transfer.li
 import com.balugaq.netex.api.enums.TransferType;
 import com.balugaq.netex.api.interfaces.PushTickOnly;
 import com.balugaq.netex.api.interfaces.SoftCellBannable;
-import com.ytdd9527.networksexpansion.core.items.machines.AbstractTransfer;
+import com.ytdd9527.networksexpansion.core.machines.AbstractTransfer;
 import io.github.sefiraat.networks.network.NodeType;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;

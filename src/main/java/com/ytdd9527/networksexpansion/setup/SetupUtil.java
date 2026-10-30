@@ -3,7 +3,7 @@ package com.ytdd9527.networksexpansion.setup;
 import com.balugaq.netex.integrations.logitech.LinkBindingStore;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItems;
 import com.ytdd9527.networksexpansion.implementation.ExpansionItemsMenus;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
+import com.ytdd9527.networksexpansion.api.cell.CellTier;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.slimefun.NetworkSlimefunItems;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;

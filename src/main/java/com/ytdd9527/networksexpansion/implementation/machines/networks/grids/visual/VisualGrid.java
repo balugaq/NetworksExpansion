@@ -6,7 +6,7 @@ import com.balugaq.bim.grid.GridOrientation;
 import com.balugaq.netex.api.keybind.Keybindable;
 import com.balugaq.netex.api.keybind.Keybinds;
 import com.xzavier0722.mc.plugin.slimefun4.storage.controller.SlimefunBlockData;
-import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
+import com.ytdd9527.networksexpansion.core.machines.AbstractGridNewStyle;
 import io.github.sefiraat.networks.NetworkStorage;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.network.NodeType;

@@ -1,6 +1,6 @@
 package com.ytdd9527.networksexpansion.implementation;
 
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellTier;
+import com.ytdd9527.networksexpansion.api.cell.CellTier;
 import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

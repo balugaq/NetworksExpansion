@@ -1,7 +1,7 @@
 package io.github.sefiraat.networks.listeners;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
+import com.ytdd9527.networksexpansion.core.machines.AbstractGridNewStyle;
 import com.ytdd9527.networksexpansion.implementation.machines.unit.NetworksDrawer;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.commands.NetworksMain;

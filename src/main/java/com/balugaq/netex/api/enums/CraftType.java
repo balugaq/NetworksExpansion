@@ -13,7 +13,7 @@ import com.balugaq.netex.api.helpers.SupportedPressureChamberRecipes;
 import com.balugaq.netex.api.helpers.SupportedQuantumWorkbenchRecipes;
 import com.balugaq.netex.api.helpers.SupportedSmelteryRecipes;
 import com.balugaq.netex.utils.Lang;
-import com.ytdd9527.networksexpansion.core.items.unusable.Blueprint;
+import com.ytdd9527.networksexpansion.core.items.Blueprint;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
