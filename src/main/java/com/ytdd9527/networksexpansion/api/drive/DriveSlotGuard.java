@@ -8,12 +8,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-final class DriveSlotGuard {
+public final class DriveSlotGuard {
 
     private DriveSlotGuard() {
     }
 
-    static boolean isCellSlot(int rawSlot) {
+    public static boolean isCellSlot(int rawSlot) {
         for (int slot : CellDrive.CELL_SLOTS) {
             if (slot == rawSlot) {
                 return true;
@@ -23,12 +23,12 @@ final class DriveSlotGuard {
     }
 
     @Nullable
-    static Inventory topInventory(@NotNull InventoryEvent event) {
+    public static Inventory topInventory(@NotNull InventoryEvent event) {
         return event.getView().getTopInventory();
     }
 
     @Nullable
-    static ItemStack resolvePlacedItem(@NotNull InventoryClickEvent event) {
+    public static ItemStack resolvePlacedItem(@NotNull InventoryClickEvent event) {
         Inventory top = topInventory(event);
         if (top == null) {
             return null;

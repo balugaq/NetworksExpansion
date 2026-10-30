@@ -10,6 +10,7 @@ import com.ytdd9527.networksexpansion.api.cell.LineState;
 import com.ytdd9527.networksexpansion.utils.GhostItems;
 import com.ytdd9527.networksexpansion.api.filter.BrowseUI;
 import com.ytdd9527.networksexpansion.api.cell.CellnetText;
+import com.ytdd9527.networksexpansion.utils.TextUtil;
 import io.github.sefiraat.networks.slimefun.network.NetworkDirectional;
 import io.github.sefiraat.networks.utils.StackUtils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -19,7 +20,6 @@ import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -42,9 +42,9 @@ public final class ChainBindingMenu {
 
     private static final int INFO_SLOT = 4;
     private static final int BACK_SLOT = 45;
-    static final int[] DIRECTION_SLOTS = {10, 11, 12, 14, 15, 16};
+    public static final int[] DIRECTION_SLOTS = {10, 11, 12, 14, 15, 16};
     private static final int[] MODE_SLOTS = {19, 20, 21, 23, 24, 25};
-    static final BlockFace[] SLOT_FACES = {
+    public static final BlockFace[] SLOT_FACES = {
         BlockFace.WEST, BlockFace.NORTH, BlockFace.UP, BlockFace.DOWN, BlockFace.SOUTH, BlockFace.EAST
     };
     private static final int[] EDIT_SLOTS = {9, 10, 11, 12, 13, 14, 15, 16, 17};
@@ -352,9 +352,9 @@ public final class ChainBindingMenu {
             }
             meta.displayName(machineName);
             List<Component> lore = new ArrayList<>();
-            lore.add(legacy(Lang.getString(
+            lore.add(TextUtil.legacy(Lang.getString(
                 CellnetText.BINDING_TARGET_POSITION, distance, directionName(session.face))));
-            lore.add(legacy(statusLine(session, distance, targets.size(), effDistance, bound)));
+            lore.add(TextUtil.legacy(statusLine(session, distance, targets.size(), effDistance, bound)));
             LineState state = AbstractChainMachine.state(session.machine);
             TransportMode override = state.modeModule
                 ? ChainBindingStore.loadDirMode(session.machine, session.face)
@@ -362,23 +362,23 @@ public final class ChainBindingMenu {
             String modeName = override == null
                 ? Lang.getString(CellnetText.BINDING_MODE_FOLLOW)
                 : Lang.getString(CellnetText.LINE_MODES_PREFIX + override.name());
-            lore.add(legacy(Lang.getString(CellnetText.BINDING_MODE_LINE, modeName)));
+            lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_MODE_LINE, modeName)));
             if (bound != null) {
                 int shown = Math.min(LIST_PREVIEW_LIMIT, bound.size());
                 for (int i = 0; i < shown; i++) {
-                    lore.add(legacy(Lang.getString(CellnetText.BINDING_LIST_ITEM))
+                    lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_LIST_ITEM))
                         .append(displayComponent(bound.get(i))));
                 }
                 if (bound.size() > shown) {
-                    lore.add(legacy(Lang.getString(CellnetText.BINDING_AND_MORE, bound.size() - shown)));
+                    lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_AND_MORE, bound.size() - shown)));
                 }
             }
             lore.add(Component.empty());
-            lore.add(legacy(Lang.getString(CellnetText.BINDING_HINT_EDIT)));
-            lore.add(legacy(Lang.getString(CellnetText.BINDING_HINT_OPEN)));
-            lore.add(legacy(Lang.getString(CellnetText.BINDING_HINT_UNBIND)));
+            lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_HINT_EDIT)));
+            lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_HINT_OPEN)));
+            lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_HINT_UNBIND)));
             if (state.modeModule) {
-                lore.add(legacy(Lang.getString(CellnetText.BINDING_HINT_CYCLE_MODE)));
+                lore.add(TextUtil.legacy(Lang.getString(CellnetText.BINDING_HINT_CYCLE_MODE)));
             }
             meta.lore(lore);
         });
@@ -387,23 +387,13 @@ public final class ChainBindingMenu {
     }
 
     @NotNull
-    static Component displayComponent(@NotNull ItemStack item) {
+    public static Component displayComponent(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null && meta.hasDisplayName()) {
-            return LEGACY_HEX.deserialize(meta.getDisplayName());
+            return TextUtil.LEGACY_HEX.deserialize(meta.getDisplayName());
         }
         return Component.translatable(item.getType().translationKey());
     }
-
-    @NotNull
-    static Component legacy(@Nullable String text) {
-        return LEGACY_HEX.deserialize(text == null ? "" : text);
-    }
-
-    private static final LegacyComponentSerializer LEGACY_HEX = LegacyComponentSerializer.builder()
-        .hexColors()
-        .useUnusualXRepeatedCharacterHexFormat()
-        .build();
 
     @NotNull
     private static String statusLine(
@@ -560,7 +550,7 @@ public final class ChainBindingMenu {
         return true;
     }
 
-    static boolean clearBinding(
+    public static boolean clearBinding(
         @NotNull Player player, @NotNull Location machine, @NotNull BlockFace face, int distance) {
         AbstractChainMachine m = AbstractChainMachine.machineAt(machine);
         if (m == null) {
@@ -786,7 +776,7 @@ public final class ChainBindingMenu {
     }
 
     @NotNull
-    static ItemStack directionIcon(@NotNull Location machine, @NotNull BlockFace face, boolean enabled) {
+    public static ItemStack directionIcon(@NotNull Location machine, @NotNull BlockFace face, boolean enabled) {
         return enabled ? directionPane(machine, face, true) : Icon.LINE_DIRECTION_OFF.clone();
     }
 
@@ -835,7 +825,7 @@ public final class ChainBindingMenu {
     }
 
     @NotNull
-    static String directionName(@NotNull BlockFace face) {
+    public static String directionName(@NotNull BlockFace face) {
         return Lang.getString(CellnetText.LINE_DIRECTION_PREFIX + face.name().toLowerCase(Locale.ROOT));
     }
 }

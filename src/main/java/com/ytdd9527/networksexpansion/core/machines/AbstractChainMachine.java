@@ -183,7 +183,7 @@ public abstract class AbstractChainMachine extends NetworkObject {
         return Networks.getConfigManager().getChainDistancePerModule();
     }
 
-    protected int maxDistance() {
+    public int maxDistance() {
         return Networks.getConfigManager().getChainMaxDistance();
     }
 
@@ -730,7 +730,7 @@ public abstract class AbstractChainMachine extends NetworkObject {
         return Math.min(BASE_TEMPLATE_SLOTS + counted * TEMPLATE_SLOTS_PER_MODULE, TEMPLATE_SLOTS.length);
     }
 
-    protected static @NotNull LineState state(@NotNull Location location) {
+    public static @NotNull LineState state(@NotNull Location location) {
         return STATES.computeIfAbsent(location, k -> new LineState());
     }
 
@@ -747,7 +747,7 @@ public abstract class AbstractChainMachine extends NetworkObject {
         return item instanceof AbstractChainMachine machine ? machine : null;
     }
 
-    static boolean hasModule(@NotNull Location location, @NotNull ChainModule module) {
+    public static boolean hasModule(@NotNull Location location, @NotNull ChainModule module) {
         BlockMenu menu = StorageCacheUtils.getMenu(location);
         if (menu == null) {
             return false;

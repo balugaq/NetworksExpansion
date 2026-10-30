@@ -189,12 +189,12 @@ public class AssemblyDrive extends SpecialSlimefunItem {
             + (active ? AssemblyRound.MIN_INTERVAL_MS : AssemblyRound.BACKOFF_INTERVAL_MS);
     }
 
-    static boolean isEnabled(@NotNull Location location) {
+    public static boolean isEnabled(@NotNull Location location) {
         String raw = StorageCacheUtils.getData(location, ENABLED_KEY);
         return raw == null || raw.isEmpty() || Boolean.parseBoolean(raw);
     }
 
-    static void setEnabled(@NotNull Location location, boolean enabled) {
+    public static void setEnabled(@NotNull Location location, boolean enabled) {
         SlimefunBlockData blockData = StorageCacheUtils.getBlock(location);
         if (blockData != null) {
             blockData.setData(ENABLED_KEY, Boolean.toString(enabled));

@@ -1,10 +1,10 @@
 package com.ytdd9527.networksexpansion.core.listeners;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
+import com.ytdd9527.networksexpansion.api.drive.DriveSlotGuard;
 import com.ytdd9527.networksexpansion.api.drive.DriveType;
 import com.ytdd9527.networksexpansion.api.cell.StorageCell;
 import com.ytdd9527.networksexpansion.api.drive.CellUniqueness;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.menu.DriveSlotGuard;
 import io.github.sefiraat.networks.Networks;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;

@@ -8,6 +8,7 @@ import com.ytdd9527.networksexpansion.api.chain.ChainBindingMenu;
 import com.ytdd9527.networksexpansion.api.chain.ChainBindingStore;
 import com.ytdd9527.networksexpansion.api.chain.ChainModule;
 import com.ytdd9527.networksexpansion.api.cell.CellnetText;
+import com.ytdd9527.networksexpansion.utils.TextUtil;
 import io.github.sefiraat.networks.Networks;
 import io.github.sefiraat.networks.slimefun.network.NetworkDirectional;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
@@ -115,12 +116,12 @@ public class ChainBrush extends SpecialSlimefunItem {
 
     private static void showSummary(@NotNull Location target, @NotNull LineHit hit, @Nullable List<ItemStack> list) {
         Component text = Component.text()
-            .append(ChainBindingMenu.legacy(Lang.getString(
+            .append(TextUtil.legacy(Lang.getString(
                 CellnetText.BINDING_TARGET_POSITION, hit.distance(), ChainBindingMenu.directionName(hit.face()))))
             .append(Component.newline())
-            .append(ChainBindingMenu.legacy(Lang.getString(CellnetText.BRUSH_SUMMARY_LABEL)))
+            .append(TextUtil.legacy(Lang.getString(CellnetText.BRUSH_SUMMARY_LABEL)))
             .append(list == null || list.isEmpty()
-                ? Component.newline().append(ChainBindingMenu.legacy(Lang.getString(CellnetText.BRUSH_SUMMARY_EMPTY)))
+                ? Component.newline().append(TextUtil.legacy(Lang.getString(CellnetText.BRUSH_SUMMARY_EMPTY)))
                 : summaryItems(list))
             .build();
         TextDisplay display = target.getWorld().spawn(
@@ -142,7 +143,7 @@ public class ChainBrush extends SpecialSlimefunItem {
         Component result = Component.empty();
         for (ItemStack item : list) {
             result = result.append(Component.newline());
-            result = result.append(ChainBindingMenu.legacy(Lang.getString(CellnetText.BRUSH_SUMMARY_BULLET)));
+            result = result.append(TextUtil.legacy(Lang.getString(CellnetText.BRUSH_SUMMARY_BULLET)));
             result = result.append(ChainBindingMenu.displayComponent(item));
         }
         return result;

@@ -21,10 +21,10 @@ public final class AssemblyDisplay {
     private AssemblyDisplay() {
     }
 
-    static void refreshIdleStatusIcon(
-            @NotNull BlockMenu blockMenu,
-            @NotNull MachineState state,
-            @Nullable NetworkRoot root) {
+    public static void refreshIdleStatusIcon(
+        @NotNull BlockMenu blockMenu,
+        @NotNull MachineState state,
+        @Nullable NetworkRoot root) {
         boolean hasRoot = root != null;
         if (state.lastStatusEnabled != null && state.lastStatusHadRoot != null
             && state.lastStatusEnabled == state.enabled

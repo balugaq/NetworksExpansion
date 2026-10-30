@@ -33,7 +33,7 @@ public class AssemblyMenu {
     private AssemblyMenu() {
     }
 
-    static void createPreset(@NotNull AssemblyDrive drive) {
+    public static void createPreset(@NotNull AssemblyDrive drive) {
         new BlockMenuPreset(drive.getId(), drive.getItemName()) {
 
             @Override

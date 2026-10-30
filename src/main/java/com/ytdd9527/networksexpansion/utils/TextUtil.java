@@ -2,9 +2,12 @@ package com.ytdd9527.networksexpansion.utils;
 
 import io.github.sefiraat.networks.Networks;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +57,10 @@ public class TextUtil {
     public static final String MAGIC = OBFUSCATED;
 
     public static final Color WHITE_COLOR = Color.fromRGB(255, 255, 255);
+    public static final LegacyComponentSerializer LEGACY_HEX = LegacyComponentSerializer.builder()
+        .hexColors()
+        .useUnusualXRepeatedCharacterHexFormat()
+        .build();
 
     private static long COUNT = 0;
 
@@ -243,5 +250,10 @@ public class TextUtil {
 
     public static @NotNull String stripColor(String s) {
         return ChatColor.stripColor(s);
+    }
+
+    @NotNull
+    public static Component legacy(@Nullable String text) {
+        return LEGACY_HEX.deserialize(text == null ? "" : text);
     }
 }
