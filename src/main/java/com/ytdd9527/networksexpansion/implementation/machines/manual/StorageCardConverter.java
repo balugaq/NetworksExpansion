@@ -65,7 +65,7 @@ public class StorageCardConverter extends NetworkObject {
                 for (int slot : BACKGROUND_SLOTS) {
                     addItem(slot, Icon.GRAY_BACKGROUND, ChestMenuUtils.getEmptyClickHandler());
                 }
-                addItem(CONVERT_SLOT, Icon.STORAGE_CONVERT_BUTTON);
+                addItem(CONVERT_SLOT, Icon.STORAGE_CONVERT_BUTTON, ChestMenuUtils.getEmptyClickHandler());
             }
 
             @Override
