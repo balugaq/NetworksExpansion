@@ -1,9 +1,9 @@
 package com.balugaq.netex.integrations.logitech;
 
 import com.xzavier0722.mc.plugin.slimefun4.storage.util.StorageCacheUtils;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.cell.CellHandle;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.drive.CellDrive;
-import com.ytdd9527.networksexpansion.implementation.machines.cellnet.support.ItemKey;
+import com.ytdd9527.networksexpansion.api.cell.CellHandle;
+import com.ytdd9527.networksexpansion.implementation.machines.drive.CellDrive;
+import com.ytdd9527.networksexpansion.utils.ItemKey;
 import com.ytdd9527.networksexpansion.utils.ReflectionUtil;
 import io.github.sefiraat.networks.network.stackcaches.QuantumCache;
 import io.github.sefiraat.networks.slimefun.network.NetworkQuantumStorage;

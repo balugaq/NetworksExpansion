@@ -3,7 +3,7 @@ package com.ytdd9527.networksexpansion.implementation.machines.networks.grids;
 import com.balugaq.netex.api.keybind.Keybindable;
 import com.balugaq.netex.api.keybind.Keybinds;
 import com.balugaq.netex.api.visual.Screen;
-import com.ytdd9527.networksexpansion.core.items.machines.AbstractGridNewStyle;
+import com.ytdd9527.networksexpansion.core.machines.AbstractGridNewStyle;
 import io.github.sefiraat.networks.network.NodeType;
 import io.github.sefiraat.networks.slimefun.network.grid.GridCache;
 import io.github.sefiraat.networks.slimefun.network.grid.GridCache.DisplayMode;
