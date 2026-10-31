@@ -49,6 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,9 +75,11 @@ public class ItemFlowViewer extends NetworkObject {
     private static final int FILTER = 26;
     private static final int PAGE_PREVIOUS = 44;
     private static final int PAGE_NEXT = 53;
+    private static final int SORT_SLOT = 35;
     private static final String BS_SUB_MENU = "sub-menu";
     private static final String NAMESPACE_SF = "sf";
     private static final String NAMESPACE_MC = "mc";
+    private static final Map<Location, FlowSortMode> SORT_MODES = new HashMap<>();
     private final @NotNull IntRangeSetting tickRate;
 
     public ItemFlowViewer(
@@ -155,6 +158,23 @@ public class ItemFlowViewer extends NetworkObject {
         return null;
     }
 
+    public enum FlowSortMode {
+        INSERTION_ORDER,
+        NAME,
+        INCREASE_AMOUNT,
+        DECREASE_AMOUNT;
+
+        @NotNull
+        public FlowSortMode next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+
+        @NotNull
+        public String getTranslationName() {
+            return Lang.getString("messages.normal-operation.viewer.sort_modes." + name().toLowerCase(Locale.ROOT));
+        }
+    }
+
     @NotNull
     public static List<DisplayEntry> getRecords(@NotNull NetworkRoot root, @NotNull GridCache cache) {
         if (!root.isRecordFlow() || root.getItemFlowRecord() == null) {
@@ -220,6 +240,48 @@ public class ItemFlowViewer extends NetworkObject {
                 }
             })
             .toList();
+    }
+
+    public static long netChange(@NotNull DisplayEntry entry) {
+        return entry.actions().stream()
+            .mapToLong(ItemFlowRecord.TransportAction::amount)
+            .sum();
+    }
+
+    @NotNull
+    private static List<DisplayEntry> sortEntries(@NotNull List<DisplayEntry> entries, @NotNull FlowSortMode mode) {
+        return switch (mode) {
+            case INSERTION_ORDER -> entries;
+            case NAME -> entries.stream()
+                .sorted(Comparator.comparing(entry -> entry.itemStack() == null
+                    ? ""
+                    : TextUtil.stripColor(ItemStackHelper.getDisplayName(entry.itemStack()).toLowerCase(Locale.ROOT))))
+                .toList();
+            case INCREASE_AMOUNT -> entries.stream()
+                .sorted(Comparator.comparingLong(ItemFlowViewer::netChange).reversed())
+                .toList();
+            case DECREASE_AMOUNT -> entries.stream()
+                .sorted(Comparator.comparingLong(ItemFlowViewer::netChange))
+                .toList();
+        };
+    }
+
+    public @NotNull FlowSortMode getSortMode(@NotNull Location location) {
+        return SORT_MODES.getOrDefault(location, FlowSortMode.INSERTION_ORDER);
+    }
+
+    @SuppressWarnings("deprecation")
+    protected @NotNull ItemStack getSortStack(@NotNull FlowSortMode mode) {
+        ItemStack stack = Icon.ITEM_FLOW_VIEWER_SORT.clone();
+        final ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            List<String> lore = meta.getLore() == null ? new ArrayList<>() : new ArrayList<>(meta.getLore());
+            lore.add(TextUtil.GRAY + Lang.getString("messages.normal-operation.viewer.current-sort-mode")
+                + TextUtil.GREEN + mode.getTranslationName());
+            meta.setLore(lore);
+            stack.setItemMeta(meta);
+        }
+        return stack;
     }
 
     public static @NotNull List<String> getLoreAddition(@NotNull DisplayEntry entry) {
@@ -317,7 +379,7 @@ public class ItemFlowViewer extends NetworkObject {
         if (!blockMenu.hasViewer()) {
             ItemFlowRecord flow = root.getItemFlowRecord();
             if (flow != null) {
-                if (System.currentTimeMillis() - flow.getLastChangeTime() > ItemFlowRecord.DEADLINE) {
+                if (System.currentTimeMillis() - flow.getLastChangeTime() > Networks.getConfigManager().getRecordGCDeadline()) {
                     NetworkController.disableRecord(root.getController());
                     return;
                 }
@@ -409,7 +471,7 @@ public class ItemFlowViewer extends NetworkObject {
 
     @SuppressWarnings("deprecation")
     public void mainMenu(@NotNull NetworkRoot root, @NotNull BlockMenu blockMenu, @NotNull GridCache gridCache) {
-        List<DisplayEntry> entries = getRecords(root, gridCache);
+        List<DisplayEntry> entries = sortEntries(getRecords(root, gridCache), getSortMode(blockMenu.getLocation()));
 
         final int pages = (int) Math.ceil(entries.size() / (double) getDisplaySlots().length) - 1;
 
@@ -544,6 +606,19 @@ public class ItemFlowViewer extends NetworkObject {
                 menu.addMenuClickHandler(getFilterSlot(), (p, slot, item, action) -> {
                     GridCache gridCache = getCacheMap().get(menu.getLocation());
                     setFilter(p, menu, gridCache, action);
+                    return false;
+                });
+
+                menu.replaceExistingItem(SORT_SLOT, getSortStack(getSortMode(menu.getLocation())));
+                menu.addMenuClickHandler(SORT_SLOT, (p, slot, item, action) -> {
+                    final FlowSortMode mode = getSortMode(menu.getLocation()).next();
+                    SORT_MODES.put(menu.getLocation(), mode);
+                    menu.replaceExistingItem(SORT_SLOT, getSortStack(mode));
+                    final GridCache gridCache = getCacheMap().get(menu.getLocation());
+                    if (gridCache != null) {
+                        gridCache.setPage(0);
+                    }
+                    updateDisplay(menu);
                     return false;
                 });
 

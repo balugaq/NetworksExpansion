@@ -15,14 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 public class ItemFlowRecord {
-    public static final long THRESHOLD = Networks.getConfigManager().getRecordGCThreshold();
-    public static final long DEADLINE = Networks.getConfigManager().getRecordGCDeadline();
-    public final Map<ItemStack, List<TransportAction>> actions = new ConcurrentHashMap<>();
-    public long actionsCount = 0;
-    public long lastChangeTime = System.currentTimeMillis();
+    final Map<ItemStack, List<TransportAction>> actions = new ConcurrentHashMap<>();
+    long actionsCount = 0;
+    long lastChangeTime = System.currentTimeMillis();
 
     public void gc() {
-        if (actionsCount > THRESHOLD) {
+        if (actionsCount > Networks.getConfigManager().getRecordGCThreshold()) {
             actions.clear();
         }
     }
@@ -40,7 +38,7 @@ public class ItemFlowRecord {
         lastChangeTime = System.currentTimeMillis();
         actionsCount++;
 
-        ItemStack key = StackUtils.getAsQuantity(before, 1);
+        ItemStack key = StackUtils.asKey(before);
         List<TransportAction> list = actions.computeIfAbsent(key, k -> new ArrayList<>());
 
         TransportAction action = new TransportAction(accessor, change, System.currentTimeMillis());

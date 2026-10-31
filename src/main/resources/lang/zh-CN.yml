@@ -287,6 +287,12 @@ messages:
         - "<click_info>Shift+右键点击: <passive>设置合成机的名字"
         - "<click_info>手持物品Shift+右键点击: <passive>设置存储在此管理器中显示的图标"
     viewer:
+      current-sort-mode: "&7当前排序: "
+      sort_modes:
+        insertion_order: "按记录顺序"
+        name: "按物品名称"
+        increase_amount: "按增加数量 (增加在前)"
+        decrease_amount: "按减少数量 (减少在前)"
       location: "&7%s:%s:%s"
       when: "&7时间: %s"
       change: "%s"
@@ -1486,6 +1492,10 @@ icons:
     name: "&7返回"
     lore:
       - "&7点击返回主界面"
+  item-flow-viewer-sort:
+    name: "<click_info>更改排序方式"
+    lore:
+      - "<click_info>点击切换排序方式"
   unknown-item:
     name: "&7未知物品"
     lore:

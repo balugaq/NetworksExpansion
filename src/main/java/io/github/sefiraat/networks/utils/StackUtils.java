@@ -53,7 +53,7 @@ import java.util.Optional;
 @NullMarked
 public class StackUtils {
     private static final boolean FORCE_CHECK_LORE = Networks.getConfigManager().isForceCheckLore();
-    private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMCVersion();
+    private static final MinecraftVersion MC_VERSION = Networks.getInstance().getMinecraftVersion();
     public static final boolean IS_1_20_5 = MC_VERSION.isAtLeast(MinecraftVersion.V1_20_5);
     public static final boolean IS_1_21 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21);
     public static final boolean IS_1_21_3 = MC_VERSION.isAtLeast(MinecraftVersion.V1_21_3);
@@ -80,6 +80,15 @@ public class StackUtils {
 
         ItemStack clone = itemStack.clone();
         clone.setAmount(amount);
+        return clone;
+    }
+
+    public static ItemStack asKey(@Nullable ItemStack itemStack) {
+        if (itemStack == null) return ItemStackUtil.AIR;
+        if (itemStack.getAmount() == 1) return itemStack;
+
+        ItemStack clone = itemStack.clone();
+        clone.setAmount(1);
         return clone;
     }
 
@@ -183,9 +192,9 @@ public class StackUtils {
         // Use DataComponent API
         if (IS_1_21_4) {
             return itemsMatchModern(ItemStackUtil.asCraftItemStack(cache.getItemStack()), ItemStackUtil.asCraftItemStack(itemStack), matchOption);
+        } else {
+            return legacyItemsMatch(cache, itemStack, matchOption);
         }
-
-        return legacyItemsMatch(cache, itemStack, matchOption);
     }
 
     private static boolean legacyItemsMatch(ItemStackCache cache, ItemStack itemStack, MatchOption matchOption) {

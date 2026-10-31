@@ -7,6 +7,7 @@ import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.utils.Theme;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import io.github.thebusybiscuit.slimefun4.utils.compatibility.VersionedEnchantment;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -130,6 +131,8 @@ public class Icon {
 
     public static final ItemStack ITEM_FLOW_VIEWER_FORCE_CLEAN =
         Lang.getIcon("item-flow-viewer-force-clean", Material.YELLOW_STAINED_GLASS_PANE);
+    public static final ItemStack ITEM_FLOW_VIEWER_SORT =
+        Lang.getIcon("item-flow-viewer-sort", Material.BLUE_STAINED_GLASS_PANE);
 
     public static final ItemStack JEG_BUTTON = Lang.getIcon("jeg-button", Material.KNOWLEDGE_BOOK);
 
@@ -286,7 +289,7 @@ public class Icon {
     private static ItemStack glint(@NotNull ItemStack icon) {
         ItemStack glinted = icon.clone();
         glinted.editMeta(meta -> {
-            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.addEnchant(VersionedEnchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         });
         return glinted;

@@ -14,7 +14,7 @@ public class NetworksVersionedEnchantment {
     public static final @NotNull Enchantment LUCK_OF_THE_SEA;
 
     static {
-        MinecraftVersion version = Networks.getInstance().getMCVersion();
+        MinecraftVersion version = Networks.getInstance().getMinecraftVersion();
         GLOW = version.isAtLeast(MinecraftVersion.V1_20_5) ? Enchantment.POWER : getKey("ARROW_DAMAGE");
         LUCK_OF_THE_SEA = version.isAtLeast(MinecraftVersion.V1_20_5) ? Enchantment.LUCK_OF_THE_SEA : getKey("LUCK");
     }

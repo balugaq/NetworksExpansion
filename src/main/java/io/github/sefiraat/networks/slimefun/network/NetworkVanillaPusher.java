@@ -116,7 +116,7 @@ public class NetworkVanillaPusher extends NetworkDirectional implements SoftCell
             return;
         }
 
-        if (Networks.getInstance().getMCVersion().isAtLeast(MinecraftVersion.V1_21)) {
+        if (Networks.getInstance().getMinecraftVersion().isAtLeast(MinecraftVersion.V1_21)) {
             if (blockState instanceof CrafterInventory) {
                 sendFeedback(block.getLocation(), FeedbackType.NOT_ALLOWED_BLOCK);
                 return;

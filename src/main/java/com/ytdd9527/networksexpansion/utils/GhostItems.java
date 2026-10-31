@@ -1,5 +1,6 @@
 package com.ytdd9527.networksexpansion.utils;
 
+import com.balugaq.netex.utils.VersionUtil;
 import com.google.common.collect.MapMaker;
 import io.github.sefiraat.networks.Networks;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
@@ -79,7 +80,7 @@ public final class GhostItems implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onClick(@NotNull InventoryClickEvent event) {
-        ChestMenu menu = menuOf(event.getView().getTopInventory());
+        ChestMenu menu = menuOf(VersionUtil.getTopInventory(event));
         if (menu == null) {
             cleanLooseGhost(event);
             return;
@@ -99,7 +100,7 @@ public final class GhostItems implements Listener {
             event.setCancelled(true);
             return;
         }
-        if (event.getRawSlot() >= event.getView().getTopInventory().getSize()) {
+        if (event.getRawSlot() >= VersionUtil.getTopInventory(event).getSize()) {
             cleanLooseGhost(event);
         }
     }
@@ -111,7 +112,7 @@ public final class GhostItems implements Listener {
             event.getView().setCursor(null);
             return;
         }
-        ChestMenu menu = menuOf(event.getView().getTopInventory());
+        ChestMenu menu = menuOf(VersionUtil.getTopInventory(event));
         if (menu == null) {
             return;
         }
@@ -125,7 +126,7 @@ public final class GhostItems implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCreative(@NotNull InventoryCreativeEvent event) {
-        ChestMenu menu = menuOf(event.getView().getTopInventory());
+        ChestMenu menu = menuOf(VersionUtil.getTopInventory(event));
         if (slotIsGhost(menu, event.getRawSlot())) {
             event.setCancelled(true);
         }

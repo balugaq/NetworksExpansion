@@ -202,7 +202,7 @@ public class NetworkRoot extends NetworkNode {
     private final EnumMap<NodeType, NodeIndex> indexes = new EnumMap<>(NodeType.class);
 
     public static class NodeIndex {
-        private final Set<Location> locations = new HashSet<>();
+        private final Set<Location> locations = ConcurrentHashMap.newKeySet();
         private @Nullable Set<BlockMenu> blockMenus = null;
 
         public void addLocation(Location location) {
@@ -1471,12 +1471,14 @@ public class NetworkRoot extends NetworkNode {
 
                         final int preserveAmount = infinity ? fetched.getAmount() - 1 : fetched.getAmount();
 
-                        if (request.getAmount() <= preserveAmount) {
+                        int delta = request.getAmount();
+                        if (delta <= preserveAmount) {
                             // Netex - Reduce start
                             uncontrolAccessOutput(accessor);
                             // Netex - Reduce end
-                            stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
-                            fetched.setAmount(fetched.getAmount() - request.getAmount());
+                            stackToReturn.setAmount(stackToReturn.getAmount() + delta);
+                            request.receiveAmount(delta);
+                            fetched.setAmount(fetched.getAmount() - delta);
                             // Netex - Record start
                             tryRecord(accessor, request);
                             // Netex - Record end
@@ -1571,12 +1573,14 @@ public class NetworkRoot extends NetworkNode {
 
                 final int preserveAmount = infinity ? fetched.getAmount() - 1 : fetched.getAmount();
 
-                if (request.getAmount() <= preserveAmount) {
+                int delta = request.getAmount();
+                if (delta <= preserveAmount) {
                     // Netex - Reduce start
                     uncontrolAccessOutput(accessor);
                     // Netex - Reduce end
-                    stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
-                    fetched.setAmount(fetched.getAmount() - request.getAmount());
+                    stackToReturn.setAmount(stackToReturn.getAmount() + delta);
+                    request.receiveAmount(delta);
+                    fetched.setAmount(fetched.getAmount() - delta);
                     // Netex - Record start
                     tryRecord(accessor, request);
                     // Netex - Record end
@@ -1653,13 +1657,15 @@ public class NetworkRoot extends NetworkNode {
                         stackToReturn.setAmount(0);
                     }
 
-                    if (request.getAmount() <= itemStack.getAmount()) {
+                    int delta = request.getAmount();
+                    if (delta <= itemStack.getAmount()) {
                         // Netex - Reduce start
                         uncontrolAccessOutput(accessor);
                         // Netex - Reduce end
                         // We can't take more than this stack. Level to request amount, remove items and then return
-                        stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
-                        itemStack.setAmount(itemStack.getAmount() - request.getAmount());
+                        stackToReturn.setAmount(stackToReturn.getAmount() + delta);
+                        request.receiveAmount(delta);
+                        itemStack.setAmount(itemStack.getAmount() - delta);
                         // Netex - Record start
                         tryRecord(accessor, request);
                         // Netex - Record end
@@ -1690,12 +1696,14 @@ public class NetworkRoot extends NetworkNode {
                         stackToReturn.setAmount(0);
                     }
 
-                    if (request.getAmount() <= itemStack.getAmount()) {
+                    int delta = request.getAmount();
+                    if (delta <= itemStack.getAmount()) {
                         // Netex - Reduce start
                         uncontrolAccessOutput(accessor);
                         // Netex - Reduce end
-                        stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
-                        itemStack.setAmount(itemStack.getAmount() - request.getAmount());
+                        stackToReturn.setAmount(stackToReturn.getAmount() + delta);
+                        request.receiveAmount(delta);
+                        itemStack.setAmount(itemStack.getAmount() - delta);
                         // Netex - Record start
                         tryRecord(accessor, request);
                         // Netex - Record end
@@ -1724,12 +1732,14 @@ public class NetworkRoot extends NetworkNode {
                         stackToReturn.setAmount(0);
                     }
 
-                    if (request.getAmount() <= itemStack.getAmount()) {
+                    int delta = request.getAmount();
+                    if (delta <= itemStack.getAmount()) {
                         // Netex - Reduce start
                         uncontrolAccessOutput(accessor);
                         // Netex - Reduce end
-                        stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
-                        itemStack.setAmount(itemStack.getAmount() - request.getAmount());
+                        stackToReturn.setAmount(stackToReturn.getAmount() + delta);
+                        request.receiveAmount(delta);
+                        itemStack.setAmount(itemStack.getAmount() - delta);
                         // Netex - Record start
                         tryRecord(accessor, request);
                         // Netex - Record end
@@ -1761,13 +1771,15 @@ public class NetworkRoot extends NetworkNode {
                     stackToReturn.setAmount(0);
                 }
 
-                if (request.getAmount() <= itemStack.getAmount()) {
+                int delta = request.getAmount();
+                if (delta <= itemStack.getAmount()) {
                     // Netex - Reduce start
                     uncontrolAccessOutput(accessor);
                     // Netex - Reduce end
                     // We can't take more than this stack. Level to request amount, remove items and then return
-                    stackToReturn.setAmount(stackToReturn.getAmount() + request.getAmount());
-                    itemStack.setAmount(itemStack.getAmount() - request.getAmount());
+                    stackToReturn.setAmount(stackToReturn.getAmount() + delta);
+                    request.receiveAmount(delta);
+                    itemStack.setAmount(itemStack.getAmount() - delta);
                     // Netex - Record start
                     tryRecord(accessor, request);
                     // Netex - Record end
@@ -1874,12 +1886,14 @@ public class NetworkRoot extends NetworkNode {
                             }
 
                             final int preserveAmount = infinity ? fetched.getAmount() - 1 : fetched.getAmount();
-                            if (request.getAmount() <= preserveAmount) {
+                            int delta = request.getAmount();
+                            if (delta <= preserveAmount) {
                                 // Netex - Reduce start
                                 uncontrolAccessOutput(accessor);
                                 // Netex - Reduce end
-                                take.collected.setAmount(take.collected.getAmount() + request.getAmount());
-                                fetched.setAmount(fetched.getAmount() - request.getAmount());
+                                take.collected.setAmount(take.collected.getAmount() + delta);
+                                request.receiveAmount(delta);
+                                fetched.setAmount(fetched.getAmount() - delta);
                                 // Netex - Record start
                                 tryRecord(accessor, request);
                                 // Netex - Record end
@@ -1986,12 +2000,14 @@ public class NetworkRoot extends NetworkNode {
                     }
 
                     final int preserveAmount = infinity ? fetched.getAmount() - 1 : fetched.getAmount();
-                    if (request.getAmount() <= preserveAmount) {
+                    int delta = request.getAmount();
+                    if (delta <= preserveAmount) {
                         // Netex - Reduce start
                         uncontrolAccessOutput(accessor);
                         // Netex - Reduce end
-                        take.collected.setAmount(take.collected.getAmount() + request.getAmount());
-                        fetched.setAmount(fetched.getAmount() - request.getAmount());
+                        take.collected.setAmount(take.collected.getAmount() + delta);
+                        request.receiveAmount(delta);
+                        fetched.setAmount(fetched.getAmount() - delta);
                         // Netex - Record start
                         tryRecord(accessor, request);
                         // Netex - Record end
@@ -2088,13 +2104,15 @@ public class NetworkRoot extends NetworkNode {
                             take.collected.setAmount(0);
                         }
 
-                        if (take.request.getAmount() <= itemStack.getAmount()) {
+                        int delta = take.request.getAmount();
+                        if (delta <= itemStack.getAmount()) {
                             // Netex - Reduce start
                             uncontrolAccessOutput(accessor);
                             // Netex - Reduce end
                             // We can't take more than this stack. Level to request amount, remove items and then return
-                            take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
-                            itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                            take.collected.setAmount(take.collected.getAmount() + delta);
+                            take.request.receiveAmount(delta);
+                            itemStack.setAmount(itemStack.getAmount() - delta);
                             // Netex - Record start
                             tryRecord(accessor, take.request);
                             // Netex - Record end
@@ -2132,12 +2150,14 @@ public class NetworkRoot extends NetworkNode {
                             take.collected.setAmount(0);
                         }
 
-                        if (take.request.getAmount() <= itemStack.getAmount()) {
+                        int delta = take.request.getAmount();
+                        if (delta <= itemStack.getAmount()) {
                             // Netex - Reduce start
                             uncontrolAccessOutput(accessor);
                             // Netex - Reduce end
-                            take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
-                            itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                            take.collected.setAmount(take.collected.getAmount() + delta);
+                            take.request.receiveAmount(delta);
+                            itemStack.setAmount(itemStack.getAmount() - delta);
                             // Netex - Record start
                             tryRecord(accessor, take.request);
                             // Netex - Record end
@@ -2173,12 +2193,14 @@ public class NetworkRoot extends NetworkNode {
                             take.collected.setAmount(0);
                         }
 
-                        if (take.request.getAmount() <= itemStack.getAmount()) {
+                        int delta = take.request.getAmount();
+                        if (delta <= itemStack.getAmount()) {
                             // Netex - Reduce start
                             uncontrolAccessOutput(accessor);
                             // Netex - Reduce end
-                            take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
-                            itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                            take.collected.setAmount(take.collected.getAmount() + delta);
+                            take.request.receiveAmount(delta);
+                            itemStack.setAmount(itemStack.getAmount() - delta);
                             // Netex - Record start
                             tryRecord(accessor, take.request);
                             // Netex - Record end
@@ -2218,13 +2240,15 @@ public class NetworkRoot extends NetworkNode {
                         take.collected.setAmount(0);
                     }
 
-                    if (take.request.getAmount() <= itemStack.getAmount()) {
+                    int delta = take.request.getAmount();
+                    if (delta <= itemStack.getAmount()) {
                         // Netex - Reduce start
                         uncontrolAccessOutput(accessor);
                         // Netex - Reduce end
                         // We can't take more than this stack. Level to request amount, remove items and then return
-                        take.collected.setAmount(take.collected.getAmount() + take.request.getAmount());
-                        itemStack.setAmount(itemStack.getAmount() - take.request.getAmount());
+                        take.collected.setAmount(take.collected.getAmount() + delta);
+                        take.request.receiveAmount(delta);
+                        itemStack.setAmount(itemStack.getAmount() - delta);
                         // Netex - Record start
                         tryRecord(accessor, take.request);
                         // Netex - Record end
