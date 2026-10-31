@@ -130,6 +130,8 @@ public class Icon {
 
     public static final ItemStack ITEM_FLOW_VIEWER_FORCE_CLEAN =
         Lang.getIcon("item-flow-viewer-force-clean", Material.YELLOW_STAINED_GLASS_PANE);
+    public static final ItemStack ITEM_FLOW_VIEWER_SORT =
+        Lang.getIcon("item-flow-viewer-sort", Material.BLUE_STAINED_GLASS_PANE);
 
     public static final ItemStack JEG_BUTTON = Lang.getIcon("jeg-button", Material.KNOWLEDGE_BOOK);
 

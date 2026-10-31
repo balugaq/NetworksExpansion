@@ -399,7 +399,7 @@ public class Networks extends JavaPlugin implements SlimefunAddon {
         libraryManager.loadLibrary(nlp);
     }
 
-    public MinecraftVersion getMCVersion() {
+    public MinecraftVersion getMinecraftVersion() {
         return minecraftVersion;
     }
 
