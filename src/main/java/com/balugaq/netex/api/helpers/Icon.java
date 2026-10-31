@@ -7,6 +7,7 @@ import com.ytdd9527.networksexpansion.utils.itemstacks.ItemStackUtil;
 import io.github.sefiraat.networks.utils.Theme;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import io.github.thebusybiscuit.slimefun4.utils.compatibility.VersionedEnchantment;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -288,7 +289,7 @@ public class Icon {
     private static ItemStack glint(@NotNull ItemStack icon) {
         ItemStack glinted = icon.clone();
         glinted.editMeta(meta -> {
-            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.addEnchant(VersionedEnchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         });
         return glinted;
