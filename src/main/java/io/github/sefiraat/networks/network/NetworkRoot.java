@@ -202,7 +202,7 @@ public class NetworkRoot extends NetworkNode {
     private final EnumMap<NodeType, NodeIndex> indexes = new EnumMap<>(NodeType.class);
 
     public static class NodeIndex {
-        private final Set<Location> locations = new HashSet<>();
+        private final Set<Location> locations = ConcurrentHashMap.newKeySet();
         private @Nullable Set<BlockMenu> blockMenus = null;
 
         public void addLocation(Location location) {
